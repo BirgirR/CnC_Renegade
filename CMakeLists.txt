@@ -419,7 +419,11 @@ renegade_library(scontrol SOURCES SCONTROL_SOURCES
 add_library(bandtest STATIC ${BANDTEST_SOURCES})
 target_compile_definitions(bandtest PUBLIC BANDTEST_STATIC)
 target_compile_definitions(bandtest PRIVATE WIN32_LEAN_AND_MEAN)
-target_link_libraries(bandtest PRIVATE renegade_common wsock32 winmm)
+# ws2_32 alongside wsock32: Open_Raw_Sockets calls WSASocket, which is Winsock 2
+# and so lives in ws2_32 rather than the Winsock 1.1 wsock32. Release happens to
+# link without it because /OPT:REF discards the unreferenced function before the
+# linker needs the symbol; Debug keeps it and fails on __imp__WSASocketA@24.
+target_link_libraries(bandtest PRIVATE renegade_common wsock32 ws2_32 winmm)
 target_include_directories(bandtest PUBLIC "${CODE}/BandTest")
 set_target_properties(bandtest PROPERTIES FOLDER "Engine")
 

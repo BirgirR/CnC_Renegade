@@ -289,7 +289,11 @@ bool BitChannelClass::Load_W3D(ChunkLoadClass & cload)
 	uint32 numbytes = (numbits + 7) / 8;
 	uint32 bytesleft = numbytes - 1;
 
-	assert((sizeof(W3dBitChannelStruct) + bytesleft) == (unsigned)chunk_size);
+	//	chunk_size was never declared here, so this only ever compiled with
+	//	NDEBUG set and Debug builds failed outright. The value it wanted is the
+	//	length of the chunk being read: the struct carries the nine header bytes
+	//	plus the first byte of data, and bytesleft is the rest.
+	assert((sizeof(W3dBitChannelStruct) + bytesleft) == cload.Cur_Chunk_Length());
 
 	Bits = new uint8[numbytes];
 	assert(Bits);
@@ -766,7 +770,8 @@ bool TimeCodedBitChannelClass::Load_W3D(ChunkLoadClass & cload)
 
 	uint32 bytesleft = (NumTimeCodes - 1) * sizeof(uint32);
 
-	assert((sizeof(W3dTimeCodedBitChannelStruct) + bytesleft) == (unsigned)chunk_size);
+	//	Same undeclared chunk_size as in BitChannelClass::Load_W3D above.
+	assert((sizeof(W3dTimeCodedBitChannelStruct) + bytesleft) == cload.Cur_Chunk_Length());
 
 	Bits = new uint32[NumTimeCodes];
 	assert(Bits);
