@@ -1,5 +1,8 @@
 # Command & Conquer Renegade
 
+[![build](https://github.com/BirgirR/CnC_Renegade/actions/workflows/build.yml/badge.svg)](https://github.com/BirgirR/CnC_Renegade/actions/workflows/build.yml)
+[![license: GPL-3.0 with additional terms](https://img.shields.io/badge/license-GPL--3.0%20with%20additional%20terms-blue)](LICENSE.md)
+
 This is a fork of the [Command & Conquer Renegade source release](https://github.com/electronicarts/CnC_Renegade)
 published by Electronic Arts. The upstream tree targets Visual C++ 6.0 and a set
 of proprietary SDKs that were never distributed with it, so it does not build as

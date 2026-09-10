@@ -1,0 +1,37 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows / x86 / Release
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Nothing to install. The whole point of the stubs under Code/Stubs is
+      # that the tree builds against Visual Studio and the Windows SDK alone,
+      # both of which the runner image already carries.
+      #
+      # -A Win32 is not a preference: 35 files contain x86 inline assembly and
+      # the build refuses to configure for 64-bit pointers.
+      - name: Configure
+        run: cmake -B build -A Win32 .
+
+      # commando and the mission scripts are EXCLUDE_FROM_ALL, so a bare build
+      # would compile the engine libraries and stop short of the game itself.
+      #
+      # Release only. The Debug configuration is the one the README documents as
+      # intermittently failing to link, because Windows Defender false-positives
+      # the executable -- and Defender is running on these runners too. A badge
+      # that goes red at random says nothing useful.
+      - name: Build
+        run: cmake --build build --config Release --target commando renegade_scripts wwtest
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
