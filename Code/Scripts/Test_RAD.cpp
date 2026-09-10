@@ -1329,7 +1329,6 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Movement(Vector3(-79.172f,-72.536f,6.0f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
 					Commands->Enable_Enemy_Seen (obj, true);
-					can_damage = true;
 					break;
 				}
 			case (2): // Second falling Nod guy moves into position.
@@ -1339,7 +1338,6 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Movement(Vector3(-97.415f,-68.822f,3.944f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
 					Commands->Enable_Enemy_Seen (obj, true);
-					can_damage = true;
 					break;
 				}
 			case (3): // Nod Rocket Soldier shoots APC.
@@ -1348,7 +1346,6 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Basic(this, MX0_A02_PRIORITY_FORCED_ACTION, MX0_A02_ACTION_NOD_MOVETO_APC);
 					params.Set_Movement(Vector3(-79.172f,-72.536f,6.0f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
-					can_damage = true;
 					break;
 				}
 			case (4): // Nod soldiers that get dropped from the helicopter 01.
@@ -1755,6 +1752,21 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 						{
 							Commands->Send_Custom_Event (obj, controller, MX0_A02_CUSTOM_TYPE_APC_BLOWITUP, MX0_A02_CUSTOM_PARAM_DEFAULT, 1.0f);
 						}
+
+						/*
+						**	He can be shot from here on. Until this point he must
+						**	survive: the APC is destroyed by the custom just sent
+						**	to the controller, and the helicopter drop follows
+						**	from that, so killing him earlier stops the scene --
+						**	the APC lives and the Nod troops never arrive.
+						**
+						**	Sending it is the commitment, not the rocket. The
+						**	event carries a delay, which queues it on the
+						**	controller rather than on him, so the APC still blows
+						**	up if he dies in the moment between.
+						*/
+						can_damage = true;
+
 						ActionParamsStruct params;
 						params.Set_Basic(this, MX0_A02_PRIORITY_FORCED_ACTION, MX0_A02_ACTION_NOD_SHOOT_APC);
 						params.Set_Attack(apc, 300.0f, 0.0f, true);
