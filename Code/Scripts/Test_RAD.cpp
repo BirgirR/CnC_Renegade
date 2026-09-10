@@ -1329,6 +1329,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Movement(Vector3(-79.172f,-72.536f,6.0f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
 					Commands->Enable_Enemy_Seen (obj, true);
+					can_damage = true;
 					break;
 				}
 			case (2): // Second falling Nod guy moves into position.
@@ -1338,6 +1339,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Movement(Vector3(-97.415f,-68.822f,3.944f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
 					Commands->Enable_Enemy_Seen (obj, true);
+					can_damage = true;
 					break;
 				}
 			case (3): // Nod Rocket Soldier shoots APC.
@@ -1346,6 +1348,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					params.Set_Basic(this, MX0_A02_PRIORITY_FORCED_ACTION, MX0_A02_ACTION_NOD_MOVETO_APC);
 					params.Set_Movement(Vector3(-79.172f,-72.536f,6.0f), RUN, 0.5f, false);
 					Commands->Action_Goto (obj, params);
+					can_damage = true;
 					break;
 				}
 			case (4): // Nod soldiers that get dropped from the helicopter 01.
