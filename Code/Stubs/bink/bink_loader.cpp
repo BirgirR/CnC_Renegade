@@ -23,6 +23,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 //-----------------------------------------------------------------------------
 //	The imported surface
@@ -57,6 +59,26 @@ static void *Real_Open_Wave_Out     = NULL;
 //-----------------------------------------------------------------------------
 
 /*
+**	This module stands in for a third-party library and links nothing from the
+**	engine, so it cannot use WWDEBUG_SAY. Whether the movies played is otherwise
+**	invisible -- a missing DLL looks exactly like a movie that already finished --
+**	so the binding decision is recorded here, next to WWAudio's _audio.txt.
+*/
+static void Bink_Log(const char *fmt, ...)
+{
+	FILE *f = fopen("_bink.txt", "at");
+	if (f == NULL) return;
+
+	va_list args;
+	va_start(args, fmt);
+	vfprintf(f, fmt, args);
+	va_end(args);
+
+	fputc('\n', f);
+	fclose(f);
+}
+
+/*
 **	Resolve everything once. Returns false if the DLL is absent or does not
 **	export the full set, in which case every entry point below falls back.
 **
@@ -75,6 +97,8 @@ static bool Load_Bink(void)
 	// beside renegade.exe wins.
 	BinkDll = ::LoadLibraryA("binkw32.dll");
 	if (BinkDll == NULL) {
+		Bink_Log("binkw32.dll not found (error %lu); movies will be skipped.",
+					::GetLastError());
 		return false;
 	}
 
@@ -92,11 +116,14 @@ static bool Load_Bink(void)
 	if (Real_Open == NULL || Real_Close == NULL || Real_Wait == NULL ||
 		 Real_Do_Frame == NULL || Real_Next_Frame == NULL || Real_Copy_To_Buffer == NULL) {
 
+		Bink_Log("binkw32.dll loaded but is missing entry points; movies will be skipped.");
 		::FreeLibrary(BinkDll);
 		BinkDll = NULL;
 		return false;
 	}
 
+	Bink_Log("binkw32.dll bound: video ok, sound system %s.",
+				(Real_Set_Sound != NULL) ? "available" : "unavailable");
 	return true;
 }
 
@@ -109,7 +136,15 @@ HBINK __stdcall BinkOpen(const char *name, U32 flags)
 	if (!Load_Bink()) {
 		return 0;
 	}
-	return Real_Open(name, flags);
+
+	HBINK bnk = Real_Open(name, flags);
+	if (bnk == 0) {
+		Bink_Log("BinkOpen failed: %s", (name != NULL) ? name : "(null)");
+	} else {
+		Bink_Log("playing %s: %ux%u, %u frames, %u/%u fps", (name != NULL) ? name : "(null)",
+					bnk->Width, bnk->Height, bnk->Frames, bnk->FrameRate, bnk->FrameRateDiv);
+	}
+	return bnk;
 }
 
 void __stdcall BinkClose(HBINK bnk)

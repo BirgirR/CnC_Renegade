@@ -26,8 +26,20 @@ typedef signed int     S32;
 typedef void          *BINKPTR;
 #endif
 
-// Surface / copy flags. Only these two are referenced (BINKMovie.cpp:289).
-#define BINKSURFACE565      3
+/*
+**	Surface / copy flags. Only these two are referenced (BINKMovie.cpp:289).
+**
+**	BINKSURFACE565 is 10, not 3. This was measured, not assumed: filling a
+**	buffer with a sentinel and asking binkw32.dll to copy one frame at each
+**	flag shows how wide a row it writes, and the widths land exactly on the
+**	SDK's table -- 1 and 2 write 3 bytes per pixel (24, 24R), 3 and 4 write 4
+**	(32, 32R), and 7 through 12 write 2 (4444, 5551, 555, 565, 655, 664).
+**
+**	The earlier value of 3 asked for BINKSURFACE32, so Bink wrote 32-bit BGRA
+**	into a buffer BINKMovie then uploaded to an R5G6B5 texture. The movie played
+**	but every frame was mangled.
+*/
+#define BINKSURFACE565      10
 #define BINKCOPYNOSCALING   0x80000000
 
 /*
