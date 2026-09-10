@@ -138,13 +138,15 @@ endif()
 # -----------------------------------------------------------------------------
 # Bink Video
 #
-# Proprietary and undistributed, like Miles. Only Code/BinkMovie needs it, and
-# only for eight entry points. The stub makes BinkOpen fail, which the movie
-# player already handles as "movie finished", so intros are skipped rather than
-# hung. See Code/Bink/include/Bink.h.
+# Proprietary and undistributed, like Miles, and only Code/BinkMovie needs it --
+# for eight entry points. Nothing is linked at build time: bink_loader.cpp binds
+# them to binkw32.dll at runtime, which the retail game ships beside its
+# executable, so owners of Renegade already have a licensed decoder. Without the
+# DLL, BinkOpen fails and the movie player treats every movie as finished, so
+# intros are skipped rather than hung. See Code/Stubs/bink/include/Bink.h.
 # -----------------------------------------------------------------------------
 
-add_library(bink STATIC "${STUBS}/bink/bink_stub.cpp")
+add_library(bink STATIC "${STUBS}/bink/bink_loader.cpp")
 target_include_directories(bink PUBLIC "${STUBS}/bink/include")
 set_target_properties(bink PROPERTIES FOLDER "ThirdParty")
 
@@ -562,10 +564,12 @@ message(STATUS "")
 message(STATUS "Renegade configured:")
 message(STATUS "  architecture     x86 (32-bit)")
 message(STATUS "  graphics         Direct3D 9 (Windows SDK headers, no DirectX SDK)")
-if(RENEGADE_MILES_STUB)
-    message(STATUS "  Miles            stub (no audio)")
+if(NOT RENEGADE_MILES_STUB)
+    message(STATUS "  audio            real Miles SDK")
+elseif(RENEGADE_XAUDIO2_AUDIO)
+    message(STATUS "  audio            XAudio2 (effects; music not yet streamed)")
 else()
-    message(STATUS "  Miles            real SDK")
+    message(STATUS "  audio            silent stub")
 endif()
 list(LENGTH RENEGADE_UNPORTED_SOURCES unported_total)
 if(RENEGADE_EXCLUDE_UNPORTED)

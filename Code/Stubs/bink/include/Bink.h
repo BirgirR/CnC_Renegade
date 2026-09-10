@@ -1,16 +1,15 @@
 /*
-**	Stub replacement for the RAD Bink Video SDK header (Bink.h).
+**	Declarations for the RAD Bink Video entry points Code/BinkMovie needs.
 **
-**	Bink is proprietary and is not distributed with the Renegade source release.
-**	Only Code/BinkMovie needs it, and only for the eight entry points declared
-**	below, so this header plus bink_stub.cpp lets that library build and link.
+**	Bink is proprietary and is not distributed with the Renegade source release,
+**	so this replaces the SDK's Bink.h. It declares only the eight functions
+**	BINKMovie.cpp calls and the part of the BINK structure it reads.
 **
-**	The stub deliberately makes BinkOpen() fail. BINKMovieClass already treats a
-**	null handle as "movie finished" (BINKMovie.cpp:355 -- `if (!Bink) return
-**	true;`) and its constructor returns early on NULL, so every movie is skipped
-**	cleanly instead of hanging the front end. Nothing else has to pretend.
-**
-**	Replace with the real SDK, or reimplement over FFmpeg, for actual playback.
+**	bink_loader.cpp binds these to binkw32.dll at runtime when the DLL is
+**	present -- it ships with the retail game, so anyone who owns Renegade
+**	already has it -- and makes BinkOpen fail cleanly when it is not. Nothing
+**	here is needed to build: the tree still compiles against the Windows SDK
+**	alone, and no part of Bink is redistributed.
 */
 
 #ifndef BINK_H
@@ -31,16 +30,34 @@ typedef void          *BINKPTR;
 #define BINKSURFACE565      3
 #define BINKCOPYNOSCALING   0x80000000
 
-// Only the fields the player actually reads are modelled. The real BINK struct
-// is much larger; nothing here is ever dereferenced because BinkOpen returns
-// NULL, but the layout has to compile.
+/*
+**	The head of the real BINK structure.
+**
+**	These offsets are not guesswork and must not be edited casually. They were
+**	read out of binkw32.dll by opening Data/Movies/R_Intro.BIK and dumping the
+**	returned struct, then matching the values against the movie's own file
+**	header -- 800x600, 475 frames, 15/1 fps:
+**
+**	    0 Width 800    12 FrameNum 1        24 FrameRateDiv 1
+**	    4 Height 600   16 LastFrameNum -1   28 ReadError 0
+**	    8 Frames 475   20 FrameRate 15      40 Size 8428292
+**
+**	LastFrameNum at offset 16 is the trap: leave it out and FrameRate reads
+**	0xffffffff, which turns BINKMovie's ticks-per-frame into nonsense.
+**
+**	The real structure continues well past what is declared here. That is safe
+**	because we only ever read through a pointer the DLL returns -- nothing in
+**	this tree allocates a BINK -- but it does mean the fields below must stay in
+**	this order and nothing may be inserted among them.
+*/
 typedef struct BINK {
-   U32 Width;
-   U32 Height;
-   U32 Frames;
-   U32 FrameNum;
-   U32 FrameRate;
-   U32 FrameRateDiv;
+   U32 Width;           // 0
+   U32 Height;          // 4
+   U32 Frames;          // 8
+   U32 FrameNum;        // 12  frame about to be displayed, 1 based
+   U32 LastFrameNum;    // 16  last frame displayed
+   U32 FrameRate;       // 20  frame rate numerator
+   U32 FrameRateDiv;    // 24  frame rate divisor
 } BINK, *HBINK;
 
 HBINK __stdcall BinkOpen                (const char *name, U32 flags);

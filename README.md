@@ -103,8 +103,13 @@ implementation under `Code/Stubs/`:
   of **XAudio2** and X3DAudio, both part of the Windows SDK, with
   `XAudio2_9.dll` shipping in Windows itself. The engine drives it without
   knowing the difference. A silent stub is available as a fallback.
-- **Bink** — stubbed. `BinkOpen` fails, which the movie player already treats as
-  "movie finished", so intro videos are skipped rather than hanging.
+- **Bink** — bound to `binkw32.dll` at runtime, the way Direct3D 9 is. The retail
+  game ships that DLL beside its executable, so anyone who owns Renegade already
+  has a licensed decoder and the movies play as they originally did; nothing of
+  RAD’s is redistributed and nothing is needed to build. Copy `binkw32.dll` and
+  `Data/Movies/` from your install into `Run/` to get them. Without the DLL,
+  `BinkOpen` fails and the player treats every movie as finished, so intros are
+  skipped rather than hanging.
 - **GameSpy** — the services shut down in 2014. The used surface is four `qr_*`
   and five `gcd_*` calls, so it is stubbed; the cost is the server browser and
   CD-key validation, not the game.
