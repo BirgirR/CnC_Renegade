@@ -217,8 +217,16 @@ public:
 };
 
 #ifdef ENABLE_WWPROFILE
-#define	WWPROFILE( name )						WWProfileSampleClass _wwprofile( name, false )
-#define	WWROOTPROFILE( name )				WWProfileSampleClass _wwprofile( name, true )
+//
+//	The sample object is pure RAII -- its name is never referenced -- so it is
+//	given a per-line unique name. Nested WWPROFILE scopes in one function used
+//	to shadow each other, which buried ~70 real shadowing warnings in noise.
+//
+#define	WWPROFILE_JOIN2( a, b )				a##b
+#define	WWPROFILE_JOIN( a, b )				WWPROFILE_JOIN2( a, b )
+
+#define	WWPROFILE( name )						WWProfileSampleClass WWPROFILE_JOIN( _wwprofile, __LINE__ )( name, false )
+#define	WWROOTPROFILE( name )				WWProfileSampleClass WWPROFILE_JOIN( _wwprofile, __LINE__ )( name, true )
 #else
 #define	WWPROFILE( name )
 #define	WWROOTPROFILE( name )

@@ -178,6 +178,8 @@ class SoundSceneClass
 		//////////////////////////////////////////////////////////////////////
 		//	Collection methods
 		//////////////////////////////////////////////////////////////////////		
+	// Named at namespace scope by DEFINE_AUTO_POOL, so it must be public.
+	public:
 		class AudibleInfoClass : public MultiListObjectClass, public AutoPoolClass<AudibleInfoClass, 64>
 		{
 		public:
@@ -192,6 +194,7 @@ class SoundSceneClass
 			AudibleSoundClass *	sound_obj;
 			float						distance2;
 		};
+	protected:
 
 		typedef MultiListClass<AudibleInfoClass>	COLLECTED_SOUNDS;
 

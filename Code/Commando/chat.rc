@@ -8,7 +8,10 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "dialogresource.h"
-#include "afxres.h"
+// afxres.h ships with MFC, which is not required to build this tree and is
+// not installed by default. winres.h is the Windows SDK equivalent for
+// resource scripts; IDC_STATIC is the only symbol chat.rc takes from it.
+#include "winres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -2042,16 +2045,6 @@ BEGIN
                     SS_CENTERIMAGE
     RTEXT           "Static",IDC_CONTRAST_SETTING,224,174,24,11,
                     SS_CENTERIMAGE
-END
-
-IDD_CDVERIFY DIALOG DISCARDABLE  0, 0, 243, 74
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "IDS_MENU_TEXT750"
-FONT 8, "MS Sans Serif"
-BEGIN
-    DEFPUSHBUTTON   "IDS_MENU_TEXT751",IDOK,46,47,61,20
-    PUSHBUTTON      "IDS_MENU_TEXT072",IDCANCEL,135,47,61,20
-    LTEXT           "IDS_MENU_TEXT752",IDC_STATIC,9,3,226,35
 END
 
 IDD_EDIT_WHEELED_VEHICLE DIALOG DISCARDABLE  0, 0, 324, 199

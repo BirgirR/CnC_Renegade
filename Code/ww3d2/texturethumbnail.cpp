@@ -161,7 +161,7 @@ ThumbnailClass::ThumbnailClass(ThumbnailManagerClass* manager, const StringClass
 		unsigned src_bpp=0;
 		Get_WW3D_Format(src_format,src_bpp,targa);
 		if (src_format==WW3D_FORMAT_UNKNOWN) {
-			WWDEBUG_SAY(("Unknown texture format for %s\n",filename));
+			WWDEBUG_SAY(("Unknown texture format for %s\n",(const char *)filename));
 			return;
 		}
 
@@ -262,14 +262,14 @@ void ThumbnailManagerClass::Create_Thumbnails()
 	FileFactoryClass* old_file_factory=_TheFileFactory;
 	_TheFileFactory=&mix;
 	if (mix.Is_Valid()) {
-		DynamicVectorClass<StringClass> list;
-		list.Set_Growth_Step (1000);
-		mix.Build_Filename_List(list);
-		for (int i=0;i<list.Count();++i) {
-			int len=list[i].Get_Length();
-			if (!stricmp(&list[i][len-4],".tga") || !stricmp(&list[i][len-4],".dds")) {
-				if (!Peek_Thumbnail_Instance(list[i])) {
-					new ThumbnailClass(this,list[i]);
+		DynamicVectorClass<StringClass> list_inner;
+		list_inner.Set_Growth_Step (1000);
+		mix.Build_Filename_List(list_inner);
+		for (int i=0;i<list_inner.Count();++i) {
+			int len=list_inner[i].Get_Length();
+			if (!stricmp(&list_inner[i][len-4],".tga") || !stricmp(&list_inner[i][len-4],".dds")) {
+				if (!Peek_Thumbnail_Instance(list_inner[i])) {
+					new ThumbnailClass(this,list_inner[i]);
 				}
 			}
 		}

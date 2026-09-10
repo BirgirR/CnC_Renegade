@@ -852,7 +852,11 @@ const DefParameterClass &
 DefParameterClass::operator= (const DefParameterClass &src)
 {
 	m_Value = src.m_Value;
-	DefParameterClass::operator= (src);
+	// Was DefParameterClass::operator=(src) -- i.e. calling itself, an
+	// unconditional infinite recursion and a guaranteed stack overflow. Every
+	// sibling (StringParameterClass, EnumParameterClass, PhysDefParameterClass)
+	// chains to the base, which is plainly what was intended.
+	ParameterClass::operator= (src);
 	return *this;
 }
 

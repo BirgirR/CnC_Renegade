@@ -567,6 +567,11 @@ void DirectInput::ReadMouse( void )
 		} else {
 			int	index = 0;
 
+			//	DIMOFS_* are dinput.h's own FIELD_OFFSET() macros, so the
+			//	non-standard offsetof pattern is the SDK's, and a case label
+			//	cannot be spelled any other way.
+#pragma warning(push)
+#pragma warning(disable: 4644)
 			switch( input_buffer.dwOfs ) {
 
 				case	DIMOFS_Z:	index++;
@@ -589,6 +594,7 @@ void DirectInput::ReadMouse( void )
 							}
 							break;
 			}
+#pragma warning(pop)
 		}
 	}
 

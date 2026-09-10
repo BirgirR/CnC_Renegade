@@ -33,6 +33,7 @@
 *
 ******************************************************************************/
 
+#include <mbstring.h>	// _mbsinc, _mbslen, _mbsnccnt
 #include "IMEManager.h"
 #include "WWString.h"
 #include "WWDebug.h"
@@ -837,7 +838,7 @@ HKL IMEManager::InputLanguageChangeRequest(HKL hkl)
 		std::vector<HKL> layoutList(numLayouts);
 		layoutList.resize(numLayouts);
 
-		numLayouts = GetKeyboardLayoutList(numLayouts, layoutList.begin());
+		numLayouts = GetKeyboardLayoutList(numLayouts, layoutList.data());
 
 		// Find the position in the list of the layout which has been requested.
 		std::vector<HKL>::iterator iter = std::find(layoutList.begin(), layoutList.end(), hkl);
@@ -934,7 +935,7 @@ void IMEManager::InputLanguageChanged(HKL hkl)
 	#endif
 
 	WWDEBUG_SAY(("IMEManager: Language Changed - LangID = %04X, CodePage = %d, Description: '%S'\n",
-			mLangID, mCodePage, mIMEDescription));
+			mLangID, mCodePage, (const WCHAR *)mIMEDescription));
 
 	WWDEBUG_SAY(("IMEManager: Properties - %s%s%s%s%s\n",
 			mIMEProperties & IME_PROP_AT_CARET ? "At Caret" : "",

@@ -60,6 +60,7 @@
 #include "WebBrowser.h"
 #include "autostart.h"
 #include "gameinitmgr.h"
+#include "campaign.h"
 #include "servercontrol.h"
 #include "consolemode.h"
 #include "gamespyadmin.h"
@@ -83,6 +84,33 @@ void Stop_Main_Loop(int exitCode)
 void _Game_Main_Loop_Loop(void)
 {
 	WWPROFILE( "Main Loop" );
+
+	/*
+	**	TEMPORARY -- unattended repro of the single-player load path.
+	**
+	**	Set RENEGADE_AUTOSTART_CAMPAIGN to start the campaign without anyone
+	**	clicking through the menu. These are the same two calls the difficulty
+	**	menu makes (DifficultyMenuClass::On_Command, dialogtests.cpp), so the
+	**	path under test is the real one. The delay lets the menu finish coming
+	**	up first, exactly as a human would.
+	*/
+	{
+		static int	_autostart_frames = -1;
+
+		if (_autostart_frames == -1) {
+			_autostart_frames = (::getenv("RENEGADE_AUTOSTART_CAMPAIGN") != NULL) ? 120 : -2;
+		}
+
+		if (_autostart_frames > 0) {
+			_autostart_frames--;
+			if (_autostart_frames == 0) {
+				WWDEBUG_SAY(("RENEGADE_AUTOSTART_CAMPAIGN: starting campaign\n"));
+				GameInitMgrClass::Initialize_SP();
+				CampaignManager::Start_Campaign(0);
+				_autostart_frames = -2;
+			}
+		}
+	}
 
 	unsigned long time1 = TIMEGETTIME();
 

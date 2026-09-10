@@ -301,7 +301,11 @@ DECLARE_SCRIPT(M08_Havoc_DLS, "")
 	{
 		if(type == M08_RELOCATE)
 		{
-			Commands->Set_Position (obj, Commands->Get_Position(Commands->Find_Object(108819)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (108819, _obj_pos)) {
+					Commands->Set_Position (obj, _obj_pos);
+				}
+			}
 			
 			// Mission objective to destroy raveshaw
 			Commands->Send_Custom_Event(obj, Commands->Find_Object(100002), 805, 3, 2.0f);
@@ -606,7 +610,11 @@ DECLARE_SCRIPT(M08_Raveshaw, "")
 	{
 		if(type == M08_RELOCATE)
 		{
-			Commands->Set_Position (obj, Commands->Get_Position(Commands->Find_Object(108818)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (108818, _obj_pos)) {
+					Commands->Set_Position (obj, _obj_pos);
+				}
+			}
 			// Accomplish rescue the scientists mission
 			Commands->Send_Custom_Event(obj, Commands->Find_Object(100002), 803, 1, 1.0f);
 			// Relocate Havoc
@@ -3295,8 +3303,11 @@ DECLARE_SCRIPT(M08_Homepoint, "Homepoint_ID=0:int")
 	void Created (GameObject * obj)
 	{
 		int homepoint_id = Get_Int_Parameter("Homepoint_ID");
-		Vector3 homepoint_loc = Commands->Get_Position(Commands->Find_Object(homepoint_id));
-		Commands->Set_Innate_Soldier_Home_Location(obj, homepoint_loc, 4.0f);    	
+		Vector3 homepoint_loc;
+		bool homepoint_loc_found = Find_Object_Position (homepoint_id, homepoint_loc);
+		if (homepoint_loc_found) {
+			Commands->Set_Innate_Soldier_Home_Location(obj, homepoint_loc, 4.0f);
+		}
 	}
 };
 
@@ -4700,7 +4711,7 @@ DECLARE_SCRIPT(M08_Patrol_Inactive, "Waypath_ID=0:int, Waypath_Loc:Vector3, Cont
 
 			Commands->Set_Innate_Soldier_Home_Location(obj, waypath_loc, 4.0f);                                                                           
 
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 	
 			if(waypath_id == 0)
 			{
@@ -4708,15 +4719,15 @@ DECLARE_SCRIPT(M08_Patrol_Inactive, "Waypath_ID=0:int, Waypath_Loc:Vector3, Cont
 			}
 			else if(waypath_id == 1)
 			{
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, GO_STAR );
-				params.Set_Movement( STAR, RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, GO_STAR );
+				params_inner.Set_Movement( STAR, RUN, 1.5f );
+				Commands->Action_Goto( obj, params_inner );
 			}
 			else
 			{
-				params.Set_Basic( this, INNATE_PRIORITY_GUNSHOT_HEARD - 5, GO_WAYPATH );
-				params.Set_Movement( waypath_loc, RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				params_inner.Set_Basic( this, INNATE_PRIORITY_GUNSHOT_HEARD - 5, GO_WAYPATH );
+				params_inner.Set_Movement( waypath_loc, RUN, 1.5f );
+				Commands->Action_Goto( obj, params_inner );
 			}		
 		}
 		
@@ -4997,13 +5008,13 @@ DECLARE_SCRIPT(M08_Facility_Scientist_Inactive, "Point1_ID=0:int, Point2_ID=0:in
 			point2_id = Get_Int_Parameter("Point2_ID");
 			point3_id = Get_Int_Parameter("Point3_ID");
 			
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			
 			if(point1_id != 0)
 			{
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, GO_POINT1A );
-				params.Set_Movement( Commands->Find_Object(point1_id), RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, GO_POINT1A );
+				params_inner.Set_Movement( Commands->Find_Object(point1_id), RUN, 1.5f );
+				Commands->Action_Goto( obj, params_inner );
 			}
 			
 		}
@@ -5114,8 +5125,8 @@ DECLARE_SCRIPT(M08_Facility_Scientist_Inactive, "Point1_ID=0:int, Point2_ID=0:in
 
 	void Killed (GameObject * obj, GameObject * killer)
 	{
-		int controller_id = Get_Int_Parameter("Controller_ID");
-		Commands->Send_Custom_Event(obj, Commands->Find_Object(controller_id), M08_SCIENTIST_KILLED, 1, 0.0f);
+		int controller_id_inner = Get_Int_Parameter("Controller_ID");
+		Commands->Send_Custom_Event(obj, Commands->Find_Object(controller_id_inner), M08_SCIENTIST_KILLED, 1, 0.0f);
 	}
 
 };
@@ -5811,7 +5822,11 @@ DECLARE_SCRIPT(M08_Sakura, "")
 			
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 6, FLEE );
 			params.MovePathfind = false;
-			params.Set_Movement( Commands->Get_Position(Commands->Find_Object(110337)), RUN, 1.5f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (110337, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 1.5f );
+				}
+			}
 			Commands->Action_Goto( obj, params );
 		}
 		if((Commands->Get_Health(obj) < (.2 * Commands->Get_Max_Health(obj))))
@@ -6006,7 +6021,11 @@ DECLARE_SCRIPT (M08_Mobile_Vehicle, "CheckBlocked=1:int, Attack_Loc0=0:int, Atta
 
 		Commands->Debug_Message("Attack_Loc = %d /n", attack_loc[loc]);
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+			}
+		}
 		params.Set_Attack(enemy, 100.0f, 5.0f, true);
 		params.AttackCheckBlocked = blocked;
 		
@@ -6024,7 +6043,16 @@ DECLARE_SCRIPT (M08_Mobile_Vehicle, "CheckBlocked=1:int, Attack_Loc0=0:int, Atta
 			{
 				if(attack_loc[x] != NULL)
 				{				
-					float dist = Commands->Get_Distance(star_loc, Commands->Get_Position (Commands->Find_Object (attack_loc [x])));
+					Vector3 attack_pos;
+					if (!Find_Object_Position (attack_loc [x], attack_pos))
+					{
+						//	The id is set but the object is not in the level.
+						//	Skip it, rather than letting it win the "closest"
+						//	comparison below by measuring to the map origin.
+						continue;
+					}
+
+					float dist = Commands->Get_Distance (star_loc, attack_pos);
 					
 					if (dist < loc_dist)
 					{
@@ -6041,7 +6069,11 @@ DECLARE_SCRIPT (M08_Mobile_Vehicle, "CheckBlocked=1:int, Attack_Loc0=0:int, Atta
 			
 			ActionParamsStruct params;
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+				}
+			}
 			
 			Commands->Action_Attack(obj, params);
 			
@@ -6177,7 +6209,11 @@ DECLARE_SCRIPT(M08_Facility_Scientist, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:
 		if(action_id == GO_FIRST_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_FIRST_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc1_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc1_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_FIRST_LOC && reason == ACTION_COMPLETE_NORMAL)
@@ -6197,7 +6233,11 @@ DECLARE_SCRIPT(M08_Facility_Scientist, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:
 		if(action_id == GO_SECOND_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_SECOND_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc2_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc2_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_SECOND_LOC && reason == ACTION_COMPLETE_NORMAL)
@@ -6218,7 +6258,11 @@ DECLARE_SCRIPT(M08_Facility_Scientist, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:
 		if(action_id == GO_THIRD_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_THIRD_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc3_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc3_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_THIRD_LOC && reason == ACTION_COMPLETE_NORMAL)
@@ -6751,10 +6795,10 @@ DECLARE_SCRIPT(M08_Mutant_Behavior, "")
 		if(type == M08_INNATE_ON && !freed)
 		{
 			
-			ActionParamsStruct params;
-			params.Set_Basic( this, 99, DOING_ANIMATION );
-			params.Set_Animation ("S_C_HUMAN.H_C_7001", false);
-			Commands->Action_Play_Animation (obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic( this, 99, DOING_ANIMATION );
+			params_inner.Set_Animation ("S_C_HUMAN.H_C_7001", false);
+			Commands->Action_Play_Animation (obj, params_inner);
 			//Commands->Innate_Enable(obj);
 
 			//params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, GO_STAR );
@@ -6816,7 +6860,11 @@ DECLARE_SCRIPT(M08_Activate_Midtro, "")
 			
 			already_entered = true;
 			
-			Commands->Set_Position (STAR, Commands->Get_Position(Commands->Find_Object(111994)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (111994, _obj_pos)) {
+					Commands->Set_Position (STAR, _obj_pos);
+				}
+			}
 
 			//Commands->Static_Anim_Phys_Goto_Last_Frame (1450630, "res_elev06.res_elev06" );
 

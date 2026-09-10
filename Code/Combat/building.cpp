@@ -677,7 +677,7 @@ BuildingGameObj::Name_Prefix_Matches_This_Building (const char * name)
 
 	if (name != NULL) {
 		StringClass prefex(Get_Definition().MeshPrefix,true);
-		char * meshname = strchr(name,'.');
+		char * meshname = const_cast<char *>(strchr(name,'.'));
 		if (meshname != NULL) {
 			meshname++;
 			retval = (strnicmp(meshname,prefex,strlen(prefex)) == 0);
@@ -707,7 +707,7 @@ BuildingGameObj::Set_Normalized_Health (float health)
 
 	WWDEBUG_SAY(("Building State Set:\r\n"));
 	WWDEBUG_SAY(("  prefix = %s mesh count = %d aggregate count = %d light count = %d\r\n",
-		Get_Definition().MeshPrefix,
+		(const char *)Get_Definition().MeshPrefix,
 		InteriorMeshes.Count() + ExteriorMeshes.Count(),
 		Aggregates.Count(),
 		PowerOnLights.Count() + PowerOffLights.Count()));

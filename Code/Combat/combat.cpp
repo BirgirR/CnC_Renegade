@@ -1278,9 +1278,9 @@ void	CombatManager::Update_Combat_Mode( void )
 			}
 #endif
 
-			Vector3	pos;
-			vehicle->Get_Position( &pos );
-			COMBAT_CAMERA->Set_Anchor_Position( pos );
+			Vector3	pos_inner;
+			vehicle->Get_Position( &pos_inner );
+			COMBAT_CAMERA->Set_Anchor_Position( pos_inner );
 
 //			bool target_2d = ( !vehicle->Use_2D_Aiming() ^ Input::Get_State(INPUT_FUNCTION_CURSOR_TARGETING) ^ VehicleGameObj::Is_Target_Steering() );
 

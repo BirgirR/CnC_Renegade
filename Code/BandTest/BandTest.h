@@ -47,7 +47,15 @@
 ** BANDTEST_API functions as being imported from a DLL, wheras this DLL sees symbols
 ** defined with this macro as being exported.
 */
-#ifdef BANDTEST_EXPORTS
+/*
+** BANDTEST_STATIC links the bandwidth test straight into the executable
+** instead, which is how this tree builds it: it exports a single function,
+** Detect_Bandwidth, called from two places, and its DllMain does nothing. A
+** separate DLL bought nothing but one more file to ship.
+*/
+#if defined(BANDTEST_STATIC)
+#define BANDTEST_API
+#elif defined(BANDTEST_EXPORTS)
 #define BANDTEST_API __declspec(dllexport)
 #else
 #define BANDTEST_API __declspec(dllimport)

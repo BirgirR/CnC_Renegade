@@ -96,7 +96,9 @@ ImageCtrlClass::Create_Control_Renderer (void)
 	//
 	//	Draw the control's outline
 	//
-	if ( Style & WS_BORDER == WS_BORDER ) {
+	// '==' binds tighter than '&', so this read as Style & (WS_BORDER==WS_BORDER),
+	// i.e. Style & 1 -- testing bit 0 rather than the border bit (0x00800000).
+	if ( (Style & WS_BORDER) == WS_BORDER ) {
 		renderer.Add_Outline (Rect, 1.0F, color);
 	}
 	return ;

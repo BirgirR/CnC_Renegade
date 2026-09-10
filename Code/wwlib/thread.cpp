@@ -16,7 +16,9 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _WIN32_WINNT 0x0400
+// This translation unit used to force _WIN32_WINNT back to 0x0400 (NT4)
+// while the rest of the build uses 0x0601. Differing values across TUs can
+// change SDK struct layouts, so the build-wide setting is used instead.
 
 #include "thread.h"
 #include "except.h"

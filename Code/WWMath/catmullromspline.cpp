@@ -134,10 +134,10 @@ void CatmullRomSpline3DClass::Update_Tangents(void)
 		Tangents[i].InTangent.Z = 0.5f*(Keys[i+1].Point.Z - Keys[i-1].Point.Z);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
-		Tangents[i].OutTangent *= out_factor;
+		float in_factor_inner = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float out_factor_inner = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		Tangents[i].InTangent *= in_factor_inner;			// compensating for the un-even keys
+		Tangents[i].OutTangent *= out_factor_inner;
 	}
 	TangentsDirty = false;
 }
@@ -273,10 +273,10 @@ void CatmullRomSpline1DClass::Update_Tangents(void)
 		Tangents[i].InTangent = 0.5f*(Keys[i+1].Point - Keys[i-1].Point);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
-		Tangents[i].OutTangent *= out_factor;
+		float in_factor_inner = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float out_factor_inner = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		Tangents[i].InTangent *= in_factor_inner;			// compensating for the un-even keys
+		Tangents[i].OutTangent *= out_factor_inner;
 	}
 	TangentsDirty = false;
 }

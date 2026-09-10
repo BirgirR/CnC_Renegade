@@ -219,14 +219,14 @@ StyleMgrClass::Initialize_From_INI (const char *filename)
 		//
 		int count = ini_file->Entry_Count (FONT_FILE_SECTION);
 		for (int index = 0; index < count; index ++) {
-			StringClass	filename (0, true);
-			ini_file->Get_String (filename, FONT_FILE_SECTION, ini_file->Get_Entry (FONT_FILE_SECTION, index));
+			StringClass	filename_inner (0, true);
+			ini_file->Get_String (filename_inner, FONT_FILE_SECTION, ini_file->Get_Entry (FONT_FILE_SECTION, index));
 
 			//
 			//	Install the font into windows
 			//
-			::AddFontResource (filename);
-			FontFileList.Add (filename);
+			::AddFontResource (filename_inner);
+			FontFileList.Add (filename_inner);
 		}
 
 		//
@@ -1044,7 +1044,7 @@ StyleMgrClass::Render_Glow
 	//	Figure out how many passes we should do to get the
 	// desired result
 	//
-	float max_radius	= max (radius_x, radius_y);
+	//float max_radius	= max (radius_x, radius_y);
 	int pass_count		= 4;//max_radius / 3;
 	//pass_count			= min (pass_count, 5);
 	//pass_count			= max (pass_count, 3);

@@ -563,13 +563,13 @@ DECLARE_SCRIPT (MX0_A02_Controller, "")
 
 						if (space_available)
 						{
-							int count = MX0_A02_ACTOR_NOD_START;
-							while (count < MX0_A02_ACTOR_HEADCOUNT)
+							int count_inner = MX0_A02_ACTOR_NOD_START;
+							while (count_inner < MX0_A02_ACTOR_HEADCOUNT)
 							{
-								if (!MX0_A02_UNIT_ID[count])
+								if (!MX0_A02_UNIT_ID[count_inner])
 								{
 									int spawnloc_id = 0;
-									switch (count)
+									switch (count_inner)
 									{
 									case (6):
 										{
@@ -594,12 +594,12 @@ DECLARE_SCRIPT (MX0_A02_Controller, "")
 									GameObject * spawnloc = Commands->Trigger_Spawner (spawnloc_id);
 									if (spawnloc)
 									{
-										Attach_Unit_Script (spawnloc, count);
+										Attach_Unit_Script (spawnloc, count_inner);
 										Commands->Send_Custom_Event (obj, spawnloc, MX0_A02_CUSTOM_TYPE_DAMAGE_ON, MX0_A02_CUSTOM_PARAM_DEFAULT, 0.1f);
-										count = MX0_A02_ACTOR_HEADCOUNT;
+										count_inner = MX0_A02_ACTOR_HEADCOUNT;
 									}
 								}
-								count++;
+								count_inner++;
 							}
 						}
 						Commands->Start_Timer (obj, this, 3.0f, MX0_A02_TIMER_PREVENT_SPAWNS);

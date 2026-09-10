@@ -1911,20 +1911,20 @@ DECLARE_SCRIPT(M11_WetBar_NeighborRoom_SpawnerController_JDG, "")
 
 			if (spawnedGuy01 == NULL)
 			{
-				GameObject * spawnedGuy01 = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_01_JDG );
-				spawn_01_ID = Commands->Get_ID ( spawnedGuy01 );
+				GameObject * spawnedGuy01_inner = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_01_JDG );
+				spawn_01_ID = Commands->Get_ID ( spawnedGuy01_inner );
 			}
 
 			if (spawnedGuy02 == NULL)
 			{
-				GameObject * spawnedGuy02 = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_02_JDG );
-				spawn_02_ID = Commands->Get_ID ( spawnedGuy02 );
+				GameObject * spawnedGuy02_inner = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_02_JDG );
+				spawn_02_ID = Commands->Get_ID ( spawnedGuy02_inner );
 			}
 
 			if (spawnedGuy03 == NULL)
 			{
-				GameObject * spawnedGuy03 = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_03_JDG );
-				spawn_03_ID = Commands->Get_ID ( spawnedGuy03 );
+				GameObject * spawnedGuy03_inner = Commands->Trigger_Spawner( M11_WETBAR_SPAWNER_03_JDG );
+				spawn_03_ID = Commands->Get_ID ( spawnedGuy03_inner );
 			}
 		}
 	}
@@ -2385,23 +2385,23 @@ DECLARE_SCRIPT(M11_Barracks_SpawnerController_JDG, "")//M11_BARRACKS_SPAWNER_CON
 
 			if (spawnedGuy01 == NULL)
 			{
-				GameObject * spawnedGuy01 = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_01_JDG );
-				Commands->Attach_Script(spawnedGuy01, "M11_Barracks_SpawnedDude_JDG", "");
-				spawn_01_ID = Commands->Get_ID ( spawnedGuy01 );
+				GameObject * spawnedGuy01_inner = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_01_JDG );
+				Commands->Attach_Script(spawnedGuy01_inner, "M11_Barracks_SpawnedDude_JDG", "");
+				spawn_01_ID = Commands->Get_ID ( spawnedGuy01_inner );
 			}
 
 			if (spawnedGuy02 == NULL)
 			{
-				GameObject * spawnedGuy02 = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_02_JDG );
-				Commands->Attach_Script(spawnedGuy02, "M11_Barracks_SpawnedDude_JDG", "");
-				spawn_02_ID = Commands->Get_ID ( spawnedGuy02 );
+				GameObject * spawnedGuy02_inner = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_02_JDG );
+				Commands->Attach_Script(spawnedGuy02_inner, "M11_Barracks_SpawnedDude_JDG", "");
+				spawn_02_ID = Commands->Get_ID ( spawnedGuy02_inner );
 			}
 
 			if (spawnedGuy03 == NULL)
 			{
-				GameObject * spawnedGuy03 = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_03_JDG );
-				Commands->Attach_Script(spawnedGuy03, "M11_Barracks_SpawnedDude_JDG", "");
-				spawn_03_ID = Commands->Get_ID ( spawnedGuy03 );
+				GameObject * spawnedGuy03_inner = Commands->Trigger_Spawner( M11_BARRACKS_SPAWNER_03_JDG );
+				Commands->Attach_Script(spawnedGuy03_inner, "M11_Barracks_SpawnedDude_JDG", "");
+				spawn_03_ID = Commands->Get_ID ( spawnedGuy03_inner );
 			}
 		}
 	}
@@ -2663,10 +2663,10 @@ DECLARE_SCRIPT(M11_Barracks_Scientist_JDG, "")//M11_BARRACKS_SCIENTIST_JDG 10040
 											
 					Commands->Monitor_Conversation(  obj, scientist_conv02 );
 
-					ActionParamsStruct params;
-					params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
-					params.Set_Animation ("H_A_HOST_L2B", true);
-					Commands->Action_Play_Animation (obj, params);
+					ActionParamsStruct params_inner;
+					params_inner.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
+					params_inner.Set_Animation ("H_A_HOST_L2B", true);
+					Commands->Action_Play_Animation (obj, params_inner);
 				}
 			}
 
@@ -3224,10 +3224,10 @@ DECLARE_SCRIPT(M11_Barracks_ToiletMutant01_JDG, "")//this guys ID is M11_BARRACK
 
 		else if (param == M01_MODIFY_YOUR_ACTION_02_JDG)
 		{
-			ActionParamsStruct params;
-			params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
-			params.Set_Animation ("S_A_HUMAN.H_A_A0A0_L28C", false);
-			Commands->Action_Play_Animation (obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
+			params_inner.Set_Animation ("S_A_HUMAN.H_A_A0A0_L28C", false);
+			Commands->Action_Play_Animation (obj, params_inner);
 		}
 	}
 };
@@ -3266,10 +3266,10 @@ DECLARE_SCRIPT(M11_Barracks_ToiletMutant02_JDG, "")//this guys ID is M11_BARRACK
 
 		else if (param == M01_MODIFY_YOUR_ACTION_02_JDG)
 		{
-			ActionParamsStruct params;
-			params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
-			params.Set_Animation ("S_A_HUMAN.H_A_A0A0_L28C", false);
-			Commands->Action_Play_Animation (obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
+			params_inner.Set_Animation ("S_A_HUMAN.H_A_A0A0_L28C", false);
+			Commands->Action_Play_Animation (obj, params_inner);
 		}
 	}
 };
@@ -3707,34 +3707,34 @@ DECLARE_SCRIPT(M11_MutantCrypt_Spawner06_Guy_JDG, "")//this one has been fixed f
 		{
 			if (obj && action_id == M01_PICK_A_NEW_LOCATION_JDG)
 			{
-				ActionParamsStruct params;
-				params.Set_Basic(this, 80, M01_WALKING_WAYPATH_01_JDG);
-				params.Set_Movement( Vector3(0,0,0), .1f, 1 );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic(this, 80, M01_WALKING_WAYPATH_01_JDG);
+				params_inner.Set_Movement( Vector3(0,0,0), .1f, 1 );
 
 				int random = Commands->Get_Random_Int(0, 3);
 
 				if (random == 0)
 				{	
-					params.WaypathID = 100021;
-					params.WaypointStartID = 100022;
-					params.WaypointEndID = 100028;
+					params_inner.WaypathID = 100021;
+					params_inner.WaypointStartID = 100022;
+					params_inner.WaypointEndID = 100028;
 				}
 
 				else if (random == 1)
 				{
-					params.WaypathID = 100021;
-					params.WaypointStartID = 100028;
-					params.WaypointEndID = 100022;
+					params_inner.WaypathID = 100021;
+					params_inner.WaypointStartID = 100028;
+					params_inner.WaypointEndID = 100022;
 				}
 
 				else
 				{
-					params.WaypathID = 100030;
-					params.WaypointStartID = 100031;
-					params.WaypointEndID = 100040;
+					params_inner.WaypathID = 100030;
+					params_inner.WaypointStartID = 100031;
+					params_inner.WaypointEndID = 100040;
 				}
 
-				Commands->Action_Goto( obj, params );
+				Commands->Action_Goto( obj, params_inner );
 			}
 
 			else if (obj && action_id == M01_WALKING_WAYPATH_01_JDG)
@@ -4230,41 +4230,41 @@ DECLARE_SCRIPT(M11_MutantCrypt_Spawner03_Guy_JDG, "")
 		{
 			if (obj && action_id == M01_PICK_A_NEW_LOCATION_JDG)
 			{
-				ActionParamsStruct params;
-				params.Set_Basic(this, 80, M01_WALKING_WAYPATH_01_JDG);
-				params.Set_Movement( Vector3(0,0,0), .1f, 1 );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic(this, 80, M01_WALKING_WAYPATH_01_JDG);
+				params_inner.Set_Movement( Vector3(0,0,0), .1f, 1 );
 
 				int random = Commands->Get_Random_Int(0, 4);
 
 				if (random == 0)
 				{	
-					params.WaypathID = 100076;
-					params.WaypointStartID = 100077;
-					params.WaypointEndID = 100085;
+					params_inner.WaypathID = 100076;
+					params_inner.WaypointStartID = 100077;
+					params_inner.WaypointEndID = 100085;
 				}
 
 				else if (random == 1)
 				{
-					params.WaypathID = 100087;
-					params.WaypointStartID = 100088;
-					params.WaypointEndID = 100096;
+					params_inner.WaypathID = 100087;
+					params_inner.WaypointStartID = 100088;
+					params_inner.WaypointEndID = 100096;
 				}
 
 				else if (random == 3)
 				{
-					params.WaypathID = 100076;
-					params.WaypointStartID = 100085;
-					params.WaypointEndID = 100077;
+					params_inner.WaypathID = 100076;
+					params_inner.WaypointStartID = 100085;
+					params_inner.WaypointEndID = 100077;
 				}
 
 				else 
 				{
-					params.WaypathID = 100087;
-					params.WaypointStartID = 100096;
-					params.WaypointEndID = 100088;
+					params_inner.WaypathID = 100087;
+					params_inner.WaypointStartID = 100096;
+					params_inner.WaypointEndID = 100088;
 				}
 
-				Commands->Action_Goto( obj, params );
+				Commands->Action_Goto( obj, params_inner );
 			
 				
 			}
@@ -4280,11 +4280,11 @@ DECLARE_SCRIPT(M11_MutantCrypt_Spawner03_Guy_JDG, "")
 
 			else if (obj && action_id == M01_DOING_ANIMATION_01_JDG)
 			{
-				ActionParamsStruct params;
-				params.Set_Basic(this, 80, M01_PICK_A_NEW_LOCATION_JDG);
-				params.Set_Movement( Vector3(-15.128f, 17.965f, -63.748f), .1f, 1 );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic(this, 80, M01_PICK_A_NEW_LOCATION_JDG);
+				params_inner.Set_Movement( Vector3(-15.128f, 17.965f, -63.748f), .1f, 1 );
 
-				Commands->Action_Goto( obj, params );
+				Commands->Action_Goto( obj, params_inner );
 			}
 
 			else if (obj && action_id == M01_HUNT_THE_PLAYER_JDG)
@@ -6750,11 +6750,11 @@ DECLARE_SCRIPT(M11_Barracks_MutantUprising_BlackhandGuy_JDG, "")//M11_BARRACKS_M
 						GameObject * mutant02 = Commands->Find_Object ( M11_BARRACKS_MUTANTUPRISING_MUTANT02_JDG );
 						if (mutant02 != NULL)
 						{
-							ActionParamsStruct params;
-							params.Set_Basic(this, 45, M01_START_ATTACKING_02_JDG);
-							params.Set_Attack( mutant02, 50, 0, true );
-							params.AttackCrouched = true;
-							Commands->Action_Attack ( obj, params );
+							ActionParamsStruct params_inner;
+							params_inner.Set_Basic(this, 45, M01_START_ATTACKING_02_JDG);
+							params_inner.Set_Attack( mutant02, 50, 0, true );
+							params_inner.AttackCrouched = true;
+							Commands->Action_Attack ( obj, params_inner );
 						}
 					}
 				}
@@ -7217,10 +7217,10 @@ DECLARE_SCRIPT(M11_Cell_Mutant02_JDG, "")
 
 		if (param == M01_START_ACTING_JDG)
 		{
-			ActionParamsStruct params;
-			params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
-			params.Set_Animation ("H_A_A0A0_L28C", false);
-			Commands->Action_Play_Animation (obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
+			params_inner.Set_Animation ("H_A_A0A0_L28C", false);
+			Commands->Action_Play_Animation (obj, params_inner);
 
 			//Commands->Set_Player_Type ( obj, SCRIPT_PLAYERTYPE_MUTANT );
 			//Commands->Set_Obj_Radar_Blip_Color ( obj, RADAR_BLIP_COLOR_MUTANT );
@@ -7298,14 +7298,14 @@ DECLARE_SCRIPT(M11_Cell_Visceroid_JDG, "")
 				Vector3 warpSpot (-4.544f, 86.890f, -34);
 				Commands->Set_Position ( obj, warpSpot );
 
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
+				params_inner.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
 				//params.Set_Movement(Vector3 (-10.635f, 68.057f, -34.233f), RUN, 1);
 				//making first change here...run to walk
 
-				Commands->Action_Goto(obj, params);
-				params.Set_Movement(Vector3 (-10.635f, 68.057f, -34.233f), WALK, 1);
+				Commands->Action_Goto(obj, params_inner);
+				params_inner.Set_Movement(Vector3 (-10.635f, 68.057f, -34.233f), WALK, 1);
 			}
 
 			else if (myId == 101996 && deadYet == false)
@@ -7315,14 +7315,14 @@ DECLARE_SCRIPT(M11_Cell_Visceroid_JDG, "")
 				Vector3 warpSpot (-7.272f, 77.365f, -34);
 				Commands->Set_Position ( obj, warpSpot );
 
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
+				params_inner.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
 				//params.Set_Movement(Vector3 (10.745f, 66.866f, -34.233f), RUN, 1);
 				//making first change here...run to walk
-				params.Set_Movement(Vector3 (10.745f, 66.866f, -34.233f), WALK, 1);
+				params_inner.Set_Movement(Vector3 (10.745f, 66.866f, -34.233f), WALK, 1);
 
-				Commands->Action_Goto(obj, params);
+				Commands->Action_Goto(obj, params_inner);
 			}
 			
 			Commands->Enable_Cinematic_Freeze( obj, true );
@@ -7334,13 +7334,13 @@ DECLARE_SCRIPT(M11_Cell_Visceroid_JDG, "")
 			GameObject * petrova = Commands->Find_Object ( M11_MUTANT_PETROVA_JDG );
 			if (petrova != NULL)
 			{
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
-				params.Set_Movement(petrova, RUN, 4);
-				params.Set_Attack( petrova, 10, 0, true );
+				params_inner.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
+				params_inner.Set_Movement(petrova, RUN, 4);
+				params_inner.Set_Attack( petrova, 10, 0, true );
 
-				Commands->Action_Attack(obj, params);
+				Commands->Action_Attack(obj, params_inner);
 			}
 		}
 	}

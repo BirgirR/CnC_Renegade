@@ -447,9 +447,9 @@ TranslateDBClass::Export_Table (const char *filename)
 				StringClass english_string = object->Get_English_String ();
 
 				int length = english_string.Get_Length ();
-				for (int index = 0; index < length; index ++) {
-					if (english_string[index] == '\n') {
-						english_string[index] = ' ';
+				for (int index_inner = 0; index_inner < length; index_inner ++) {
+					if (english_string[index_inner] == '\n') {
+						english_string[index_inner] = ' ';
 					}
 				}
 
@@ -1121,14 +1121,14 @@ TranslateDBClass::Get_Next_Object (uint32 category_id, TDBObjClass *curr_obj)
 	// one that matches the given category ID
 	//	
 	for (int index = start_index; index < m_ObjectList.Count (); index ++) {
-		TDBObjClass *curr_obj = m_ObjectList[index];
-		if (curr_obj != NULL) {
+		TDBObjClass *curr_obj_inner = m_ObjectList[index];
+		if (curr_obj_inner != NULL) {
 
 			//
 			//	Does this object belong to the category we are enumerating?
 			//
-			if (curr_obj->Get_Category_ID () == category_id) {
-				object = curr_obj;
+			if (curr_obj_inner->Get_Category_ID () == category_id) {
+				object = curr_obj_inner;
 				break;
 			}
 		}
@@ -1334,7 +1334,7 @@ int Build_List_From_String
 				// Copy this entry into its own string
 				//
 				StringClass entry_string = entry;
-				char *delim_start = ::strstr (entry_string, delimiter);				
+				char *delim_start = const_cast<char *>(::strstr (entry_string, delimiter));				
 				if (delim_start != NULL) {
 					delim_start[0] = 0;
 				}

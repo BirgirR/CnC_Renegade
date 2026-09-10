@@ -418,18 +418,18 @@ DefinitionMgrClass::Get_Next
 			(definition == NULL) && (index < _DefinitionCount);
 			index ++)
 	{		
-		DefinitionClass *curr_def = _SortedDefinitionArray[index];
-		if (curr_def != NULL) {
+		DefinitionClass *curr_def_inner = _SortedDefinitionArray[index];
+		if (curr_def_inner != NULL) {
 
 			//
 			//	Is this the definition we were looking for?
 			//
 			if (	(type == ID_SUPERCLASS) &&
-					(::SuperClassID_From_ClassID (curr_def->Get_Class_ID ()) == id)) {
-				definition = curr_def;
+					(::SuperClassID_From_ClassID (curr_def_inner->Get_Class_ID ()) == id)) {
+				definition = curr_def_inner;
 			} else if (	(type == ID_CLASS) &&
-							(curr_def->Get_Class_ID () == id)) {
-				definition = curr_def;
+							(curr_def_inner->Get_Class_ID () == id)) {
+				definition = curr_def_inner;
 			}
 		}
 	}

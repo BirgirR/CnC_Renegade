@@ -399,9 +399,9 @@ CollisionReactionType BulletDataClass::Bullet_Collision_Occurred( const Collisio
 				) 
 			{
 				DamageableStaticPhysClass * damphys = (DamageableStaticPhysClass *)event.OtherObj;
-				OffenseObjectClass offense( AmmoDefinition->Damage, (int)AmmoDefinition->Warhead, Get_Owner() );
-				offense.EnableClientDamage = true;	// Only bullets apply to client damage;
-				damphys->Apply_Damage_Static( offense );
+				OffenseObjectClass offense_inner( AmmoDefinition->Damage, (int)AmmoDefinition->Warhead, Get_Owner() );
+				offense_inner.EnableClientDamage = true;	// Only bullets apply to client damage;
+				damphys->Apply_Damage_Static( offense_inner );
 			}
 
 			// check for a non-stopping surface
@@ -550,7 +550,7 @@ void BulletClass::Init( const BulletDataClass & data, float progress_time, const
 
 		// If no name is given, lets create the NULL render obj
 		if ( model == NULL ) {
-			Debug_Say(( "Bullet Not Found \"%s\" \n", BulletData.AmmoDefinition->ModelName ));
+			Debug_Say(( "Bullet Not Found \"%s\" \n", (const char *)BulletData.AmmoDefinition->ModelName));
 			model = WW3DAssetManager::Get_Instance ()->Create_Render_Obj( "NULL" );
 
 		}
@@ -559,7 +559,7 @@ void BulletClass::Init( const BulletDataClass & data, float progress_time, const
 
 		if (model) {
 			if ( BulletData.AmmoDefinition->ModelName.Compare_No_Case( model->Get_Name() ) != 0 ) {
-				Debug_Say(( "Possible bullet twiddler!!  %s %s\n", BulletData.AmmoDefinition->ModelName, model->Get_Name() ));
+				Debug_Say(( "Possible bullet twiddler!!  %s %s\n", (const char *)BulletData.AmmoDefinition->ModelName, (const char *)model->Get_Name()));
 			}
 //			ModelNameCRC = CRC_Stringi( model->Get_Name() );
 			ModelNameCRC = CRC_Stringi( BulletData.AmmoDefinition->ModelName );
@@ -824,12 +824,12 @@ void	BulletClass::Think( void )
 
 				cross.Normalize();
 				Matrix3D tm(cross,angle);
-				Vector3	current_vector;
-				Projectile->Get_Velocity( &current_vector );
-				WWASSERT(current_vector.Is_Valid());
-				current_vector = tm.Rotate_Vector( current_vector );
-				WWASSERT(current_vector.Is_Valid());
-				Projectile->Set_Velocity( current_vector );
+				Vector3	current_vector_inner;
+				Projectile->Get_Velocity( &current_vector_inner );
+				WWASSERT(current_vector_inner.Is_Valid());
+				current_vector_inner = tm.Rotate_Vector( current_vector_inner );
+				WWASSERT(current_vector_inner.Is_Valid());
+				Projectile->Set_Velocity( current_vector_inner );
 			}
 		}
 	}

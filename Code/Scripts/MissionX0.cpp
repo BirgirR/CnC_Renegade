@@ -62,7 +62,9 @@ DECLARE_SCRIPT(MX0_MissionStart_DME, "") //1200001
 		engineer1 = engineer2 = eng_num = count = sniper_1 = sniper_2 = curr_conv7 = 0;
 		SniperNotify = false;
 
-		Vector3 drop_loc = Commands->Get_Position ( Commands->Find_Object(1200001));
+		//	Nothing below uses this, and the line under it -- the other half of
+		//	the same abandoned code -- was already commented out.
+		//Vector3 drop_loc = Commands->Get_Position (Commands->Find_Object (1200001));
 		//float chin_face = Commands->Get_Facing ( Commands->Find_Object(1200001));
 
 		Commands->Fade_Background_Music ( "renegade_intro_no_vox.mp3", 0, 1 );
@@ -116,22 +118,25 @@ DECLARE_SCRIPT(MX0_MissionStart_DME, "") //1200001
 
 		if (timer_id == SNIPER_CREATE)
 		{
-			Vector3 sniper1_loc = Commands->Get_Position (Commands->Find_Object (1200043));
-			Vector3 sniper2_loc = Commands->Get_Position (Commands->Find_Object (1200044));
-
-			GameObject *sniper1 = Commands->Create_Object ("NOD_Minigunner_2SF", sniper1_loc);
-			Commands->Attach_Script(sniper1, "M00_Soldier_Powerup_Disable", "");
-			Commands->Attach_Script(sniper1, "M00_Send_Object_ID", "1200001, 1, 0.0f");
-			Commands->Attach_Script(sniper1, "MX0_SniperAction", "1200045");
-			Commands->Attach_Script(sniper1, "MX0_KillNotify", "");
-
-			sniper_1 = Commands->Get_ID (sniper1);
-
-			GameObject *sniper2 = Commands->Create_Object ("NOD_Minigunner_2SF", sniper2_loc);
-			Commands->Attach_Script(sniper2, "M00_Soldier_Powerup_Disable", "");
-			Commands->Attach_Script(sniper2, "M00_Send_Object_ID", "1200001, 2, 0.0f");
-			Commands->Attach_Script(sniper2, "MX0_SniperAction", "1200045");
-			sniper_2 = Commands->Get_ID (sniper2);
+			Vector3 sniper1_loc;
+			Vector3 sniper2_loc;
+			bool sniper1_loc_found = Find_Object_Position (1200043, sniper1_loc);
+			bool sniper2_loc_found = Find_Object_Position (1200044, sniper2_loc);
+			if (sniper1_loc_found && sniper2_loc_found) {
+				GameObject *sniper1 = Commands->Create_Object ("NOD_Minigunner_2SF", sniper1_loc);
+				Commands->Attach_Script(sniper1, "M00_Soldier_Powerup_Disable", "");
+				Commands->Attach_Script(sniper1, "M00_Send_Object_ID", "1200001, 1, 0.0f");
+				Commands->Attach_Script(sniper1, "MX0_SniperAction", "1200045");
+				Commands->Attach_Script(sniper1, "MX0_KillNotify", "");
+	
+				sniper_1 = Commands->Get_ID (sniper1);
+	
+				GameObject *sniper2 = Commands->Create_Object ("NOD_Minigunner_2SF", sniper2_loc);
+				Commands->Attach_Script(sniper2, "M00_Soldier_Powerup_Disable", "");
+				Commands->Attach_Script(sniper2, "M00_Send_Object_ID", "1200001, 2, 0.0f");
+				Commands->Attach_Script(sniper2, "MX0_SniperAction", "1200045");
+				sniper_2 = Commands->Get_ID (sniper2);
+			}
 		}
 
 		if (timer_id == SNIPER_REMINDER && Commands->Find_Object (sniper_1))
@@ -502,7 +507,11 @@ DECLARE_SCRIPT (MX0_Engineer1, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (point_id)), RUN, 1.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (point_id, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 1.0f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -524,7 +533,11 @@ DECLARE_SCRIPT (MX0_Engineer1, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (1200029)), RUN, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (1200029, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -539,7 +552,11 @@ DECLARE_SCRIPT (MX0_Engineer1, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (1200029)), RUN, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (1200029, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);		
 		}
@@ -691,7 +708,11 @@ DECLARE_SCRIPT (MX0_Engineer1, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (point_id)), RUN, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (point_id, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -736,7 +757,11 @@ DECLARE_SCRIPT (MX0_Engineer2, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (1200026)), RUN, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (1200026, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 			
@@ -804,7 +829,11 @@ DECLARE_SCRIPT (MX0_Engineer2, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (point_id)), RUN, 1.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (point_id, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 1.0f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -948,7 +977,11 @@ DECLARE_SCRIPT (MX0_Engineer2, "Damage_multiplier:float")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 96, ENGINEER_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (point_id)), RUN, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (point_id, _obj_pos)) {
+					params.Set_Movement( _obj_pos, RUN, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -1143,19 +1176,22 @@ DECLARE_SCRIPT(MX0_NOD_TroopDrop, "")
 	{
 		if (timer_id == TROOP_DROP)
 		{
-			Vector3 drop_loc = Commands->Get_Position ( Commands->Find_Object(1200018));
-			float chin_face = Commands->Get_Facing ( Commands->Find_Object(1200018));
-
-			GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", drop_loc);
-			Commands->Set_Facing(chinook_obj, chin_face);
-			Commands->Attach_Script(chinook_obj, "Test_Cinematic", "MX0_C130Troopdrop.txt");
-
-			drop_loc = Commands->Get_Position ( Commands->Find_Object(1200020));
-			chin_face = Commands->Get_Facing ( Commands->Find_Object(1200020));
-
-			GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", drop_loc);
-			Commands->Set_Facing(chinook_obj2, chin_face);
-			Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_C130Troopdrop2.txt");
+			Vector3 drop_loc;
+			bool drop_loc_found = Find_Object_Position (1200018, drop_loc);
+float chin_face = Commands->Get_Facing ( Commands->Find_Object(1200018));
+			if (drop_loc_found) {
+				GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", drop_loc);
+				Commands->Set_Facing(chinook_obj, chin_face);
+				Commands->Attach_Script(chinook_obj, "Test_Cinematic", "MX0_C130Troopdrop.txt");
+	
+				//	Leaves drop_loc alone when the object is gone, rather than overwriting it with the origin.
+				Find_Object_Position (1200020, drop_loc);
+				chin_face = Commands->Get_Facing ( Commands->Find_Object(1200020));
+	
+				GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", drop_loc);
+				Commands->Set_Facing(chinook_obj2, chin_face);
+				Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_C130Troopdrop2.txt");
+			}
 		}
 	}
 
@@ -1165,23 +1201,26 @@ DECLARE_SCRIPT(MX0_NOD_TroopDrop, "")
 		{
 			already_entered = true;
 
-			Vector3 drop_loc = Commands->Get_Position ( Commands->Find_Object(1200018));
-			float chin_face = Commands->Get_Facing ( Commands->Find_Object(1200018));
-
-			GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", drop_loc);
-			Commands->Set_Facing(chinook_obj, chin_face);
-			Commands->Attach_Script(chinook_obj, "Test_Cinematic", "MX0_C130Troopdrop.txt");
-
-			drop_loc = Commands->Get_Position ( Commands->Find_Object(1200020));
-			chin_face = Commands->Get_Facing ( Commands->Find_Object(1200020));
-
-			GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", drop_loc);
-			Commands->Set_Facing(chinook_obj2, chin_face);
-			Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_C130Troopdrop2.txt");
-
-			Commands->Start_Timer(obj, this, 3.0f, TROOP_DROP);
-
-			Commands->Send_Custom_Event( obj, Commands->Find_Object (1200001), START_SNIPER, 0, 0.0f );
+			Vector3 drop_loc;
+			bool drop_loc_found = Find_Object_Position (1200018, drop_loc);
+float chin_face = Commands->Get_Facing ( Commands->Find_Object(1200018));
+			if (drop_loc_found) {
+				GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", drop_loc);
+				Commands->Set_Facing(chinook_obj, chin_face);
+				Commands->Attach_Script(chinook_obj, "Test_Cinematic", "MX0_C130Troopdrop.txt");
+	
+				//	Leaves drop_loc alone when the object is gone, rather than overwriting it with the origin.
+				Find_Object_Position (1200020, drop_loc);
+				chin_face = Commands->Get_Facing ( Commands->Find_Object(1200020));
+	
+				GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", drop_loc);
+				Commands->Set_Facing(chinook_obj2, chin_face);
+				Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_C130Troopdrop2.txt");
+	
+				Commands->Start_Timer(obj, this, 3.0f, TROOP_DROP);
+	
+				Commands->Send_Custom_Event( obj, Commands->Find_Object (1200001), START_SNIPER, 0, 0.0f );
+			}
 		}
 	}
 };
@@ -1865,9 +1904,12 @@ DECLARE_SCRIPT (MX0_A03_CONTROLLER_DAK, "" )
 
 			if ( num_Ledge_Troops == 0 && num_drops < 5 && !harvester_Dead ) // all ledge troops have been killed. bring in some more
 			{
-				GameObject * minigunners = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position( Commands->Find_Object ( MX0_A03_NOD_LEDGE_DROP_LOC_ID )));
-				Commands->Attach_Script ( minigunners, "Test_Cinematic", "MX0_A03_NOD_LedgeDrop.txt" );
-				num_drops++;
+				Vector3 minigunners_spawn_pos;
+				if (Find_Object_Position (MX0_A03_NOD_LEDGE_DROP_LOC_ID, minigunners_spawn_pos)) {
+					GameObject * minigunners = Commands->Create_Object ( "Invisible_Object", minigunners_spawn_pos);
+					Commands->Attach_Script ( minigunners, "Test_Cinematic", "MX0_A03_NOD_LedgeDrop.txt" );
+					num_drops++;
+				}
 			}
 		}
 
@@ -1876,36 +1918,39 @@ DECLARE_SCRIPT (MX0_A03_CONTROLLER_DAK, "" )
 			zone_not_finished = false;
 
 			// Additional GDI troop drop
-			GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position(Commands->Find_Object(1500051)));
-			Commands->Set_Facing(chinook_obj2, 0.0f);
-			Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_TroopDrop_Area4.txt");
-
-			// Move Drop Tank up to section 4
-			GameObject *tank = Commands->Find_Object( GDI_Drop_Tank_Id );
-			if ( tank )
-			{
-				Commands->Action_Reset( tank, 100 );
-
-				ActionParamsStruct params;
-				params.Set_Basic ( this, 91, 1 );
-				params.Set_Movement( Vector3(0,0,0), 1.0f, 1 );
-				params.WaypathID = MX0_A03_WAYPATH_TANK_ID;
-				Commands->Action_Goto (tank, params);
-			}
-
-			// Move Humvee up to Section 4
-			GameObject *humvee = Commands->Find_Object( Humvee_Id );
-			if (humvee)
-			{
-				Commands->Send_Custom_Event( obj, humvee, 3, 0, 1.25f);
-			}
-
-			// Move Trooper 1 up to Seciton 4
-			GameObject *trooper_one = Commands->Find_Object( Trooper_One_Id );
-			if ( trooper_one )
-			{
-				Commands->Send_Custom_Event( obj, trooper_one, 2, 0, 0);
-				//Commands->Debug_Message( "***** DAK ***** custom sent to trooper 1.\n" );
+			Vector3 chinook_obj2_spawn_pos;
+			if (Find_Object_Position (1500051, chinook_obj2_spawn_pos)) {
+				GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", chinook_obj2_spawn_pos);
+				Commands->Set_Facing(chinook_obj2, 0.0f);
+				Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_TroopDrop_Area4.txt");
+	
+				// Move Drop Tank up to section 4
+				GameObject *tank = Commands->Find_Object( GDI_Drop_Tank_Id );
+				if ( tank )
+				{
+					Commands->Action_Reset( tank, 100 );
+	
+					ActionParamsStruct params;
+					params.Set_Basic ( this, 91, 1 );
+					params.Set_Movement( Vector3(0,0,0), 1.0f, 1 );
+					params.WaypathID = MX0_A03_WAYPATH_TANK_ID;
+					Commands->Action_Goto (tank, params);
+				}
+	
+				// Move Humvee up to Section 4
+				GameObject *humvee = Commands->Find_Object( Humvee_Id );
+				if (humvee)
+				{
+					Commands->Send_Custom_Event( obj, humvee, 3, 0, 1.25f);
+				}
+	
+				// Move Trooper 1 up to Seciton 4
+				GameObject *trooper_one = Commands->Find_Object( Trooper_One_Id );
+				if ( trooper_one )
+				{
+					Commands->Send_Custom_Event( obj, trooper_one, 2, 0, 0);
+					//Commands->Debug_Message( "***** DAK ***** custom sent to trooper 1.\n" );
+				}
 			}
 		}
 
@@ -1989,10 +2034,10 @@ DECLARE_SCRIPT (MX0_A03_CONTROLLER_DAK, "" )
 			{
 				if (Trooper_One)
 				{
-					GameObject *Trooper_One = Commands->Find_Object( Trooper_One_Id );
+					GameObject *Trooper_One_inner = Commands->Find_Object( Trooper_One_Id );
 					// Trooper1: "Nice! That'll cost 'em!"
 					int conv_id = Commands->Create_Conversation ( "MX0_A03_08" );
-					Commands->Join_Conversation( Trooper_One, conv_id, false, false, true);
+					Commands->Join_Conversation( Trooper_One_inner, conv_id, false, false, true);
 					Commands->Start_Conversation (conv_id, 0);
 				}
 			}
@@ -2134,13 +2179,13 @@ DECLARE_SCRIPT ( MX0_A03_HUMVEE, "" ) // moves humvee
 		{
 			// Commands->Debug_Message( "***** DAK ***** finding Object Buggie.\n" );
 			Current_Target = Target_Id[target];
-			GameObject *target = Commands->Find_Object( Current_Target );
+			GameObject *target_inner = Commands->Find_Object( Current_Target );
 
-			if ( target ) 
+			if ( target_inner ) 
 			{
 				ActionParamsStruct params;
 				params.Set_Basic(this, INNATE_PRIORITY_ENEMY_SEEN, 1);
-				params.Set_Attack(target, 60.0f, 0.25f, true);
+				params.Set_Attack(target_inner, 60.0f, 0.25f, true);
 				Commands->Action_Attack(obj, params);
 			}
 		}
@@ -2148,13 +2193,13 @@ DECLARE_SCRIPT ( MX0_A03_HUMVEE, "" ) // moves humvee
 		{
 			target = target + 1;
 			Current_Target = Target_Id[target];
-			GameObject *target = Commands->Find_Object( Current_Target );
+			GameObject *target_inner = Commands->Find_Object( Current_Target );
 
-			if ( target )
+			if ( target_inner )
 			{
 				ActionParamsStruct params;
 				params.Set_Basic(this, INNATE_PRIORITY_ENEMY_SEEN, 1);
-				params.Set_Attack(target, 60.0f, 0.25f, true);
+				params.Set_Attack(target_inner, 60.0f, 0.25f, true);
 				Commands->Action_Attack(obj, params);
 			}
 			else // no targets. attack whatever you can see.
@@ -2177,9 +2222,9 @@ DECLARE_SCRIPT ( MX0_A03_HUMVEE, "" ) // moves humvee
 
 		if ( type == 2 ) // resume fire on buggy. halt after 3 - 6 seconds.
 		{
-			GameObject *target = Commands->Find_Object( Current_Target );
+			GameObject *target_inner = Commands->Find_Object( Current_Target );
 
-			if ( target )
+			if ( target_inner )
 			{
 				ActionParamsStruct params;
 				params.Set_Basic(this, INNATE_PRIORITY_ENEMY_SEEN, 1);
@@ -2254,12 +2299,12 @@ DECLARE_SCRIPT ( MX0_A03_TANK, "" ) // moves tank
 		if ( type == 0 ) // attack Target_Id[target]
 		{
 			Current_Target = Target_Id[target];
-			GameObject *target = Commands->Find_Object ( Current_Target );
-			if ( target )
+			GameObject *target_inner = Commands->Find_Object ( Current_Target );
+			if ( target_inner )
 			{
 				ActionParamsStruct params;
 				params.Set_Basic(this, INNATE_PRIORITY_ENEMY_SEEN, 0);
-				params.Set_Attack( target, 60.0f, 0.25f, true);
+				params.Set_Attack( target_inner, 60.0f, 0.25f, true);
 				Commands->Action_Attack(obj, params);
 			}
 		}
@@ -2576,10 +2621,13 @@ DECLARE_SCRIPT( MX0_A03_FIRST_PLAYER_ZONE, "" )
 			}
 
 			// drop off first NOD minigunners.
-			GameObject * minigunners = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position( Commands->Find_Object ( MX0_A03_NOD_LEDGE_DROP_LOC_ID )));
-			Commands->Attach_Script ( minigunners, "Test_Cinematic", "MX0_A03_NOD_LedgeDrop.txt" );
-
-			first_time = false;
+			Vector3 minigunners_spawn_pos;
+			if (Find_Object_Position (MX0_A03_NOD_LEDGE_DROP_LOC_ID, minigunners_spawn_pos)) {
+				GameObject * minigunners = Commands->Create_Object ( "Invisible_Object", minigunners_spawn_pos);
+				Commands->Attach_Script ( minigunners, "Test_Cinematic", "MX0_A03_NOD_LedgeDrop.txt" );
+	
+				first_time = false;
+			}
 		}
 	}
 

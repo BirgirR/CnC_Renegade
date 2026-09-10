@@ -44,7 +44,6 @@
 
 #include "menudialog.h"
 #include "resource.h"
-#include "cdverify.h"
 
 
 ////////////////////////////////////////////////////////////////
@@ -52,7 +51,7 @@
 //	MovieOptionsMenuClass
 //
 ////////////////////////////////////////////////////////////////
-class MovieOptionsMenuClass : public MenuDialogClass, public Observer<CDVerifyEvent>
+class MovieOptionsMenuClass : public MenuDialogClass
 {
 public:
 	
@@ -79,7 +78,6 @@ public:
 	//
 	//	Notification
 	//
-	void		HandleNotification (CDVerifyEvent &event);
 
 private:
 
@@ -93,7 +91,6 @@ private:
 	//	Private member data
 	////////////////////////////////////////////////////////////////
 	bool				IsPlaying;
-	CDVerifyClass	CDVerifier;
 	StringClass		PendingMovieFilename;
 };
 

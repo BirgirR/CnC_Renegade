@@ -157,31 +157,32 @@ DECLARE_SCRIPT(M06_Objective_Controller, "") // 100018
 			{
 				Commands->Add_Objective(609, OBJECTIVE_TYPE_SECONDARY, OBJECTIVE_STATUS_PENDING, IDS_Enc_ObjTitle_Hidden_M06_01, NULL, IDS_Enc_Obj_Hidden_M06_01);
 				Vector3 star_pos = Commands->Get_Position(STAR);
-				Vector3 greenhouse_alarm = Commands->Get_Position(Commands->Find_Object(101548));
-				Vector3 shower_alarm = Commands->Get_Position(Commands->Find_Object(101549));
-				float star_greenhouse = Commands->Get_Distance(star_pos, greenhouse_alarm);
-				float star_shower = Commands->Get_Distance(star_pos, shower_alarm);
-				if(star_greenhouse == (WWMath::Min(star_greenhouse, star_shower)))
-				{
-					object = Commands->Find_Object(101548);
-					if(object)
+				Vector3 greenhouse_alarm;
+				Vector3 shower_alarm;
+				bool greenhouse_alarm_found = Find_Object_Position (101548, greenhouse_alarm);
+				bool shower_alarm_found = Find_Object_Position (101549, shower_alarm);
+				if (greenhouse_alarm_found && shower_alarm_found) {
+					float star_greenhouse = Commands->Get_Distance(star_pos, greenhouse_alarm);
+					float star_shower = Commands->Get_Distance(star_pos, shower_alarm);
+					if(star_greenhouse == (WWMath::Min(star_greenhouse, star_shower)))
 					{
-						Commands->Set_Objective_Radar_Blip_Object(609, object);
-						Commands->Set_Objective_HUD_Info_Position(609, 90.0f, "POG_M08_2_02.tga", IDS_POG_DISABLE, Commands->Get_Position (object));
+						object = Commands->Find_Object(101548);
+						if(object)
+						{
+							Commands->Set_Objective_Radar_Blip_Object(609, object);
+							Commands->Set_Objective_HUD_Info_Position(609, 90.0f, "POG_M08_2_02.tga", IDS_POG_DISABLE, Commands->Get_Position (object));
+						}
+					}
+					else
+					{
+						object = Commands->Find_Object(101549);
+						if(object)
+						{
+							Commands->Set_Objective_Radar_Blip_Object(609, object);
+							Commands->Set_Objective_HUD_Info_Position(609, 90.0f, "POG_M08_2_02.tga", IDS_POG_DISABLE, Commands->Get_Position (object));
+						}
 					}
 				}
-				else
-				{
-					object = Commands->Find_Object(101549);
-					if(object)
-					{
-						Commands->Set_Objective_Radar_Blip_Object(609, object);
-						Commands->Set_Objective_HUD_Info_Position(609, 90.0f, "POG_M08_2_02.tga", IDS_POG_DISABLE, Commands->Get_Position (object));
-					}
-				}
-
-
-				
 			}
 			break;
 		// Alarm State: Stand Down
@@ -457,7 +458,11 @@ DECLARE_SCRIPT(M06_Sydney_Mobius, "")
 		{
 			if(param == 0)
 			{
-				Commands->Set_Position (obj, Commands->Get_Position(Commands->Find_Object(107606)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (107606, _obj_pos)) {
+						Commands->Set_Position (obj, _obj_pos);
+					}
+				}
 				// Relocate Havoc
 				Commands->Send_Custom_Event(obj, STAR, M06_RELOCATE, 0, 0.0f);
 				// Activate MidtroC zone
@@ -478,7 +483,11 @@ DECLARE_SCRIPT(M06_Sydney_Mobius, "")
 			}
 			if(param == 1)
 			{
-				Commands->Set_Position (obj, Commands->Get_Position(Commands->Find_Object(108277)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (108277, _obj_pos)) {
+						Commands->Set_Position (obj, _obj_pos);
+					}
+				}
 				// Relocate Havoc
 				Commands->Send_Custom_Event(obj, STAR, M06_RELOCATE, 1, 0.0f);
 				// Accomplish Mission Objective for Sydney Escort out of Chateau
@@ -629,7 +638,11 @@ DECLARE_SCRIPT(M06_MidtroB_Explosion_Controller, "Loc0_ID=0:int, Loc1_ID=0:int, 
 			explode_loc[2] = Get_Int_Parameter("Loc2_ID");
 			explode_loc[3] = Get_Int_Parameter("Loc3_ID");
 			explode_loc[4] = Get_Int_Parameter("Loc4_ID");
-			Commands->Create_Explosion("Chateau_Explosions_Twiddler", Commands->Get_Position(Commands->Find_Object(explode_loc[param])));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (explode_loc[param], _obj_pos)) {
+					Commands->Create_Explosion("Chateau_Explosions_Twiddler", _obj_pos);
+				}
+			}
 		}
 	}
 };
@@ -1570,7 +1583,8 @@ DECLARE_SCRIPT(M06_Alarm_Behavior, "Alarm_Enemy_Seen=0.0:float, Alarm_Damaged=0.
 			
 			if(Commands->Find_Object(alarm_switch_id[i]))
 			{
-				alarm_pos = Commands->Get_Position(Commands->Find_Object(alarm_switch_id[i]));
+				//	Leaves alarm_pos alone when the object is gone, rather than overwriting it with the origin.
+				Find_Object_Position (alarm_switch_id[i], alarm_pos);
 			
 				this_distance = Commands->Get_Distance(soldier_pos, alarm_pos);
 			
@@ -1598,13 +1612,15 @@ DECLARE_SCRIPT(M06_Alarm_Behavior, "Alarm_Enemy_Seen=0.0:float, Alarm_Damaged=0.
 		ActionParamsStruct params;
 		if(action_id == 10 && reason == ACTION_COMPLETE_NORMAL && !alarmed)
 		{
-			Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(closest_id));
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 11);
-			params.Set_Face_Location( alarm_pos, 1.5f);
-			Commands->Action_Face_Location ( obj, params );
-
-			Commands->Send_Custom_Event (obj, Commands->Find_Object(closest_id), M06_CHECK_ALARM, Commands->Get_ID(obj), 0.0f);
-			
+			Vector3 alarm_pos;
+			bool alarm_pos_found = Find_Object_Position (closest_id, alarm_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 11);
+			if (alarm_pos_found) {
+				params.Set_Face_Location( alarm_pos, 1.5f);
+				Commands->Action_Face_Location ( obj, params );
+	
+				Commands->Send_Custom_Event (obj, Commands->Find_Object(closest_id), M06_CHECK_ALARM, Commands->Get_ID(obj), 0.0f);
+			}
 		}
 		
 	}
@@ -1643,10 +1659,13 @@ DECLARE_SCRIPT(M06_Alarm_Behavior, "Alarm_Enemy_Seen=0.0:float, Alarm_Damaged=0.
 				// Go to another alarm box
 				closest_id = Nearest(obj);
 
-				Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(closest_id));
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-				params.Set_Movement( alarm_pos, RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				Vector3 alarm_pos;
+				bool alarm_pos_found = Find_Object_Position (closest_id, alarm_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
+				if (alarm_pos_found) {
+					params.Set_Movement( alarm_pos, RUN, 1.5f );
+					Commands->Action_Goto( obj, params );
+				}
 			}
 			else
 			{
@@ -1742,10 +1761,13 @@ DECLARE_SCRIPT(M06_Alarm_Behavior, "Alarm_Enemy_Seen=0.0:float, Alarm_Damaged=0.
 
 				closest_id = Nearest(obj);
 
-				Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(closest_id));
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-				params.Set_Movement( alarm_pos, RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				Vector3 alarm_pos;
+				bool alarm_pos_found = Find_Object_Position (closest_id, alarm_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
+				if (alarm_pos_found) {
+					params.Set_Movement( alarm_pos, RUN, 1.5f );
+					Commands->Action_Goto( obj, params );
+				}
 			}
 		}
 	}
@@ -1768,10 +1790,13 @@ DECLARE_SCRIPT(M06_Alarm_Behavior, "Alarm_Enemy_Seen=0.0:float, Alarm_Damaged=0.
 
 				closest_id = Nearest(obj);
 
-				Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(closest_id));
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-				params.Set_Movement( alarm_pos, RUN, 1.5f );
-				Commands->Action_Goto( obj, params );
+				Vector3 alarm_pos;
+				bool alarm_pos_found = Find_Object_Position (closest_id, alarm_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
+				if (alarm_pos_found) {
+					params.Set_Movement( alarm_pos, RUN, 1.5f );
+					Commands->Action_Goto( obj, params );
+				}
 			}
 		}
 	}
@@ -3189,11 +3214,13 @@ DECLARE_SCRIPT(M06_Alarm_Engineer, "")
 		ActionParamsStruct params;
 		if(action_id == 10 && reason == ACTION_COMPLETE_NORMAL)
 		{
-			Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(broken_alarm_id));
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, 11);
-			params.Set_Face_Location( alarm_pos, 1.5f);
-			Commands->Action_Face_Location ( obj, params );
-
+			Vector3 alarm_pos;
+			bool alarm_pos_found = Find_Object_Position (broken_alarm_id, alarm_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, 11);
+			if (alarm_pos_found) {
+				params.Set_Face_Location( alarm_pos, 1.5f);
+				Commands->Action_Face_Location ( obj, params );
+			}
 		}
 		
 		if(action_id == 11 && reason == ACTION_COMPLETE_NORMAL)
@@ -3229,11 +3256,13 @@ DECLARE_SCRIPT(M06_Alarm_Engineer, "")
 			fixing_alarm = true;
 			broken_alarm_id = Commands->Get_ID(sound.Creator);
 
-			Vector3 alarm_pos = Commands->Get_Position(Commands->Find_Object(broken_alarm_id));
-			params.Set_Basic (this, (INNATE_PRIORITY_ENEMY_SEEN - 5), 10);
-			params.Set_Movement (alarm_pos, RUN, 2.0f);
-			Commands->Action_Goto (obj, params);
-
+			Vector3 alarm_pos;
+			bool alarm_pos_found = Find_Object_Position (broken_alarm_id, alarm_pos);
+params.Set_Basic (this, (INNATE_PRIORITY_ENEMY_SEEN - 5), 10);
+			if (alarm_pos_found) {
+				params.Set_Movement (alarm_pos, RUN, 2.0f);
+				Commands->Action_Goto (obj, params);
+			}
 		}
 		
 	}
@@ -3451,7 +3480,11 @@ DECLARE_SCRIPT(M06_Havoc_DLS, "")
 		{
 			if(param == 0)
 			{
-				Commands->Set_Position (obj, Commands->Get_Position(Commands->Find_Object(107607)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (107607, _obj_pos)) {
+						Commands->Set_Position (obj, _obj_pos);
+					}
+				}
 				Commands->Set_Facing (obj, -85.0F);
 			}
 			if(param == 1)
@@ -4938,7 +4971,7 @@ DECLARE_SCRIPT(M06_Flyover_Controller, "")  // 100018
 		{
 			last = param;
 
-			char *flyovers[11] = 
+			char *flyovers_inner[11] = 
 			{
 				"M06_XG_VehicleDrop0.txt",
 				"M06_XG_VehicleDrop1.txt",
@@ -4973,7 +5006,7 @@ DECLARE_SCRIPT(M06_Flyover_Controller, "")  // 100018
 				{
 					GameObject *controller = Commands->Create_Object("Invisible_Object", Vector3(-44.177f, 30.547f, 1.605f));
 					Commands->Set_Facing(controller, 0.000f);
-					Commands->Attach_Script(controller, "Test_Cinematic", flyovers[random]);
+					Commands->Attach_Script(controller, "Test_Cinematic", flyovers_inner[random]);
 				}
 				break;
 			case 4:
@@ -4984,7 +5017,7 @@ DECLARE_SCRIPT(M06_Flyover_Controller, "")  // 100018
 			case 9:
 				{
 					GameObject *controller = Commands->Create_Object("Invisible_Object", Vector3(0,0,0));
-					Commands->Attach_Script(controller, "Test_Cinematic", flyovers[random]);
+					Commands->Attach_Script(controller, "Test_Cinematic", flyovers_inner[random]);
 				}
 				break;
 			}
@@ -5165,7 +5198,11 @@ DECLARE_SCRIPT(M06_Servant_Behavior, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:in
 		if(action_id == GO_FIRST_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_FIRST_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc1_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc1_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_FIRST_LOC && reason == ACTION_COMPLETE_NORMAL)
@@ -5185,7 +5222,11 @@ DECLARE_SCRIPT(M06_Servant_Behavior, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:in
 		if(action_id == GO_SECOND_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_SECOND_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc2_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc2_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_SECOND_LOC && reason == ACTION_COMPLETE_NORMAL)
@@ -5206,7 +5247,11 @@ DECLARE_SCRIPT(M06_Servant_Behavior, "Loc1_ID=0:int, Loc2_ID=0:int, Loc3_ID=0:in
 		if(action_id == GO_THIRD_LOC && reason == ACTION_COMPLETE_NORMAL)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, FACING_THIRD_LOC);
-			params.Set_Face_Location( Commands->Get_Position(Commands->Find_Object(Get_Int_Parameter("Loc3_ID"))), 1.5f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (Get_Int_Parameter("Loc3_ID"), _obj_pos)) {
+					params.Set_Face_Location( _obj_pos, 1.5f);
+				}
+			}
 			Commands->Action_Face_Location ( obj, params );
 		}
 		if(action_id == FACING_THIRD_LOC && reason == ACTION_COMPLETE_NORMAL)

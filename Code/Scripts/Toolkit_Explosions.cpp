@@ -194,7 +194,11 @@ DECLARE_SCRIPT(M00_Create_Random_Explosion_DLS, "Explosion_Name:string, Delay_Mi
 				random = Commands->Get_Random_Int(0, 9);
 			}
 
-			Commands->Create_Explosion(Get_Parameter("Explosion_Name"), Commands->Get_Position(Commands->Find_Object(loc_id[random])), obj);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (loc_id[random], _obj_pos)) {
+					Commands->Create_Explosion(Get_Parameter("Explosion_Name"), _obj_pos, obj);
+				}
+			}
 			last = random;
 
 			float delay = Commands->Get_Random(Get_Float_Parameter("Delay_Min"), Get_Float_Parameter("Delay_Max"));

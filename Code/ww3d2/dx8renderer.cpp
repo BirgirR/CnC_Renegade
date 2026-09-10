@@ -1081,13 +1081,13 @@ void DX8RigidFVFCategoryContainer::Add_Mesh(MeshClass* mesh_)
 	}
 	
 	for (int j=0; j<uvcount; j++) {
-		unsigned char *vb=(unsigned char*) l.Get_Vertex_Array();
+		unsigned char *vb_inner=(unsigned char*) l.Get_Vertex_Array();
 		const Vector2*uvs=split_table.Get_UV_Array(j);
 		if (uvs) {
 			for (i=0; i<split_table.Get_Vertex_Count(); i++)
 			{
-				*(Vector2*)(vb+fi.Get_Tex_Offset(j))=uvs[i];
-				vb+=fi.Get_FVF_Size();
+				*(Vector2*)(vb_inner+fi.Get_Tex_Offset(j))=uvs[i];
+				vb_inner+=fi.Get_FVF_Size();
 			}		
 		}
 	}
@@ -1137,15 +1137,15 @@ void DX8FVFCategoryContainer::Insert_To_Texture_Category(
 		** the list always having matching texture categories next to each other.
 		*/
 		bool found_similar_category = false;
-		TextureCategoryListIterator it(&texture_category_list[pass]);
-		while (!it.Is_Done()) {
+		TextureCategoryListIterator it_inner(&texture_category_list[pass]);
+		while (!it_inner.Is_Done()) {
 			// Categorize according to first stage's texture for now
-			if (it.Peek_Obj()->Peek_Texture(0) == texs[0]) {
-				texture_category_list[pass].Add_After(new_tex_category,it.Peek_Obj());
+			if (it_inner.Peek_Obj()->Peek_Texture(0) == texs[0]) {
+				texture_category_list[pass].Add_After(new_tex_category,it_inner.Peek_Obj());
 				found_similar_category = true;
 				break;
 			}
-			it.Next();
+			it_inner.Next();
 		}
 
 		if (!found_similar_category) {
@@ -1443,7 +1443,7 @@ unsigned DX8TextureCategoryClass::Add_Mesh(
 	unsigned vertex_offset,
 	unsigned index_offset,
 	IndexBufferClass* index_buffer,
-	unsigned pass)
+	unsigned mesh_pass)
 {
 	int poly_count=split_table.Get_Polygon_Count();
 
@@ -1622,7 +1622,7 @@ void DX8TextureCategoryClass::Render(void)
 	#endif
 
 		for (unsigned i=0;i<MAX_TEXTURE_STAGES;++i) {
-			SNAPSHOT_SAY(("Set_Texture(%d,%s)\n",i,Peek_Texture(i) ? Peek_Texture(i)->Get_Texture_Name() : "NULL"));
+			SNAPSHOT_SAY(("Set_Texture(%d,%s)\n",i,(const char *)(Peek_Texture(i) ? Peek_Texture(i)->Get_Texture_Name() : "NULL")));
 			DX8Wrapper::Set_Texture(i,Peek_Texture(i));
 		}
 
@@ -1633,7 +1633,7 @@ void DX8TextureCategoryClass::Render(void)
 	SNAPSHOT_SAY(("Set_Material(%s)\n",Peek_Material() ? Peek_Material()->Get_Name() : "NULL"));
 	DX8Wrapper::Set_Material(Peek_Material());
 
-	SNAPSHOT_SAY(("Set_Shader(0x%x)\n",Get_Shader()));
+	SNAPSHOT_SAY(("Set_Shader(0x%x)\n",Get_Shader().Get_Bits()));
 	DX8Wrapper::Set_Shader(Get_Shader());
 	
 	PolyRenderTaskClass * prt = render_task_head;
@@ -2034,7 +2034,7 @@ void DX8MeshRendererClass::Add_To_Render_List(DecalMeshClass * decalmesh)
 
 void DX8MeshRendererClass::Render_Decal_Meshes(void)
 {
-	DX8Wrapper::Set_DX8_Render_State(D3DRS_ZBIAS,8);
+	DX8Wrapper::Set_DX8_Z_Bias(8);
 	
 	DecalMeshClass * decal_mesh = visible_decal_meshes;
 	while (decal_mesh != NULL) {
@@ -2043,7 +2043,7 @@ void DX8MeshRendererClass::Render_Decal_Meshes(void)
 	}
 	visible_decal_meshes = NULL;
 
-	DX8Wrapper::Set_DX8_Render_State(D3DRS_ZBIAS,0);
+	DX8Wrapper::Set_DX8_Z_Bias(0);
 }
 
 // ----------------------------------------------------------------------------

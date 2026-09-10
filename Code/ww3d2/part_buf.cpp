@@ -1818,7 +1818,6 @@ void ParticleBufferClass::Reset_Rotations(ParticlePropertyStruct<float> &new_pro
 {
 
 	unsigned int i;	// Used in loops	
-   float oo_intmax = 1.0f / (float)INT_MAX;
 	unsigned int ui_previous_key_time = 0;
 	unsigned int ui_current_key_time = 0;
 
@@ -2028,7 +2027,6 @@ void ParticleBufferClass::Reset_Frames(ParticlePropertyStruct<float> &new_props)
 {
 
 	unsigned int i;	// Used in loops	
-   float oo_intmax = 1.0f / (float)INT_MAX;
 	unsigned int ui_previous_key_time = 0;
 	unsigned int ui_current_key_time = 0;
 
@@ -2189,7 +2187,6 @@ void ParticleBufferClass::Reset_Blur_Times(ParticlePropertyStruct<float> &new_bl
 {
 
 	unsigned int i;	// Used in loops	
-   float oo_intmax = 1.0f / (float)INT_MAX;
 	unsigned int ui_previous_key_time = 0;
 	unsigned int ui_current_key_time = 0;
 

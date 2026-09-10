@@ -42,6 +42,8 @@
 #define __STATEMACHINE_H
 
 
+#include <type_traits>	// std::remove_reference, for ADD_STATE_TO_MACHINE
+
 #include "simplevec.h"
 #include "chunkio.h"
 
@@ -59,12 +61,20 @@
 			is_begin ? On_##state##_Begin : NULL,									\
 			is_end ? On_##state##_End : NULL);	*/
 
-#define ADD_STATE_TO_MACHINE(machine, state)		\
-		machine.Add_State (								\
-			On_##state##_Think,							\
-			On_##state##_Request_End,					\
-			On_##state##_Begin,							\
-			On_##state##_End);
+//
+//	Add_State takes pointers-to-member, which standard C++ requires be written
+//	&Class::Member -- VC6 accepted the bare member name (C3867). The owning
+//	class is recovered from the enclosing member function via decltype(*this),
+//	so every call site stays exactly as it was.
+//
+#define STATE_MACHINE_OWNER	std::remove_reference<decltype(*this)>::type
+
+#define ADD_STATE_TO_MACHINE(machine, state)					\
+		machine.Add_State (										\
+			&STATE_MACHINE_OWNER::On_##state##_Think,			\
+			&STATE_MACHINE_OWNER::On_##state##_Request_End,		\
+			&STATE_MACHINE_OWNER::On_##state##_Begin,			\
+			&STATE_MACHINE_OWNER::On_##state##_End);
 
 
 		//machine.Add_State (On_##state_Think, On_##state_Request_End, On_##state_Begin, On_##state_End);
@@ -258,10 +268,10 @@ public:
 	///////////////////////////////////////////////////////////////////
 	void	Add_State
 	(
-		STATE_OBJ::THINK_PTR think_ptr,
-		STATE_OBJ::REQUEST_END_PTR request_ptr,
-		STATE_OBJ::BEGIN_PTR begin_ptr,
-		STATE_OBJ::END_PTR end_ptr
+		typename STATE_OBJ::THINK_PTR think_ptr,
+		typename STATE_OBJ::REQUEST_END_PTR request_ptr,
+		typename STATE_OBJ::BEGIN_PTR begin_ptr,
+		typename STATE_OBJ::END_PTR end_ptr
 	)
 	{
 		StateClass<T> state;

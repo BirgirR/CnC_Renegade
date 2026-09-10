@@ -492,13 +492,13 @@ bool DynamicMeshClass::End_Vertex()
 		}
 
 		// check each pass
-		int pass = Get_Pass_Count();
-		while (pass--) {
+		int pass_inner = Get_Pass_Count();
+		while (pass_inner--) {
 
 			// If we are multi texture
-			if (MultiTexture[pass]) {
-				TextureClass *tex = Peek_Material_Info()->Get_Texture(TextureIdx[pass]);
-				Model->Set_Texture(PolyCount, tex, pass);
+			if (MultiTexture[pass_inner]) {
+				TextureClass *tex = Peek_Material_Info()->Get_Texture(TextureIdx[pass_inner]);
+				Model->Set_Texture(PolyCount, tex, pass_inner);
 				REF_PTR_RELEASE(tex);
 			}
 		}

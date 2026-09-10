@@ -231,6 +231,7 @@ protected:
 	/////////////////////////////////////////////////////////////////////////
 	// Protected methods
 	/////////////////////////////////////////////////////////////////////////
+	float					Parameterize_Key (float current_dist, int index, int count) const;
 	void					Initialize_Spline (DynamicVectorClass<PATH_NODE> &node_list);
 	void					Initialize_Vehicle_Spline (DynamicVectorClass<PATH_NODE> &node_list);
 	void					Initialize_Human_Spline (DynamicVectorClass<PATH_NODE> &node_list);

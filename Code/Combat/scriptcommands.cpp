@@ -1979,8 +1979,13 @@ bool Innate_Soldier_Enable( GameObject * obj, int bits, bool state )
 	if ( soldier == NULL ) {
 //		Cinematics call this for non-soldiers
 //		Debug_Say(( "Object is not a soldier!\n" ));
+		//	Return quietly, exactly as the non-PhysicalGameObj case above does.
+		//	This is an expected call, not a script error, but the
+		//	SCRIPT_PTR_CHECK_RET that used to stand here reported it as one --
+		//	so the message the authors deliberately commented out was being
+		//	printed anyway, just with a less useful wording.
+		return false;
 	}
-	SCRIPT_PTR_CHECK_RET(soldier, false);
 	bool old_state = soldier->Is_Innate_Enabled( bits );
 	if ( state ) {
 		soldier->Innate_Enable( bits );
@@ -2283,7 +2288,10 @@ void	Change_Objective_Type( int id, int type )
 
 void	Set_Objective_Radar_Blip( int id, const Vector3 & position )
 {
-	SCRIPT_TRACE((	"ST>Set_Objective_Radar_Blip( %d, %f %f %f )\n", id, position ));
+	// Was passing the Vector3 itself: %f expects three promoted doubles (24
+	// bytes) but a bitwise class copy pushes three raw floats (12), so the
+	// trace printed garbage and misread the stack. Pass the components.
+	SCRIPT_TRACE((	"ST>Set_Objective_Radar_Blip( %d, %f %f %f )\n", id, position.X, position.Y, position.Z ));
 	ObjectiveManager::Set_Objective_Radar_Blip( id, position );
 }
 
@@ -3386,7 +3394,7 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Action_Dock = Action_Dock;
 	EngineCommands.Action_Follow_Input = Action_Follow_Input;
 
-	EngineCommands.Modify_Action = Modify_Action;
+	EngineCommands.Modify_Action_Fn = Modify_Action;
 
 	EngineCommands.Set_Position = &Set_Position;
 	EngineCommands.Get_Position = &Get_Position;
@@ -3409,15 +3417,15 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Get_Preset_ID = &Get_Preset_ID;
 	EngineCommands.Get_Preset_Name = &Get_Preset_Name;
 	EngineCommands.Start_Timer = &Start_Timer;
-	EngineCommands.Trigger_Weapon = &Trigger_Weapon;
+	EngineCommands.Trigger_Weapon_Fn = &Trigger_Weapon;
 	EngineCommands.Select_Weapon = &Select_Weapon;
-	EngineCommands.Send_Custom_Event = &Send_Custom_Event;
+	EngineCommands.Send_Custom_Event_Fn = &Send_Custom_Event;
 	EngineCommands.Send_Damaged_Event = &Send_Damaged_Event;
 	EngineCommands.Get_Random = &Get_Random;
 	EngineCommands.Get_Random_Int = &Get_Random_Int;
 	EngineCommands.Find_Random_Simple_Object = &Find_Random_Simple_Object;
 	EngineCommands.Set_Model = &Set_Model;
-	EngineCommands.Set_Animation = &Set_Animation;
+	EngineCommands.Set_Animation_Fn = &Set_Animation;
 	EngineCommands.Set_Animation_Frame = &Set_Animation_Frame;
 	EngineCommands.Create_Sound = Create_Sound;
 	EngineCommands.Create_2D_Sound = Create_2D_Sound;
@@ -3429,7 +3437,7 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Fade_Background_Music = Fade_Background_Music;
 	EngineCommands.Stop_Background_Music = Stop_Background_Music;
 	EngineCommands.Monitor_Sound = Monitor_Sound;
-	EngineCommands.Stop_Sound = Stop_Sound;
+	EngineCommands.Stop_Sound_Fn = Stop_Sound;
 	EngineCommands.Start_Sound = Start_Sound;
 	EngineCommands.Get_Health = Get_Health;
 	EngineCommands.Get_Max_Health = Get_Max_Health;
@@ -3447,19 +3455,19 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Get_The_Star = Get_The_Star;
 	EngineCommands.Get_A_Star = Get_A_Star;
 
-	EngineCommands.Find_Closest_Soldier = Find_Closest_Soldier;
+	EngineCommands.Find_Closest_Soldier_Fn = Find_Closest_Soldier;
 	EngineCommands.Is_A_Star = Is_A_Star;
 
 	EngineCommands.Control_Enable = Control_Enable;
 	EngineCommands.Get_Damage_Bone_Name = Get_Damage_Bone_Name;
 	EngineCommands.Get_Damage_Bone_Direction = Get_Damage_Bone_Direction;
 	EngineCommands.Is_Object_Visible = Is_Object_Visible;
-	EngineCommands.Enable_Enemy_Seen = Enable_Enemy_Seen;
+	EngineCommands.Enable_Enemy_Seen_Fn = Enable_Enemy_Seen;
 
-	EngineCommands.Set_Display_Color = Set_Display_Color;
+	EngineCommands.Set_Display_Color_Fn = Set_Display_Color;
 	EngineCommands.Display_Text = Display_Text;
-	EngineCommands.Display_Float = Display_Float;
-	EngineCommands.Display_Int = Display_Int;
+	EngineCommands.Display_Float_Fn = Display_Float;
+	EngineCommands.Display_Int_Fn = Display_Int;
 
 	EngineCommands.Save_Data = Save_Data;
 	EngineCommands.Save_Pointer = Save_Pointer;
@@ -3481,12 +3489,12 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Set_Obj_Radar_Blip_Color = Set_Obj_Radar_Blip_Color;
 	EngineCommands.Enable_Radar = Enable_Radar;
 
-	EngineCommands.Create_Explosion = Create_Explosion;
-	EngineCommands.Create_Explosion_At_Bone = Create_Explosion_At_Bone;
+	EngineCommands.Create_Explosion_Fn = Create_Explosion;
+	EngineCommands.Create_Explosion_At_Bone_Fn = Create_Explosion_At_Bone;
 
 	EngineCommands.Enable_HUD = Enable_HUD;
 	EngineCommands.Mission_Complete = Mission_Complete;
-	EngineCommands.Give_PowerUp = Give_PowerUp;
+	EngineCommands.Give_PowerUp_Fn = Give_PowerUp;
 
 	EngineCommands.Innate_Disable = Innate_Disable;
 	EngineCommands.Innate_Enable = Innate_Enable;
@@ -3495,7 +3503,7 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Innate_Soldier_Enable_Footsteps_Heard = &Innate_Soldier_Enable_Footsteps_Heard;
 	EngineCommands.Innate_Soldier_Enable_Bullet_Heard = &Innate_Soldier_Enable_Bullet_Heard;
 	EngineCommands.Innate_Soldier_Enable_Actions = &Innate_Soldier_Enable_Actions;
-	EngineCommands.Set_Innate_Soldier_Home_Location = Set_Innate_Soldier_Home_Location;
+	EngineCommands.Set_Innate_Soldier_Home_Location_Fn = Set_Innate_Soldier_Home_Location;
 	EngineCommands.Set_Innate_Aggressiveness = Set_Innate_Aggressiveness;
 	EngineCommands.Set_Innate_Take_Cover_Probability = Set_Innate_Take_Cover_Probability;
 	EngineCommands.Set_Innate_Is_Stationary = Set_Innate_Is_Stationary;
@@ -3504,12 +3512,12 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Innate_Force_State_Gunshots_Heard = &Innate_Force_State_Gunshots_Heard;
 	EngineCommands.Innate_Force_State_Enemy_Seen = &Innate_Force_State_Enemy_Seen;
 
-	EngineCommands.Static_Anim_Phys_Goto_Frame = &Static_Anim_Phys_Goto_Frame;
-	EngineCommands.Static_Anim_Phys_Goto_Last_Frame = &Static_Anim_Phys_Goto_Last_Frame;
+	EngineCommands.Static_Anim_Phys_Goto_Frame_Fn = &Static_Anim_Phys_Goto_Frame;
+	EngineCommands.Static_Anim_Phys_Goto_Last_Frame_Fn = &Static_Anim_Phys_Goto_Last_Frame;
 
 	EngineCommands.Get_Sync_Time = &Get_Sync_Time;
 
-	EngineCommands.Add_Objective = &Add_Objective;
+	EngineCommands.Add_Objective_Fn = &Add_Objective;
 	EngineCommands.Remove_Objective = &Remove_Objective;
 	EngineCommands.Set_Objective_Status = &Set_Objective_Status;
 	EngineCommands.Change_Objective_Type = &Change_Objective_Type;
@@ -3518,7 +3526,7 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Set_Objective_HUD_Info = &Set_Objective_HUD_Info;
 	EngineCommands.Set_Objective_HUD_Info_Position = &Set_Objective_HUD_Info_Position;
 
-	EngineCommands.Shake_Camera = Shake_Camera;
+	EngineCommands.Shake_Camera_Fn = Shake_Camera;
 
 	EngineCommands.Enable_Spawner = Enable_Spawner;
 	EngineCommands.Trigger_Spawner = Trigger_Spawner;
@@ -3526,21 +3534,21 @@ ScriptCommands* Get_Script_Commands( void )
 	EngineCommands.Enable_Engine = Enable_Engine;
 	EngineCommands.Get_Difficulty_Level = Get_Difficulty_Level;
 
-	EngineCommands.Grant_Key = Grant_Key;
+	EngineCommands.Grant_Key_Fn = Grant_Key;
 	EngineCommands.Has_Key = Has_Key;
 	EngineCommands.Enable_Hibernation = Enable_Hibernation;
 	EngineCommands.Attach_To_Object_Bone = Attach_To_Object_Bone;
 
-	EngineCommands.Create_Conversation			= Create_Conversation;
-	EngineCommands.Join_Conversation				= Join_Conversation;
+	EngineCommands.Create_Conversation_Fn			= Create_Conversation;
+	EngineCommands.Join_Conversation_Fn				= Join_Conversation;
 	EngineCommands.Join_Conversation_Facing	= Join_Conversation_Facing;
-	EngineCommands.Start_Conversation			= Start_Conversation;
+	EngineCommands.Start_Conversation_Fn			= Start_Conversation;
 	EngineCommands.Monitor_Conversation			= Monitor_Conversation;
 	EngineCommands.Start_Random_Conversation	= Start_Random_Conversation;
 	EngineCommands.Stop_Conversation				= Stop_Conversation;
 	EngineCommands.Stop_All_Conversations		= Stop_All_Conversations;
 
-	EngineCommands.Apply_Damage					= Apply_Damage;
+	EngineCommands.Apply_Damage_Fn					= Apply_Damage;
 	EngineCommands.Set_Loiters_Allowed			= Set_Loiters_Allowed;
 
 	EngineCommands.Set_Is_Visible					= Set_Is_Visible;

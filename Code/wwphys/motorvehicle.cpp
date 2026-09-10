@@ -460,7 +460,7 @@ bool MotorVehicleDefClass::Load(ChunkLoadClass &cload)
 	if (!EngineTorqueCurveFilename.Is_Empty()) {
 
 		// strip the path off the filename
-		char * fname = strrchr(EngineTorqueCurveFilename,'\\');
+		char * fname = const_cast<char *>(strrchr(EngineTorqueCurveFilename,'\\'));
 		if (fname == NULL) {
 			EngineTorqueCurve = LookupTableMgrClass::Get_Table(EngineTorqueCurveFilename);
 		} else {
@@ -468,7 +468,7 @@ bool MotorVehicleDefClass::Load(ChunkLoadClass &cload)
 		}
 	}
 	if (EngineTorqueCurve == NULL) {
-		WWDEBUG_SAY(("Missing EngineTorqueCurve Table file: %s\r\n",EngineTorqueCurveFilename));
+		WWDEBUG_SAY(("Missing EngineTorqueCurve Table file: %s\r\n",(const char *)EngineTorqueCurveFilename));
 		EngineTorqueCurve = LookupTableMgrClass::Get_Table("DefaultTable");
 	}
 

@@ -1027,10 +1027,10 @@ ParticleEmitterDefClass::Read_Rotation_Keyframes (ChunkLoadClass &chunk_load)
 
 	// Read in the keys
 	for (unsigned int i=0; (i<header.KeyframeCount) && (ret_val == WW3D_ERROR_OK); i++) {
-		W3dEmitterRotationKeyframeStruct key;
-		if (chunk_load.Read(&key,sizeof(key)) == sizeof(key)) {
-			m_RotationKeyframes.KeyTimes[i] = key.Time;
-			m_RotationKeyframes.Values[i] = key.Rotation;
+		W3dEmitterRotationKeyframeStruct key_inner;
+		if (chunk_load.Read(&key_inner,sizeof(key_inner)) == sizeof(key_inner)) {
+			m_RotationKeyframes.KeyTimes[i] = key_inner.Time;
+			m_RotationKeyframes.Values[i] = key_inner.Rotation;
 		} else {
 			m_RotationKeyframes.KeyTimes[i] = 0.0f;
 			m_RotationKeyframes.Values[i] = 0.0f;
@@ -1074,12 +1074,12 @@ ParticleEmitterDefClass::Read_Frame_Keyframes (ChunkLoadClass &chunk_load)
 
 	// Read in the keys
 	for (unsigned int i=0; (i<header.KeyframeCount) && (ret_val == WW3D_ERROR_OK); i++) {
-		W3dEmitterFrameKeyframeStruct key;
-		if (chunk_load.Read(&key,sizeof(key)) != sizeof(key)) {
+		W3dEmitterFrameKeyframeStruct key_inner;
+		if (chunk_load.Read(&key_inner,sizeof(key_inner)) != sizeof(key_inner)) {
 			ret_val = WW3D_ERROR_LOAD_FAILED;
 		}
-		m_FrameKeyframes.KeyTimes[i] = key.Time;
-		m_FrameKeyframes.Values[i] = key.Frame;
+		m_FrameKeyframes.KeyTimes[i] = key_inner.Time;
+		m_FrameKeyframes.Values[i] = key_inner.Frame;
 	}
 	return ret_val;
 }
@@ -1117,12 +1117,12 @@ ParticleEmitterDefClass::Read_Blur_Time_Keyframes (ChunkLoadClass &chunk_load)
 
 	// Read in the keys
 	for (unsigned int i=0; (i<header.KeyframeCount) && (ret_val == WW3D_ERROR_OK); i++) {
-		W3dEmitterBlurTimeKeyframeStruct key;
-		if (chunk_load.Read(&key,sizeof(key)) != sizeof(key)) {
+		W3dEmitterBlurTimeKeyframeStruct key_inner;
+		if (chunk_load.Read(&key_inner,sizeof(key_inner)) != sizeof(key_inner)) {
 			ret_val = WW3D_ERROR_LOAD_FAILED;
 		}
-		m_BlurTimeKeyframes.KeyTimes[i] = key.Time;
-		m_BlurTimeKeyframes.Values[i] = key.BlurTime;
+		m_BlurTimeKeyframes.KeyTimes[i] = key_inner.Time;
+		m_BlurTimeKeyframes.Values[i] = key_inner.BlurTime;
 	}
 	return ret_val;
 }

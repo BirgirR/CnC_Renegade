@@ -132,58 +132,18 @@ void	MovieGameModeClass::Start_Movie( const char * filename )
 	WWMEMLOG(MEM_BINK);
 	
 	//
-	//	Check to see if we should enforce the CD or not...
+	//	The movies CD check that used to live here has been removed. It looked
+	//	for a drive whose volume label was "Renegade Data" -- the 2002 movies
+	//	disc -- and raised a modal dialog when it could not find one. No digital
+	//	release ships that disc, so the only thing it could do on a modern
+	//	install was interrupt every movie with a prompt nobody can satisfy.
 	//
-	bool force_cd = true;
-
-#ifdef WWDEBUG
-	RegistryClass registry( APPLICATION_SUB_KEY_NAME_DEBUG );
-	if ( registry.Is_Valid() ) {
-		force_cd = (registry.Get_Int( "DisableCDCheck", 0 ) == 0);
-	}
-#endif //WWDEBUG
-
-#if defined(BETACLIENT) || defined(FREEDEDICATEDSERVER) || defined(MULTIPLAYERDEMO)
-	force_cd = false;
-#endif //BETACLIENT
 
 	//
-	//	Play the movie (if it exists locally)
+	//	A movie that is installed plays; one that is not is skipped.
 	//
 	if ( ::GetFileAttributes ( filename ) != 0xFFFFFFFF ) {
 		Play_Movie ( filename );
-	} else {
-
-		//
-		//	Strip any path information off the filename
-		//
-		StringClass filename_only( filename, true );
-		const char *delimiter = ::strrchr( filename, '\\' );
-		if ( delimiter != NULL ) {
-			filename_only = delimiter + 1;
-		}
-
-		//
-		//	Try to find the CD...
-		//
-		StringClass cd_path;
-		if ( CDVerifier.Get_CD_Path( cd_path ) ) {
-			
-			//
-			//	Build a full-path to the movie on the CD
-			//
-			StringClass full_path = cd_path;
-			if ( cd_path[cd_path.Get_Length () - 1] != '\\' ) {
-				full_path += "\\";
-			}
-			full_path += filename_only;
-			Play_Movie( full_path );
-
-		} else if ( force_cd ) {
-			PendingMovieFilename	= filename_only;
-			IsPending				= true;
-			CDVerifier.Display_UI( this );
-		}
 	}
 }
 
@@ -202,46 +162,6 @@ void	MovieGameModeClass::Play_Movie( const char * filename )
 	IsPlaying = true;
 	return ;
 }
-
-void	MovieGameModeClass::HandleNotification (CDVerifyEvent &event)
-{
-	if ( event.Event() == CDVerifyEvent::VERIFIED ) {
-
-		//
-		//	Get the path to the CD...
-		//
-		StringClass cd_path;
-		if ( CDVerifier.Get_CD_Path( cd_path ) ) {
-			
-			//
-			//	Build a full-path to the movie on the CD
-			//
-			StringClass full_path = cd_path;
-			if ( cd_path[cd_path.Get_Length () - 1] != '\\' ) {
-				full_path += "\\";
-			}
-			full_path += PendingMovieFilename;
-			Play_Movie( full_path );
-		}		
-	} else if ( event.Event() == CDVerifyEvent::NOT_VERIFIED ) {			
-
-		if ( MovieStartupMode == STARTUP_MOVIE_EA || MovieStartupMode == STARTUP_MOVIE_INTRO) {
-			MovieStartupMode = STARTUP_MOVIE_OFF;
-			
-			// Goto main menu
-			RenegadeDialogMgrClass::Goto_Location (RenegadeDialogMgrClass::LOC_MAIN_MENU);
-			Deactivate();
-
-		} else {
-			Movie_Done();
-		}
-	}
-
-	PendingMovieFilename = "";
-	IsPending = false;
-	return ;
-}
-
 
 void	MovieGameModeClass::Startup_Movies( void )
 {

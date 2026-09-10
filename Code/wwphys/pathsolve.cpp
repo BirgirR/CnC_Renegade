@@ -1637,7 +1637,7 @@ PathSolveClass::Post_Process_Path (void)
 	//
 	for (index = m_Path.Count () - 2; index > 1; index --) {
 		Vector3 &prev_point				= m_Path[index + 1].m_Point;
-		Vector3 &next_point				= m_Path[index - 1].m_Point;
+		Vector3 &next_point_inner				= m_Path[index - 1].m_Point;
 		PathfindPortalClass *portal	= m_Path[index].m_Portal;
 		if (portal != NULL && portal->As_PathfindActionPortalClass () == NULL) {
 
@@ -1648,7 +1648,7 @@ PathSolveClass::Post_Process_Path (void)
 			AABoxClass portal_box;
 			portal->Get_Bounding_Box (portal_box);
 
-			m_Path[index].m_Point = Relax_Line (prev_point, next_point, portal_box);
+			m_Path[index].m_Point = Relax_Line (prev_point, next_point_inner, portal_box);
 		}
 	}
 
@@ -1700,7 +1700,7 @@ PathSolveClass::Keep_Unit_Inside_Sectors (void)
 			//
 			//	Get the sector's box
 			//
-			AABoxClass sector_box (m_Path[index].m_SectorCenter, m_Path[index].m_SectorExtent);
+			AABoxClass sector_box_inner (m_Path[index].m_SectorCenter, m_Path[index].m_SectorExtent);
 			float width				= m_PathObject.Get_Width () * 3;
 			Vector3 start_point	= curr_point;
 
@@ -1726,7 +1726,7 @@ PathSolveClass::Keep_Unit_Inside_Sectors (void)
 				// along this line
 				//
 				Vector3 new_point (0, 0, 0);
-				if (::Check_Line (start_point, next_point, sector_box, portal_box, width, &new_point)) {
+				if (::Check_Line (start_point, next_point, sector_box_inner, portal_box, width, &new_point)) {
 
 					//
 					//	Yup, we would jut outside the sector, so add a new point
@@ -1754,7 +1754,7 @@ PathSolveClass::Keep_Unit_Inside_Sectors (void)
 				// along this line
 				//
 				Vector3 new_point (0, 0, 0);
-				if (::Check_Line (start_point, next_point, sector_box, portal_box, width, &new_point)) {
+				if (::Check_Line (start_point, next_point, sector_box_inner, portal_box, width, &new_point)) {
 
 					//
 					//	Yup, we would jut outside the sector, so add a new point

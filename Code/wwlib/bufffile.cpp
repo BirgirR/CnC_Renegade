@@ -157,11 +157,11 @@ int BufferedFileClass::Read(void * buffer, int size)
 
 	// If there is anything in the buffer, copy it in.
 	if ( BufferAvailable > 0 ) {
-		int amount = min( size, BufferAvailable );
-		::memcpy( buffer, &Buffer[BufferOffset], amount );
-		BufferAvailable -= amount;
-		BufferOffset += amount;
-		read += amount;
+		int amount_inner = min( size, BufferAvailable );
+		::memcpy( buffer, &Buffer[BufferOffset], amount_inner );
+		BufferAvailable -= amount_inner;
+		BufferOffset += amount_inner;
+		read += amount_inner;
 	}
 
 	return read;

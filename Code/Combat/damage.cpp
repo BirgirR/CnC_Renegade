@@ -151,7 +151,7 @@ void	ArmorWarheadManager::Init( void )
 		for ( armor_num = 0; armor_num < ArmorNames.Count(); armor_num++ ) {
 			int id = armorINI->Get_Int(	SECTION_ARMOR_SAVE_IDS, ArmorNames[armor_num], -100 );
 			if ( id == -100 ) {
-				Debug_Say(( "Missing Armor_Save_ID for %s\n", ArmorNames[armor_num] ));
+				Debug_Say(( "Missing Armor_Save_ID for %s\n", (const char *)ArmorNames[armor_num]));
 			}
 			ArmorSaveIDs[ armor_num ] = id;
 		}
@@ -161,7 +161,7 @@ void	ArmorWarheadManager::Init( void )
 		for ( warhead_num = 0; warhead_num < WarheadNames.Count(); warhead_num++ ) {
 			int id = armorINI->Get_Int(	SECTION_WARHEAD_SAVE_IDS, WarheadNames[warhead_num], -100 );
 			if ( id == -100 ) {
-				Debug_Say(( "Missing Warhead_Save_ID for %s\n", WarheadNames[warhead_num] ));
+				Debug_Say(( "Missing Warhead_Save_ID for %s\n", (const char *)WarheadNames[warhead_num]));
 			}
 			WarheadSaveIDs[ warhead_num ] = id;
 		}
@@ -183,10 +183,10 @@ void	ArmorWarheadManager::Init( void )
 		Multipliers = new safe_float[ Get_Num_Armor_Types() * Get_Num_Warhead_Types() ];
 		for ( armor_num = 0; armor_num < ArmorNames.Count(); armor_num++ ) {
 			char section_name[80];
-			sprintf( section_name, SECTION_SCALE, ArmorNames[armor_num] );
-			for ( int warhead_num = 0; warhead_num < WarheadNames.Count(); warhead_num++ ) {
-				Multipliers[ armor_num * Get_Num_Warhead_Types() + warhead_num ]  =
-					armorINI->Get_Float( section_name, WarheadNames[warhead_num], 1.0f );
+			sprintf( section_name, SECTION_SCALE, (const char *)ArmorNames[armor_num] );
+			for ( int warhead_num_inner = 0; warhead_num_inner < WarheadNames.Count(); warhead_num_inner++ ) {
+				Multipliers[ armor_num * Get_Num_Warhead_Types() + warhead_num_inner ]  =
+					armorINI->Get_Float( section_name, WarheadNames[warhead_num_inner], 1.0f );
 			}
 		}
 
@@ -194,10 +194,10 @@ void	ArmorWarheadManager::Init( void )
 		Absorbsion = new safe_float[ Get_Num_Armor_Types() * Get_Num_Warhead_Types() ];
 		for ( armor_num = 0; armor_num < ArmorNames.Count(); armor_num++ ) {
 			char section_name[80];
-			sprintf( section_name, SECTION_SHIELD, ArmorNames[armor_num] );
-			for ( int warhead_num = 0; warhead_num < WarheadNames.Count(); warhead_num++ ) {
-				Absorbsion[ armor_num * Get_Num_Warhead_Types() + warhead_num ]  =
-					armorINI->Get_Float( section_name, WarheadNames[warhead_num], 0.0f );
+			sprintf( section_name, SECTION_SHIELD, (const char *)ArmorNames[armor_num] );
+			for ( int warhead_num_inner = 0; warhead_num_inner < WarheadNames.Count(); warhead_num_inner++ ) {
+				Absorbsion[ armor_num * Get_Num_Warhead_Types() + warhead_num_inner ]  =
+					armorINI->Get_Float( section_name, WarheadNames[warhead_num_inner], 0.0f );
 			}
 		}
 
@@ -283,8 +283,8 @@ void	ArmorWarheadManager::Init( void )
 			};
 			StringClass section = ImperviousSectionNames[damage];
 
-			int count =  armorINI->Entry_Count( section );
-			for ( entry = 0; entry < count; entry++ )	{
+			int count_inner =  armorINI->Entry_Count( section );
+			for ( entry = 0; entry < count_inner; entry++ )	{
 				StringClass	entry_name = armorINI->Get_String( temp_string, section, armorINI->Get_Entry( section, entry) );
 				if ( !entry_name.Is_Empty() ) {
 					ImperviousSkins[damage].Add( Get_Armor_Type( entry_name ) );
@@ -958,7 +958,7 @@ float	DefenseObjectClass::Do_Damage( const OffenseObjectClass & offense, float s
 		}
 		float points = damage;
 		float armor = Get_Shield_Strength();
-	   DIAG_LOG(( "DRCV", "%s; %d; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f", weapon_name, hitter_id, points, armor, Health, pos.X, pos.Y, pos.Z ));
+	   DIAG_LOG(( "DRCV", "%s; %d; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f", weapon_name, hitter_id, points, armor, (float)Health, pos.X, pos.Y, pos.Z ));
 	}
 
 	if (( smart == COMBAT_STAR ) && ( smart != NULL )) {
@@ -980,7 +980,7 @@ float	DefenseObjectClass::Do_Damage( const OffenseObjectClass & offense, float s
 		}
 		float points = damage;
 		float armor = Get_Shield_Strength();
-	   DIAG_LOG(( "DEFC", "%1.2f; %1.2f; %1.2f; %s; %d; %d; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %s ", pos.X, pos.Y, pos.Z, weapon_name, ammo, hittee_id, points, armor, Health, victim_pos.X, victim_pos.Y, victim_pos.Z, team_name ));
+	   DIAG_LOG(( "DEFC", "%1.2f; %1.2f; %1.2f; %s; %d; %d; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %1.2f; %s ", pos.X, pos.Y, pos.Z, weapon_name, ammo, hittee_id, points, armor, (float)Health, victim_pos.X, victim_pos.Y, victim_pos.Z, team_name ));
 	}
 
 	// Clamp Health to Max

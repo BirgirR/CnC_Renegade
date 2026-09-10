@@ -1546,12 +1546,12 @@ DialogBaseClass::Set_Rect (const RectClass &rect)
 		//
 		//	Offset this dialog
 		//
-		RectClass rect = ChildDialogList[index]->Get_Rect ();
-		rect.Left	+= offset.X;
-		rect.Right	+= offset.X;
-		rect.Top		+= offset.Y;
-		rect.Bottom	+= offset.Y;
-		ChildDialogList[index]->Set_Rect (rect);
+		RectClass rect_inner = ChildDialogList[index]->Get_Rect ();
+		rect_inner.Left	+= offset.X;
+		rect_inner.Right	+= offset.X;
+		rect_inner.Top		+= offset.Y;
+		rect_inner.Bottom	+= offset.Y;
+		ChildDialogList[index]->Set_Rect (rect_inner);
 	}
 
 	Rect = rect;

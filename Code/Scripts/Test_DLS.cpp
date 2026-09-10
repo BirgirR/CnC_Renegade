@@ -1779,7 +1779,7 @@ enum
 #define	WRONG_WAY_CONV_TABLE_SIZE  ( sizeof(Wrong_Way_Conv_Table) / sizeof (Wrong_Way_Conv_Table[0]) )
 const char *	Wrong_Way_Conv_Table[] = 
 {
-	"MX0_A04_CON015",	// You’re going the wrong way, Havoc!
+	"MX0_A04_CON015",	// Youï¿½re going the wrong way, Havoc!
 	"MX0_A04_CON016",	// Stay with the Mission, Havoc!
 	"MX0_A04_CON017",	// This area is already secure.
 	"MX0_A04_CON018",	// Havoc, Did I say retreat? Now Turn Around!
@@ -2028,9 +2028,12 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 			{
 				mx0_gdi_reinforcement_killed = 0;
 				// Additional GDI troop drop
-				GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position(Commands->Find_Object(1500102)));
-				Commands->Set_Facing(chinook_obj2, Commands->Get_Facing(Commands->Find_Object(1500102)));
-				Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_Reinforce_Area4.txt");
+				Vector3 chinook_obj2_spawn_pos;
+				if (Find_Object_Position (1500102, chinook_obj2_spawn_pos)) {
+					GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", chinook_obj2_spawn_pos);
+					Commands->Set_Facing(chinook_obj2, Commands->Get_Facing(Commands->Find_Object(1500102)));
+					Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_Reinforce_Area4.txt");
+				}
 			}
 		}
 
@@ -2185,12 +2188,15 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 
 					// Begin reinforcing GDI via Chinook
 					// Additional GDI troop drop
-					GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position(Commands->Find_Object(1500102)));
-					Commands->Set_Facing(chinook_obj2, Commands->Get_Facing(Commands->Find_Object(1500102)));
-					Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_Reinforce_Area4.txt");
-
-					// Relocate Troops
-					Relocate_Soldiers (obj);
+					Vector3 chinook_obj2_spawn_pos;
+					if (Find_Object_Position (1500102, chinook_obj2_spawn_pos)) {
+						GameObject * chinook_obj2 = Commands->Create_Object ( "Invisible_Object", chinook_obj2_spawn_pos);
+						Commands->Set_Facing(chinook_obj2, Commands->Get_Facing(Commands->Find_Object(1500102)));
+						Commands->Attach_Script(chinook_obj2, "Test_Cinematic", "MX0_GDI_Reinforce_Area4.txt");
+	
+						// Relocate Troops
+						Relocate_Soldiers (obj);
+					}
 				}
 				break;
 			}
@@ -2247,12 +2253,12 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 		// Commando, take out those SAMs
 		if(timer_id == CONVERSATION_HAVOC_TAKE_OUT_SAMS)
 		{
-			// Havoc, you’ve got  to clear out those SAM sites!
+			// Havoc, youï¿½ve got  to clear out those SAM sites!
 			const char *conv_name = ("MX0_A04_CON005");
 			int conv_id = Commands->Create_Conversation (conv_name, 100.0f, 200.0f, false);
 			Commands->Join_Conversation(NULL, conv_id, false, true);
 			Commands->Start_Conversation (conv_id, 1);
-			// RocketTrooper - It’s down! The Obelisk is down!
+			// RocketTrooper - Itï¿½s down! The Obelisk is down!
 			Commands->Send_Custom_Event( obj, Commands->Find_Object(gdi_trooper2_id), MX0_SPECIFIC_ACTION, MX0_ROCKETTROOPER_OBELISK_DOWN, 3.0f);
 		}
 		if(timer_id == SAMS_DESTRUCTION)
@@ -2352,12 +2358,12 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 				{
 					// Start A10 - Outro muzak
 					Commands->Fade_Background_Music( "Renegade_A10_Outro.mp3", 1, 1);
-					// A10 - This is Eagle Claw 1 –Starting  attack run
+					// A10 - This is Eagle Claw 1 ï¿½Starting  attack run
 					const char *conv_name = ("MX0_A04_CON010");
 					int conv_id = Commands->Create_Conversation (conv_name, 100.0f, 200.0f, false);
 					Commands->Join_Conversation(NULL, conv_id, false, true);
 					Commands->Start_Conversation (conv_id, 1);
-					// A10 - I’m hit! I’m hit!
+					// A10 - Iï¿½m hit! Iï¿½m hit!
 					Commands->Start_Timer (obj, this, 5.0f, A10_HIT);
 					// A10 cinematic
 					GameObject *controller = Commands->Create_Object("Invisible_Object", Vector3(0.0f, 0.0f, 0.0f));
@@ -2374,7 +2380,7 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 			}
 			
 		}
-		// A10 - I’m hit! I’m hit!
+		// A10 - Iï¿½m hit! Iï¿½m hit!
 		if(timer_id == A10_HIT)
 		{
 			const char *conv_name = ("MX0_A04_CON011");
@@ -2386,20 +2392,22 @@ DECLARE_SCRIPT (MX0_Area4_Controller_DLS, "")
 		if(timer_id == ION_CANNON_STRIKE)
 		{
 			// We have a lock on that base
-			// This is Eagle Base.  I’m not risking any more pilots.
+			// This is Eagle Base.  Iï¿½m not risking any more pilots.
 			const char *conv_name = ("MX0_A04_CON012");
 			int conv_id = Commands->Create_Conversation (conv_name, 100.0f, 200.0f, false);
 			Commands->Join_Conversation(NULL, conv_id, false, true);
 			Commands->Start_Conversation (conv_id, 1);
 			// Ion Cannon strike
-			GameObject * ion_cannon_strike = Commands->Create_Object("Nod_RocketSoldier_1Off", Commands->Get_Position(Commands->Find_Object(1500087)));
-			Commands->Attach_Script(ion_cannon_strike, "MX0_Plant_Ion_Beacon_DLS", "");
-			Commands->Start_Timer (obj, this, 22.0f, FLASH_TO_WHITE);
-			Commands->Start_Timer (obj, this, 25.0f, FINALE);
-
-			// Relocate Troops
-			Relocate_Soldiers (obj);
-			
+			Vector3 ion_cannon_strike_spawn_pos;
+			if (Find_Object_Position (1500087, ion_cannon_strike_spawn_pos)) {
+				GameObject * ion_cannon_strike = Commands->Create_Object("Nod_RocketSoldier_1Off", ion_cannon_strike_spawn_pos);
+				Commands->Attach_Script(ion_cannon_strike, "MX0_Plant_Ion_Beacon_DLS", "");
+				Commands->Start_Timer (obj, this, 22.0f, FLASH_TO_WHITE);
+				Commands->Start_Timer (obj, this, 25.0f, FINALE);
+	
+				// Relocate Troops
+				Relocate_Soldiers (obj);
+			}
 		}
 		if(timer_id == FLASH_TO_WHITE)
 		{
@@ -2492,7 +2500,11 @@ DECLARE_SCRIPT (MX0_Vehicle_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Attack_L
 
 		ActionParamsStruct params;
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, speed, 5.0f );
+			}
+		}
 		params.Set_Attack(Commands->Find_Object(1500024), 0.0f, 0.0f, true);
 		Commands->Action_Attack(obj, params);
 	}
@@ -2503,7 +2515,11 @@ DECLARE_SCRIPT (MX0_Vehicle_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Attack_L
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, speed, 5.0f );
+			}
+		}
 		params.Set_Attack(enemy, 200.0f, 5.0f, true);
 	//	params.AttackCheckBlocked = false;
 	//	params.AttackForceFire = true;
@@ -2519,7 +2535,11 @@ DECLARE_SCRIPT (MX0_Vehicle_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Attack_L
 		{
 			loc = param;
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+					params.Set_Movement( _obj_pos, speed, 5.0f );
+				}
+			}
 			params.Set_Attack(Commands->Find_Object(1500024), 0.0f, 0.0f, true);
 			Commands->Action_Attack(obj, params);
 			Commands->Debug_Message("Attack_Loc [%d] = %d \n", loc, attack_loc[loc]);					
@@ -2530,7 +2550,7 @@ DECLARE_SCRIPT (MX0_Vehicle_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Attack_L
 			// Humvee announces discovery of Nod Base
 			if(param == MX0_DISCOVERS_NOD_BASE)  
 			{
-				// Eagle Base– We found it!
+				// Eagle Baseï¿½ We found it!
 				const char *conv_name = ("MX0_A04_CON001");
 				int conv_id = Commands->Create_Conversation (conv_name, 100.0f, 200.0f, false);
 				Commands->Join_Conversation(obj, conv_id, false, true);
@@ -2873,7 +2893,11 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 
 		ActionParamsStruct params;
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, speed, 5.0f );
+			}
+		}
 		params.Set_Attack(Commands->Find_Object(1500024), 0.0f, 0.0f, true);
 		Commands->Action_Attack(obj, params);
 	}
@@ -2884,7 +2908,11 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, speed, 5.0f );
+			}
+		}
 		params.Set_Attack(enemy, 200.0f, 5.0f, true);
 	//	params.AttackCheckBlocked = false;
 	//	params.AttackForceFire = true;
@@ -2901,7 +2929,11 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 			loc = param;
 			bool move_crouched = Commands->Get_Random_Int(0, 1) ? false : true;
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, MX0_SOLDIER_MOVE );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+					params.Set_Movement( _obj_pos, speed, 5.0f );
+				}
+			}
 			params.Set_Attack(Commands->Find_Object(1500024), 0.0f, 0.0f, true);
 			params.MoveCrouched = move_crouched;
 			Commands->Action_Attack(obj, params);
@@ -2915,11 +2947,11 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 			{
 				Commands->Innate_Disable(obj);
 
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic( this, 100, 1 );
-				params.Set_Animation ("H_A_A0A0_L51", true);
-				Commands->Action_Play_Animation (obj, params);
+				params_inner.Set_Basic( this, 100, 1 );
+				params_inner.Set_Animation ("H_A_A0A0_L51", true);
+				Commands->Action_Play_Animation (obj, params_inner);
 				
 				// Death #1 - Bullet death scream
 				const char *conv_name = ("MX0_A04_CON019");
@@ -2949,10 +2981,10 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 				Commands->Join_Conversation(obj, conv_id, false, true);
 				Commands->Start_Conversation (conv_id, MX0_ROCKETTROOPER_HOT_OBELISK);	
 			}
-			// Rocket Trooper - It’s down! The Obelisk is down!
+			// Rocket Trooper - Itï¿½s down! The Obelisk is down!
 			if(param == MX0_ROCKETTROOPER_OBELISK_DOWN) 
 			{
-				// It’s down! The Obelisk is down!
+				// Itï¿½s down! The Obelisk is down!
 				const char *conv_name = ("MX0_A04_CON006");
 				int conv_id = Commands->Create_Conversation (conv_name, 100.0f, 200.0f, false);
 				Commands->Join_Conversation(obj, conv_id, false, true);
@@ -3005,7 +3037,11 @@ DECLARE_SCRIPT (MX0_GDI_Soldier_DLS, "Attack_Loc0=0:int, Attack_Loc1=0:int, Atta
 		if(timer_id == MX0_SOLDIER_MOVE)
 		{
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, MX0_SOLDIER_MOVE );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), speed, 5.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+					params.Set_Movement( _obj_pos, speed, 5.0f );
+				}
+			}
 			params.Set_Attack(Commands->Find_Object(1500024), 0.0f, 0.0f, true);
 			Commands->Action_Attack(obj, params);
 		}

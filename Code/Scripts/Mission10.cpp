@@ -513,14 +513,17 @@ DECLARE_SCRIPT(M10_Objective_Controller, "")
 							Commands->Start_Conversation(id, 100045);
 							Commands->Monitor_Conversation(obj, id);
 
-							Vector3 drop_loc = Commands->Get_Position (Commands->Find_Object (2005997));
-							float facing = Commands->Get_Facing (Commands->Find_Object (2005997));
-							GameObject * chinook_obj1 = Commands->Create_Object("Invisible_Object", drop_loc);
-
-							if (chinook_obj1)
-							{
-								Commands->Set_Facing(chinook_obj1, facing);
-								Commands->Attach_Script(chinook_obj1, "Test_Cinematic", "M10_GDI_Drop_HummVee.txt");
+							Vector3 drop_loc;
+							bool drop_loc_found = Find_Object_Position (2005997, drop_loc);
+float facing = Commands->Get_Facing (Commands->Find_Object (2005997));
+							if (drop_loc_found) {
+								GameObject * chinook_obj1 = Commands->Create_Object("Invisible_Object", drop_loc);
+	
+								if (chinook_obj1)
+								{
+									Commands->Set_Facing(chinook_obj1, facing);
+									Commands->Attach_Script(chinook_obj1, "Test_Cinematic", "M10_GDI_Drop_HummVee.txt");
+								}
 							}
 						}
 					}
@@ -2801,10 +2804,10 @@ DECLARE_SCRIPT (M10_Mammoth_Grant_Controller, "") //2001634
 
 		if (type == GRANT)
 		{
-			GameObject *mammoth = Commands->Find_Object (2000787);
-			float curr_health = Commands->Get_Health(mammoth);
-			Vector3 mammoth_loc = Commands->Get_Position (mammoth);
-			float mammoth_face = Commands->Get_Facing (mammoth);
+			GameObject *mammoth_inner = Commands->Find_Object (2000787);
+			float curr_health = Commands->Get_Health(mammoth_inner);
+			Vector3 mammoth_loc = Commands->Get_Position (mammoth_inner);
+			float mammoth_face = Commands->Get_Facing (mammoth_inner);
 
 			GameObject *mammoth_new;
 			
@@ -2813,16 +2816,19 @@ DECLARE_SCRIPT (M10_Mammoth_Grant_Controller, "") //2001634
 			Commands->Set_Health(mammoth_new, curr_health);
 			Commands->Set_Facing ( mammoth_new, mammoth_face );
 
-			Commands->Destroy_Object (mammoth);
+			Commands->Destroy_Object (mammoth_inner);
 
 			GameObject *GDI_soldier;
-			Vector3 GI_loc = Commands->Get_Position (Commands->Find_Object (2001634));
-			GDI_soldier = Commands->Create_Object ("GDI_MP", GI_loc);
-
-			int id = Commands->Create_Conversation("M10CON071", 99, 2000, false);
-			Commands->Join_Conversation(GDI_soldier, id);
-			Commands->Start_Conversation(id, 100071);
-			Commands->Monitor_Conversation(obj, id);		
+			Vector3 GI_loc;
+			bool GI_loc_found = Find_Object_Position (2001634, GI_loc);
+			if (GI_loc_found) {
+				GDI_soldier = Commands->Create_Object ("GDI_MP", GI_loc);
+	
+				int id = Commands->Create_Conversation("M10CON071", 99, 2000, false);
+				Commands->Join_Conversation(GDI_soldier, id);
+				Commands->Start_Conversation(id, 100071);
+				Commands->Monitor_Conversation(obj, id);
+			}
 		}
 	}
 };
@@ -2927,14 +2933,16 @@ DECLARE_SCRIPT(DME_Cinematic_Zone, "")
 			stealth_counter++;
 
 			float stealth_face = Commands->Get_Facing (Commands->Find_Object (drop_area [2]));
-			Vector3 drop_loc = Commands->Get_Position (Commands->Find_Object (drop_area [2]));
-
-			GameObject * chinook_obj3 = Commands->Create_Object ( "Invisible_Object", drop_loc);
-			Commands->Set_Facing(chinook_obj3, stealth_face);
-			Commands->Attach_Script(chinook_obj3, "Test_Cinematic", "M10_XG_VehicleDrop2.txt");
-
-			stealthtank_alive = true;
-			Commands->Start_Timer(obj, this, 10.0f, FAKE_TIMER);
+			Vector3 drop_loc;
+			bool drop_loc_found = Find_Object_Position (drop_area [2], drop_loc);
+			if (drop_loc_found) {
+				GameObject * chinook_obj3 = Commands->Create_Object ( "Invisible_Object", drop_loc);
+				Commands->Set_Facing(chinook_obj3, stealth_face);
+				Commands->Attach_Script(chinook_obj3, "Test_Cinematic", "M10_XG_VehicleDrop2.txt");
+	
+				stealthtank_alive = true;
+				Commands->Start_Timer(obj, this, 10.0f, FAKE_TIMER);
+			}
 		}
 
 	}
@@ -2953,11 +2961,13 @@ DECLARE_SCRIPT(DME_Cinematic_Zone, "")
 				int random_loc = Commands->Get_Random_Int (0, 4);
 
 				float stealth_face = Commands->Get_Facing (Commands->Find_Object (drop_area [random_loc]));
-				Vector3 drop_loc = Commands->Get_Position (Commands->Find_Object (drop_area [random_loc]));
-
-				GameObject * chinook_obj3 = Commands->Create_Object ( "Invisible_Object", drop_loc);
-				Commands->Set_Facing(chinook_obj3, stealth_face);
-				Commands->Attach_Script(chinook_obj3, "Test_Cinematic", "M10_XG_VehicleDrop2.txt");
+				Vector3 drop_loc;
+				bool drop_loc_found = Find_Object_Position (drop_area [random_loc], drop_loc);
+				if (drop_loc_found) {
+					GameObject * chinook_obj3 = Commands->Create_Object ( "Invisible_Object", drop_loc);
+					Commands->Set_Facing(chinook_obj3, stealth_face);
+					Commands->Attach_Script(chinook_obj3, "Test_Cinematic", "M10_XG_VehicleDrop2.txt");
+				}
 			}
 
 			Commands->Start_Timer(obj, this, 10.0f, FAKE_TIMER);
@@ -3043,7 +3053,11 @@ DECLARE_SCRIPT (M10_Stealth_Attack_01, "")
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+			}
+		}
 		params.Set_Attack(enemy, 100.0f, 5.0f, true);
 		params.AttackCheckBlocked = false;
 		//params.AttackActive = true;
@@ -3065,7 +3079,16 @@ DECLARE_SCRIPT (M10_Stealth_Attack_01, "")
 
 			for (int x = 0; x <= 12; x++)
 			{
-				float dist = Commands->Get_Distance(star_loc, Commands->Get_Position (Commands->Find_Object (attack_loc [x])));
+				Vector3 attack_pos;
+				if (!Find_Object_Position (attack_loc [x], attack_pos))
+				{
+					//	This attack point is not in the level. Skip it, rather
+					//	than letting it win the "closest" comparison below by
+					//	measuring the distance to the map origin.
+					continue;
+				}
+
+				float dist = Commands->Get_Distance (star_loc, attack_pos);
 				
 				if (dist < loc_dist)
 				{
@@ -3087,7 +3110,11 @@ DECLARE_SCRIPT (M10_Stealth_Attack_01, "")
 			
 				ActionParamsStruct params;
 				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-				params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+						params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+					}
+				}
 				//params.Set_Attack(STAR, 100.0f, 5.0f, true);
 				//params.AttackCheckBlocked = false;
 				//params.AttackActive = true;
@@ -3183,7 +3210,11 @@ DECLARE_SCRIPT (M10_Stealth_Attack_02, "")
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+				params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+			}
+		}
 		params.Set_Attack(enemy, 100.0f, 5.0f, true);
 		params.AttackCheckBlocked = false;
 		//params.AttackActive = true;
@@ -3200,7 +3231,16 @@ DECLARE_SCRIPT (M10_Stealth_Attack_02, "")
 
 			for (int x = 0; x <= 12; x++)
 			{
-				float dist = Commands->Get_Distance(star_loc, Commands->Get_Position (Commands->Find_Object (attack_loc [x])));
+				Vector3 attack_pos;
+				if (!Find_Object_Position (attack_loc [x], attack_pos))
+				{
+					//	This attack point is not in the level. Skip it, rather
+					//	than letting it win the "closest" comparison below by
+					//	measuring the distance to the map origin.
+					continue;
+				}
+
+				float dist = Commands->Get_Distance (star_loc, attack_pos);
 				
 				if (dist < loc_dist)
 				{
@@ -3218,7 +3258,11 @@ DECLARE_SCRIPT (M10_Stealth_Attack_02, "")
 			
 				ActionParamsStruct params;
 				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-				params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_loc [loc])), 1.0f, 5.0f );
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (attack_loc [loc], _obj_pos)) {
+						params.Set_Movement( _obj_pos, 1.0f, 5.0f );
+					}
+				}
 				//params.Set_Attack(STAR, 100.0f, 5.0f, true);
 				//params.AttackCheckBlocked = false;
 				//params.AttackActive = true;
@@ -4086,8 +4130,16 @@ DECLARE_SCRIPT(M10_Mrls_Grant, "")
 			{
 				already_poked = true;
 
-				Commands->Create_Logical_Sound (obj, CLEAR1, Commands->Get_Position (Commands->Find_Object (drop_loc1)), 10.0f);
-				Commands->Create_Logical_Sound (obj, CLEAR2, Commands->Get_Position (Commands->Find_Object (drop_loc2)), 10.0f);
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (drop_loc1, _obj_pos)) {
+						Commands->Create_Logical_Sound (obj, CLEAR1, _obj_pos, 10.0f);
+					}
+				}
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (drop_loc2, _obj_pos)) {
+						Commands->Create_Logical_Sound (obj, CLEAR2, _obj_pos, 10.0f);
+					}
+				}
 				
 				Commands->Start_Timer ( obj, this, 2.0f, GRANT_MRLS );
 			}
@@ -4129,14 +4181,20 @@ DECLARE_SCRIPT(M10_Mrls_Grant, "")
 		{
 			if (!occupied1 && grant)
 			{
-				GameObject * mrls = Commands->Create_Object ( "GDI_MRLS_Player", Commands->Get_Position (Commands->Find_Object (drop_loc1)));
-				Commands->Attach_Script(mrls, "M10_Mrls_Waypath", "");
+				Vector3 mrls_spawn_pos;
+				if (Find_Object_Position (drop_loc1, mrls_spawn_pos)) {
+					GameObject * mrls = Commands->Create_Object ( "GDI_MRLS_Player", mrls_spawn_pos);
+					Commands->Attach_Script(mrls, "M10_Mrls_Waypath", "");
+				}
 			}
 
 			else if (!occupied2 && grant)
 			{
-				GameObject * mrls2 = Commands->Create_Object ( "GDI_MRLS_Player", Commands->Get_Position (Commands->Find_Object (drop_loc2)));
-				Commands->Attach_Script(mrls2, "M10_Mrls_Waypath", "");
+				Vector3 mrls2_spawn_pos;
+				if (Find_Object_Position (drop_loc2, mrls2_spawn_pos)) {
+					GameObject * mrls2 = Commands->Create_Object ( "GDI_MRLS_Player", mrls2_spawn_pos);
+					Commands->Attach_Script(mrls2, "M10_Mrls_Waypath", "");
+				}
 			}
 		}
 	}

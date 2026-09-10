@@ -48,7 +48,14 @@ bool RegistryClass::IsLocked = false;
 bool RegistryClass::Exists(const char* sub_key)
 {
 	HKEY hKey;
-	LONG result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, sub_key, 0, KEY_READ, &hKey);
+
+	//	Per-user settings live under HKCU (see the constructor). HKLM is still
+	//	consulted so anything an installer left behind is found.
+	LONG result = RegOpenKeyEx(HKEY_CURRENT_USER, sub_key, 0, KEY_READ, &hKey);
+
+	if (ERROR_SUCCESS != result) {
+		result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, sub_key, 0, KEY_READ, &hKey);
+	}
 
 	if (ERROR_SUCCESS == result) {
 		RegCloseKey(hKey);
@@ -69,12 +76,23 @@ RegistryClass::RegistryClass( const char * sub_key, bool create ) :
 
 	LONG result = -1;
 
+	//	These are per-user application settings, so they belong under
+	//	HKEY_CURRENT_USER. The original asked for KEY_ALL_ACCESS on
+	//	HKEY_LOCAL_MACHINE, which only worked because the 2002 interactive user
+	//	was an administrator; under UAC it fails outright and every setting
+	//	silently stops persisting.
 	if (create && !IsLocked) {
 		DWORD disposition;
-		result = RegCreateKeyEx(HKEY_LOCAL_MACHINE, sub_key, 0, NULL, 0,
+		result = RegCreateKeyEx(HKEY_CURRENT_USER, sub_key, 0, NULL, 0,
 			KEY_ALL_ACCESS, NULL, &key, &disposition);
 	} else {
-		result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, sub_key, 0, IsLocked ? KEY_READ : KEY_ALL_ACCESS, &key);
+		result = RegOpenKeyEx(HKEY_CURRENT_USER, sub_key, 0, IsLocked ? KEY_READ : KEY_ALL_ACCESS, &key);
+	}
+
+	//	Fall back to a read-only look at HKLM, where an installer may have put
+	//	values that predate the move to HKCU.
+	if (ERROR_SUCCESS != result) {
+		result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, sub_key, 0, KEY_READ, &key);
 	}
 
 	if (ERROR_SUCCESS == result) {

@@ -373,8 +373,8 @@ float	RadarManager::Add_Blip( const Vector3 & pos, int shape_type, int color_typ
 				if ( bracket ) {
 					color = 0x0000FF00;	// Make Green
 					color |= (unsigned int)(RadarIntensity * alpha * 255) << 24;
-					RectClass uv = BlipUV[ BLIP_BRACKET ];
-					Renderer->Add_Quad( blip, uv, color );
+					RectClass uv_inner = BlipUV[ BLIP_BRACKET ];
+					Renderer->Add_Quad( blip, uv_inner, color );
 				}
 			}
 		}
@@ -584,8 +584,8 @@ void	RadarManager::Update( const Matrix3D & player_tm, const Vector2 & center )
 {WWPROFILE( "Objectives" );
 	// for all objectives with a position
 	int count = ObjectiveManager::Get_Objective_Count();
-	for ( int i = 0; i < count; i++ ) {
-		Objective * objective = ObjectiveManager::Get_Objective( i );
+	for ( int i_inner = 0; i_inner < count; i_inner++ ) {
+		Objective * objective = ObjectiveManager::Get_Objective( i_inner );
 		if ( objective->DrawBlip && objective->Status == ObjectiveManager::STATUS_IS_PENDING ) {
 			float intensity = objective->BlipIntensity;
 			intensity = Add_Blip( objective->Position, BLIP_SHAPE_TYPE_OBJECTIVE, objective->Radar_Blip_Color_Type(), intensity, false );

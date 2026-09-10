@@ -61,6 +61,7 @@
 #include "wolbuddymgr.h"
 #include "bandwidthcheck.h"
 #include "bandwidth.h"
+#include "useroptions.h"	// cUserOptions::NetUpdateRate
 #include "gamespyadmin.h"
 #include "specialbuilds.h"
 
@@ -522,15 +523,37 @@ void AutoRestartClass::Think(void)
 			if (ServerSettingsClass::Get_Game_Mode() == ServerSettingsClass::MODE_WOL && 
 				The_Game()->Get_Max_Players() == 0 && BandwidthCheckerClass::Got_Bandwidth()) {
 
-				int max_players = (cBandwidth::Get_Bandwidth_Bps_From_Type(BANDWIDTH_AUTO) / 250000) * 4;
-				if (max_players < 2) {
-					if (cBandwidth::Get_Bandwidth_Bps_From_Type(BANDWIDTH_AUTO) > 100000) {
-						max_players = 4;
-					} else {
-						max_players = 2;
-					}
-				} else if (max_players > 32) {
-					max_players = 32;
+				//
+				//	The original calculation was (bps / 250000) * 4, i.e. a flat
+				//	62500 bps per player, clamped to 32. Two things had gone stale:
+				//
+				//	  - The 62500 figure assumed the old 10 Hz NetUpdateRate. Per
+				//	    player cost scales with the update rate, so the budget is
+				//	    now derived from the configured rate instead of assuming it.
+				//	  - The clamp, not the bandwidth, was the binding constraint:
+				//	    any connection at or above 2 Mbit/s already produced 32, so
+				//	    a 10 Mbit/s line and a 1 Gbit/s line were treated alike.
+				//	    The engine itself allows MAX_PLAYERS (255, playermanager.h);
+				//	    64 is a conservative server size, raise it here if wanted.
+				//
+				const int BPS_PER_PLAYER_AT_10HZ	= 62500;
+				const int REFERENCE_UPDATE_RATE		= 10;
+				const int MIN_AUTO_PLAYERS				= 2;
+				const int MAX_AUTO_PLAYERS				= 64;
+
+				int update_rate	= cUserOptions::NetUpdateRate.Get();
+				if (update_rate < 1) {
+					update_rate = REFERENCE_UPDATE_RATE;
+				}
+
+				int bps_per_player	= (BPS_PER_PLAYER_AT_10HZ * update_rate) / REFERENCE_UPDATE_RATE;
+				int bandwidth_bps		= cBandwidth::Get_Bandwidth_Bps_From_Type(BANDWIDTH_AUTO);
+				int max_players		= bandwidth_bps / bps_per_player;
+
+				if (max_players < MIN_AUTO_PLAYERS) {
+					max_players = MIN_AUTO_PLAYERS;
+				} else if (max_players > MAX_AUTO_PLAYERS) {
+					max_players = MAX_AUTO_PLAYERS;
 				}
 				The_Game()->Set_Max_Players(max_players);
 			}

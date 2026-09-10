@@ -338,12 +338,20 @@ DECLARE_SCRIPT(M05_Objective_Controller, "")  // 100001
 			if(param == 0)
 			{
 				//Hotwire Midtro
-				Commands->Set_Position (STAR, Commands->Get_Position(Commands->Find_Object(108474)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (108474, _obj_pos)) {
+						Commands->Set_Position (STAR, _obj_pos);
+					}
+				}
 			}
 			if(param == 1)
 			{
 				// Gunner Midtro
-				Commands->Set_Position (STAR, Commands->Get_Position(Commands->Find_Object(108475)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (108475, _obj_pos)) {
+						Commands->Set_Position (STAR, _obj_pos);
+					}
+				}
 			}
 		}
 	}
@@ -1733,14 +1741,14 @@ DECLARE_SCRIPT(M05_Triangle_Tank, "")
 
 		if(timer_id == TANK_TIMER)
 		{
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			attacking = false;
 			int random = Commands->Get_Random_Int(0,ARRAY_ELEMENT_COUNT(fire_loc)); 
 			
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
-			params.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
-			params.AttackCheckBlocked = false;
-			Commands->Action_Attack( obj, params );
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
+			params_inner.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
+			params_inner.AttackCheckBlocked = false;
+			Commands->Action_Attack( obj, params_inner );
 
 			// Fire upon building
 			Commands->Start_Timer (obj, this, 15.0f, TANK_TIMER);
@@ -1801,14 +1809,14 @@ DECLARE_SCRIPT(M05_TownSquare_Tank, "")
 
 		if(timer_id == TANK_TIMER)
 		{
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			
 			int random = Commands->Get_Random_Int(0, ARRAY_ELEMENT_COUNT(fire_loc));
 			
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
-			params.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
-			params.AttackCheckBlocked = false;
-			Commands->Action_Attack( obj, params );
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
+			params_inner.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
+			params_inner.AttackCheckBlocked = false;
+			Commands->Action_Attack( obj, params_inner );
 
 			Commands->Start_Timer (obj, this, 15.0f, TANK_TIMER);
 		}
@@ -1869,14 +1877,14 @@ DECLARE_SCRIPT(M05_Bridge_Tank, "")
 
 		if(timer_id == TANK_TIMER)
 		{
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			attacking = false;
 			int random = Commands->Get_Random_Int(0, ARRAY_ELEMENT_COUNT(fire_loc));
 			
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
-			params.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
-			params.AttackCheckBlocked = false;
-			Commands->Action_Attack( obj, params );
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
+			params_inner.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
+			params_inner.AttackCheckBlocked = false;
+			Commands->Action_Attack( obj, params_inner );
 
 			Commands->Start_Timer (obj, this, 15.0f, TANK_TIMER);
 		}
@@ -2990,13 +2998,16 @@ DECLARE_SCRIPT (M05_Park_Controller, "")
 			loop_count++;
 
 			int artillery_id1 = Get_Int_Parameter("Artillery_ID1");
-			artillery_loc1 = Commands->Get_Position(Commands->Find_Object(artillery_id1));
+			//	Leaves artillery_loc1 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id1, artillery_loc1);
 
 			int artillery_id2 = Get_Int_Parameter("Artillery_ID2");
-			artillery_loc2 = Commands->Get_Position(Commands->Find_Object(artillery_id2));
+			//	Leaves artillery_loc2 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id2, artillery_loc2);
 
 			int artillery_id3 = Get_Int_Parameter("Artillery_ID3");
-			artillery_loc3 = Commands->Get_Position(Commands->Find_Object(artillery_id3));
+			//	Leaves artillery_loc3 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id3, artillery_loc3);
 			
 			char *bomb[3] = 
 			{
@@ -3299,10 +3310,13 @@ DECLARE_SCRIPT(M05_ParkEngineer, "")
 		// Technicians working on the obelisk
 		if(action_id == 10 && reason == ACTION_COMPLETE_NORMAL)
 		{
-			Vector3 hedge_pos = Commands->Get_Position(Commands->Find_Object(truck_id[truck_cnt]));
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, 11);
-			params.Set_Face_Location( hedge_pos, 1.0f);
-			Commands->Action_Face_Location ( obj, params );
+			Vector3 hedge_pos;
+			bool hedge_pos_found = Find_Object_Position (truck_id[truck_cnt], hedge_pos);
+params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, 11);
+			if (hedge_pos_found) {
+				params.Set_Face_Location( hedge_pos, 1.0f);
+				Commands->Action_Face_Location ( obj, params );
+			}
 		}
 		if(action_id == 11 && reason == ACTION_COMPLETE_NORMAL)
 		{
@@ -5114,7 +5128,9 @@ DECLARE_SCRIPT(M05_Dump_Captives, "")
 			Commands->Select_Weapon(obj, "Weapon_Chaingun_AI" );
 
 			Vector3 curr_loc = Commands->Get_Position(obj);
-			Commands->Debug_Message("Current Location: %d", curr_loc);
+			// Was passing the whole Vector3 through varargs against a %d, which is
+			// undefined and printed nonsense. Print the components instead.
+			Commands->Debug_Message("Current Location: %f %f %f", curr_loc.X, curr_loc.Y, curr_loc.Z);
 			Vector3 go_loc = Get_Circle_Position(obj, obj, 5.0f, 0.0f);
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, GO_POWERUPS );
 			params.Set_Movement( go_loc, RUN, 0.5f );
@@ -5450,14 +5466,14 @@ DECLARE_SCRIPT(M05_Inn_Tank, "")
 
 		if(timer_id == TANK_TIMER)
 		{
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			attacking = false;
 			int random = Commands->Get_Random_Int(0,ARRAY_ELEMENT_COUNT(fire_loc)); 
 			
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
-			params.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
-			params.AttackCheckBlocked = false;
-			Commands->Action_Attack( obj, params );
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
+			params_inner.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 10.0f, 1);
+			params_inner.AttackCheckBlocked = false;
+			Commands->Action_Attack( obj, params_inner );
 
 			// Fire upon building
 			Commands->Start_Timer (obj, this, 15.0f, TANK_TIMER);
@@ -5701,8 +5717,16 @@ DECLARE_SCRIPT(M05_Activate_Surprise_Tank, "")
 	{
 		if(timer_id == EXPLODE_BLOCK)
 		{
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(105382)));
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(101865)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (105382, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			}
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (101865, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			}
 			
 
 			Commands->Destroy_Object(Commands->Find_Object(105382));
@@ -6612,8 +6636,16 @@ DECLARE_SCRIPT(M05_Activate_Roadblock_Tank, "")
 
 		if(timer_id == EXPLODE_BLOCK)
 		{
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(101858)));
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(101859)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (101858, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			}
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (101859, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			}
 			Commands->Destroy_Object(Commands->Find_Object(101858));
 			Commands->Destroy_Object(Commands->Find_Object(101859));
 		}
@@ -7088,13 +7120,16 @@ DECLARE_SCRIPT(M05_Activate_Artillery, "Artillery_ID1=0:int, Artillery_ID2=0:int
 			loop_count++;
 
 			int artillery_id1 = Get_Int_Parameter("Artillery_ID1");
-			artillery_loc1 = Commands->Get_Position(Commands->Find_Object(artillery_id1));
+			//	Leaves artillery_loc1 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id1, artillery_loc1);
 
 			int artillery_id2 = Get_Int_Parameter("Artillery_ID2");
-			artillery_loc2 = Commands->Get_Position(Commands->Find_Object(artillery_id2));
+			//	Leaves artillery_loc2 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id2, artillery_loc2);
 
 			int artillery_id3 = Get_Int_Parameter("Artillery_ID3");
-			artillery_loc3 = Commands->Get_Position(Commands->Find_Object(artillery_id3));
+			//	Leaves artillery_loc3 alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (artillery_id3, artillery_loc3);
 			
 			char *bomb[3] = 
 			{
@@ -7244,9 +7279,12 @@ DECLARE_SCRIPT(M05_Activate_Triangle_Tank_Drop, "")
 			already_entered = true;
 
 			// Drop tank
-			GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", Commands->Get_Position(Commands->Find_Object(108970)));
-			Commands->Set_Facing(chinook_obj, -35.000f);
-			Commands->Attach_Script(chinook_obj, "Test_Cinematic", "M05_XG_VehicleDrop2.txt");
+			Vector3 chinook_obj_spawn_pos;
+			if (Find_Object_Position (108970, chinook_obj_spawn_pos)) {
+				GameObject * chinook_obj = Commands->Create_Object ( "Invisible_Object", chinook_obj_spawn_pos);
+				Commands->Set_Facing(chinook_obj, -35.000f);
+				Commands->Attach_Script(chinook_obj, "Test_Cinematic", "M05_XG_VehicleDrop2.txt");
+			}
 		}
 	}
 
@@ -7412,14 +7450,14 @@ DECLARE_SCRIPT(M05_Cathedral_Artillery, "Fire_Loc1=0:int, Fire_Loc2=0:int")
 
 		if(timer_id == TANK_TIMER)
 		{
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 			
 			int random = Commands->Get_Random_Int(0,ARRAY_ELEMENT_COUNT(fire_loc)); 
 			
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
-			params.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 0.0f, 1);
-			params.AttackCheckBlocked = false;
-			Commands->Action_Attack( obj, params );
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 1 );
+			params_inner.Set_Attack (Commands->Find_Object(fire_loc[random]), 250.0f, 0.0f, 1);
+			params_inner.AttackCheckBlocked = false;
+			Commands->Action_Attack( obj, params_inner );
 
 			// Fire upon building
 			Commands->Start_Timer (obj, this, 5.0f, TANK_TIMER);

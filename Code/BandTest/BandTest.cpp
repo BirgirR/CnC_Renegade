@@ -784,7 +784,10 @@ unsigned long Upstream_Detect(unsigned long server_ip, unsigned long my_ip, int 
 	*/
 	unsigned long downstream_bandwidth = upstream_bandwidth;
 	int old_band = Get_Registry_Int("Up", 0);
-	unsigned long diff = abs(upstream_bandwidth - old_band);
+	// The operand is unsigned long, so abs() is ambiguous under modern C++.
+	// VC6 had only abs(int) and narrowed to it silently; the cast preserves
+	// that exact behaviour on this 32-bit target.
+	unsigned long diff = abs((long)(upstream_bandwidth - old_band));
 	bool calc_down = true;
 	if (diff < upstream_bandwidth / 10) {
 		downstream_bandwidth = Get_Registry_Int("Down", upstream_bandwidth);

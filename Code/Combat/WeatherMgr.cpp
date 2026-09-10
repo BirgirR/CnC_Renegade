@@ -661,19 +661,19 @@ bool WeatherSystemClass::Update (WindClass *wind, const Vector3 &cameraposition)
 
 		if ((Age > 0.0f) && (Can_Spawn (rayptr))) {
 
-			float		s;
-			unsigned	spawncount;
+			float		s_inner;
+			unsigned	spawncount_inner;
 
 			// Spawn some particles along the ray.
 			// NOTE: For accuracy, accumulate fractional spawncounts so that they can be used on a later ray.
-			s = ParticlesPerUnitLength * (rayptr->EndPosition - raystartposition).Quick_Length();
-			spawncount = floor (s);
-			spawncountfraction += s - spawncount;
+			s_inner = ParticlesPerUnitLength * (rayptr->EndPosition - raystartposition).Quick_Length();
+			spawncount_inner = floor (s_inner);
+			spawncountfraction += s_inner - spawncount_inner;
 			if (spawncountfraction >= 1.0f) {
 				spawncountfraction -= 1.0f;
-				spawncount++;
+				spawncount_inner++;
 			}
-			for (unsigned p = 0; p < spawncount; p++) {
+			for (unsigned p = 0; p < spawncount_inner; p++) {
 				Spawn (rayptr);
 			}
 		}
@@ -1051,7 +1051,7 @@ void WeatherSystemClass::Render (RenderInfoClass &rinfo)
 
 		#if WEATHER_PARTICLE_SORT
 		#else
-		DX8Wrapper::Set_DX8_Render_State (D3DRS_ZBIAS, 12);
+		DX8Wrapper::Set_DX8_Z_Bias(12);
 		#endif
 
  		camerafocus = rinfo.Camera.Get_Transform().Get_Z_Vector();
@@ -1217,7 +1217,7 @@ void WeatherSystemClass::Render (RenderInfoClass &rinfo)
 
 		#if WEATHER_PARTICLE_SORT
 		#else
-		DX8Wrapper::Set_DX8_Render_State (D3DRS_ZBIAS, 0);
+		DX8Wrapper::Set_DX8_Z_Bias(0);
 		#endif
 	}
 }

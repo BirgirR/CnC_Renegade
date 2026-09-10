@@ -964,7 +964,12 @@ void CPUDetectClass::Init_Processor_Log()
 		(OSVersionBuildNumber&0xff000000)>>24,
 		(OSVersionBuildNumber&0xff0000)>>16,
 		(OSVersionBuildNumber&0xffff)));
-	SYSLOG(("OS-Info: %s\r\n",OSVersionExtraInfo));
+	// OSVersionExtraInfo is a StringClass, not a char*. Passing a class type
+	// through a variadic %s is undefined; VC6 happened to push m_Buffer first so
+	// it read correctly, but under modern MSVC printf walks a bad pointer and
+	// faults inside strnlen -- during static init, before main, in anything that
+	// links wwlib. Convert explicitly.
+	SYSLOG(("OS-Info: %s\r\n",(const char *)OSVersionExtraInfo));
 
 	SYSLOG(("Processor: %s\r\n",CPUDetectClass::Get_Processor_String()));
 	SYSLOG(("Clock speed: ~%dMHz\r\n",CPUDetectClass::Get_Processor_Speed()));
@@ -975,7 +980,8 @@ void CPUDetectClass::Init_Processor_Log()
 	case 2: cpu_type="Dual"; break;
 	case 3: cpu_type="*Intel Reserved*"; break;
 	}
-	SYSLOG(("Processor type: %s\r\n",cpu_type));
+	// Same StringClass-through-varargs defect as the OS-Info line above.
+	SYSLOG(("Processor type: %s\r\n",(const char *)cpu_type));
 
 	SYSLOG(("\r\n"));
 
@@ -1022,7 +1028,7 @@ void CPUDetectClass::Init_Processor_Log()
 	}
 
 	if (CPUDetectClass::Get_L1_Instruction_Trace_Cache_Size()) {
-		SYSLOG(("L1 Instruction Trace Cache: %d way set associative, %dk µOPs\r\n",
+		SYSLOG(("L1 Instruction Trace Cache: %d way set associative, %dk ï¿½OPs\r\n",
 			CPUDetectClass::Get_L1_Instruction_Cache_Set_Associative(),
 			CPUDetectClass::Get_L1_Instruction_Cache_Size()/1024));
 	}
@@ -1210,6 +1216,28 @@ void Get_OS_Info(
 	unsigned build_major=(OSVersionBuildNumber&0xff000000)>>24;
 	unsigned build_minor=(OSVersionBuildNumber&0xff0000)>>16;
 	unsigned build_sub=(OSVersionBuildNumber&0xffff);
+
+	//
+	//	Establish a valid fallback before anything else.
+	//
+	//	The version tables below stop at Windows XP, and the NT branch only
+	//	recognises major versions 4 and 5. On anything newer -- Vista through
+	//	Windows 11, which report major 6 or 10 -- every branch fell through and
+	//	this function returned leaving the caller's OSInfoStruct uninitialised.
+	//	Init_Compact_Log then ran stricmp() over the garbage SubCode pointer and
+	//	faulted, during static initialisation, before main, in any program that
+	//	links wwlib. Populating the struct up front makes every path safe and
+	//	turns "OS I do not recognise" into a reported UNKNOWN rather than a crash.
+	//
+	memset(&os_info,0,sizeof(os_info));
+	os_info.Code="UNKNOWN";
+	os_info.SubCode="UNKNOWN";
+	os_info.VersionString="UNKNOWN";
+	os_info.VersionMajor=(unsigned char)OSVersionNumberMajor;
+	os_info.VersionMinor=(unsigned char)OSVersionNumberMinor;
+	os_info.BuildMajor=(unsigned char)build_major;
+	os_info.BuildMinor=(unsigned char)build_minor;
+	os_info.BuildSub=(unsigned short)build_sub;
 
 	switch (OSVersionPlatformId) {
 	default:

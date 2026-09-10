@@ -1705,13 +1705,13 @@ bool Phys3Class::Apply_Move
 				/*
 				** Try to move up to the obstacle
 				*/
-				float move_len = result.Fraction * move.Length();
-				if (move_len > epsilon) {
-					move_len -= epsilon;
+				float move_len_inner = result.Fraction * move.Length();
+				if (move_len_inner > epsilon) {
+					move_len_inner -= epsilon;
 					Vector3 direction = move;
 					direction.Normalize();
 
-					State.Position += move_len * direction;
+					State.Position += move_len_inner * direction;
 
 					move -= result.Fraction * move;
 					dt -= result.Fraction * dt;

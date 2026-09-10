@@ -261,6 +261,18 @@ MainMenuTransitionClass::Update_Controls (void)
 		//	Move the dialog control
 		//
 		DialogControlClass *control	= Dialog->Get_Dlg_Item (ControlIDArray[index]);
+
+		//
+		//	Get_Dlg_Item returns NULL for an ID this dialog does not carry, and
+		//	everything below here is a virtual call. Skip it rather than
+		//	dereferencing null -- the other five controls still animate.
+		//
+		if (control == NULL) {
+			WWDEBUG_SAY (("MainMenuTransition: control %d not in dialog, skipped\n",
+								ControlIDArray[index]));
+			continue;
+		}
+
 		const RectClass &control_rect	= control->Get_Window_Rect ();
 		new_pos.Y							-= (control_rect.Height () / 2);
 		control->Set_Window_Pos (Vector2 (new_pos.X, new_pos.Y));

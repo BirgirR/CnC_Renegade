@@ -142,11 +142,11 @@ EditableClass::Unlock_Parameter (int i)
 	//
 	//		To register a complex variable (such as an enumerated type:
 	//		#ifdef	PARAM_EDITING_ON
-	//		EnumParameterClass *param = new EnumParameterClass(GangID);
-	//		param->Set_Name ("Gang");
-	//		param->Add_Value ("GDI", ID_GDI);
-	//		param->Add_Value ("NOD", ID_NOD);
-	//		param->Add_Value ("Neutral", ID_NEUTRAL);
+	//		EnumParameterClass *EDITABLE_PARAM_TMP = new EnumParameterClass(GangID);
+	//		EDITABLE_PARAM_TMP->Set_Name ("Gang");
+	//		EDITABLE_PARAM_TMP->Add_Value ("GDI", ID_GDI);
+	//		EDITABLE_PARAM_TMP->Add_Value ("NOD", ID_NOD);
+	//		EDITABLE_PARAM_TMP->Add_Value ("Neutral", ID_NEUTRAL);
 	//		GENERIC_EDITABLE_PARAM(param)
 	//		#endif
 	//
@@ -157,120 +157,129 @@ EditableClass::Unlock_Parameter (int i)
 	#define NAMED_EDITABLE_PARAM(_class, type, data, name)		plist_##_class.Add (&(data), name, type);
 	
 	#define INT_EDITABLE_PARAM(_class, data, min, max) {						\
-		IntParameterClass *param = new IntParameterClass( &data, #data);	\
-		param->Set_Range (min, max);													\
-		plist_##_class.Add (param); }													\
+		IntParameterClass *EDITABLE_PARAM_TMP = new IntParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);													\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }													\
 
 	#define INT_UNITS_PARAM(_class, data, min, max, unitsname) {	   	\
-		IntParameterClass *param = new IntParameterClass( &data, #data);	\
-		param->Set_Range (min, max);													\
-		param->Set_Units_Name(unitsname);											\
-		plist_##_class.Add (param); }													\
+		IntParameterClass *EDITABLE_PARAM_TMP = new IntParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);													\
+		EDITABLE_PARAM_TMP->Set_Units_Name(unitsname);											\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }													\
 
 	#define NAMED_INT_UNITS_PARAM(_class,data,min,max,unitsname,name) {	\
-		IntParameterClass *param = new IntParameterClass( &data, #data);	\
-		param->Set_Range (min, max);													\
-		param->Set_Units_Name(unitsname);											\
-		param->Set_Name(name);															\
-		plist_##_class.Add (param); }													\
+		IntParameterClass *EDITABLE_PARAM_TMP = new IntParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);													\
+		EDITABLE_PARAM_TMP->Set_Units_Name(unitsname);											\
+		EDITABLE_PARAM_TMP->Set_Name(name);															\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }													\
 
 	#define FLOAT_EDITABLE_PARAM(_class, data, min, max) {						\
-		FloatParameterClass *param = new FloatParameterClass( &data, #data);	\
-		param->Set_Range (min, max);														\
-		plist_##_class.Add (param); }														\
+		FloatParameterClass *EDITABLE_PARAM_TMP = new FloatParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);														\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }														\
 
 	#define FLOAT_UNITS_PARAM(_class, data, min, max, unitsname) {				\
-		FloatParameterClass *param = new FloatParameterClass( &data, #data);	\
-		param->Set_Range (min, max);														\
-		param->Set_Units_Name(unitsname);												\
-		plist_##_class.Add (param); }	
+		FloatParameterClass *EDITABLE_PARAM_TMP = new FloatParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);														\
+		EDITABLE_PARAM_TMP->Set_Units_Name(unitsname);												\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }	
 
 	#define NAMED_FLOAT_UNITS_PARAM(_class, data, min, max, unitsname,name) {	\
-		FloatParameterClass *param = new FloatParameterClass( &data, #data);		\
-		param->Set_Range (min, max);															\
-		param->Set_Units_Name(unitsname);													\
-		param->Set_Name(name);																	\
-		plist_##_class.Add (param); }	
+		FloatParameterClass *EDITABLE_PARAM_TMP = new FloatParameterClass( &data, #data);		\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);															\
+		EDITABLE_PARAM_TMP->Set_Units_Name(unitsname);													\
+		EDITABLE_PARAM_TMP->Set_Name(name);																	\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }	
 
 	#define ANGLE_EDITABLE_PARAM(_class, data, min, max) {						\
-		AngleParameterClass *param = new AngleParameterClass( &data, #data);	\
-		param->Set_Range (min, max);														\
-		param->Set_Units_Name ("degrees");												\
-		plist_##_class.Add (param); }														\
+		AngleParameterClass *EDITABLE_PARAM_TMP = new AngleParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);														\
+		EDITABLE_PARAM_TMP->Set_Units_Name ("degrees");												\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }														\
 
 	#define NAMED_ANGLE_EDITABLE_PARAM(_class, data, min, max, name) {		\
-		AngleParameterClass *param = new AngleParameterClass( &data, #data);	\
-		param->Set_Range (min, max);														\
-		param->Set_Units_Name ("degrees");												\
-		param->Set_Name(name);																\
-		plist_##_class.Add (param); }														\
+		AngleParameterClass *EDITABLE_PARAM_TMP = new AngleParameterClass( &data, #data);	\
+		EDITABLE_PARAM_TMP->Set_Range (min, max);														\
+		EDITABLE_PARAM_TMP->Set_Units_Name ("degrees");												\
+		EDITABLE_PARAM_TMP->Set_Name(name);																\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }														\
+
+//
+//	The temporary each *_PARAM macro creates is local to the macro body and
+//	never referenced by the caller. Naming it per line stops consecutive
+//	invocations shadowing one another.
+//
+#define EDITABLE_PARAM_JOIN2( a, b )	a##b
+#define EDITABLE_PARAM_JOIN( a, b )	EDITABLE_PARAM_JOIN2( a, b )
+#define EDITABLE_PARAM_TMP				EDITABLE_PARAM_JOIN( _param_, __LINE__ )
 
 	#define GENERIC_EDITABLE_PARAM(_class, param)	\
 		plist_##_class.Add (param);						\
 
 	#define MODEL_DEF_PARAM(_class, data, name) {									\
-		ModelDefParameterClass *param = new ModelDefParameterClass (&data);	\
-		param->Set_Name (#data);															\
-		param->Set_Base_Class (name);														\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		ModelDefParameterClass *EDITABLE_PARAM_TMP = new ModelDefParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Name (#data);															\
+		EDITABLE_PARAM_TMP->Set_Base_Class (name);														\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define PHYS_DEF_PARAM(_class, data, name) {										\
-		PhysDefParameterClass *param = new PhysDefParameterClass (&data);		\
-		param->Set_Name (#data);															\
-		param->Set_Base_Class (name);														\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		PhysDefParameterClass *EDITABLE_PARAM_TMP = new PhysDefParameterClass (&data);		\
+		EDITABLE_PARAM_TMP->Set_Name (#data);															\
+		EDITABLE_PARAM_TMP->Set_Base_Class (name);														\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define SCRIPT_PARAM(_class, name, params) {													\
-		ScriptParameterClass *param = new ScriptParameterClass (&name, &params);		\
-		param->Set_Name (#name);																		\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		ScriptParameterClass *EDITABLE_PARAM_TMP = new ScriptParameterClass (&name, &params);		\
+		EDITABLE_PARAM_TMP->Set_Name (#name);																		\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define SCRIPTLIST_PARAM(_class, name, name_list, param_list) {										\
-		ScriptListParameterClass *param = new ScriptListParameterClass (&name_list, &param_list);	\
-		param->Set_Name (name);																							\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		ScriptListParameterClass *EDITABLE_PARAM_TMP = new ScriptListParameterClass (&name_list, &param_list);	\
+		EDITABLE_PARAM_TMP->Set_Name (name);																							\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define ENUM_PARAM(_class, data, params) {							\
-		EnumParameterClass *param = new EnumParameterClass (&data);	\
-		param->Set_Name (#data);												\
-		param->Add_Values params;												\
-		plist_##_class.Add (param); }											\
+		EnumParameterClass *EDITABLE_PARAM_TMP = new EnumParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Name (#data);												\
+		EDITABLE_PARAM_TMP->Add_Values params;												\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }											\
 
 	#define FILENAME_PARAM(_class, data, desc, extension) {						\
-		FilenameParameterClass *param = new FilenameParameterClass (&data);	\
-		param->Set_Name (#data);															\
-		param->Set_Description (desc);													\
-		param->Set_Extension (extension);												\
-		plist_##_class.Add (param); }														\
+		FilenameParameterClass *EDITABLE_PARAM_TMP = new FilenameParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Name (#data);															\
+		EDITABLE_PARAM_TMP->Set_Description (desc);													\
+		EDITABLE_PARAM_TMP->Set_Extension (extension);												\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }														\
 
 	#define DEFIDLIST_PARAM(_class, data, root_class_id) {							\
-		DefIDListParameterClass *param = new DefIDListParameterClass (&data);	\
-		param->Set_Name (#data);																\
-		param->Set_Class_ID (root_class_id);												\
-		plist_##_class.Add (param); }															\
+		DefIDListParameterClass *EDITABLE_PARAM_TMP = new DefIDListParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Name (#data);																\
+		EDITABLE_PARAM_TMP->Set_Class_ID (root_class_id);												\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }															\
 
 	#define CLASSID_DEFIDLIST_PARAM(_class, data, root_class_id, class_id, name) {	\
-		DefIDListParameterClass *param = new DefIDListParameterClass (&data);	\
-		param->Set_Name (name);																	\
-		param->Set_Class_ID (root_class_id);												\
-		param->Set_Selected_Class_ID (&class_id);											\
-		plist_##_class.Add (param); }
+		DefIDListParameterClass *EDITABLE_PARAM_TMP = new DefIDListParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Name (name);																	\
+		EDITABLE_PARAM_TMP->Set_Class_ID (root_class_id);												\
+		EDITABLE_PARAM_TMP->Set_Selected_Class_ID (&class_id);											\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }
 
 	#define ZONE_PARAM(_class, data, name) {											\
-		ZoneParameterClass *param = new ZoneParameterClass (&data);				\
-		param->Set_Name (name);																\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		ZoneParameterClass *EDITABLE_PARAM_TMP = new ZoneParameterClass (&data);				\
+		EDITABLE_PARAM_TMP->Set_Name (name);																\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define PARAM_SEPARATOR(_class, name) {											\
-		SeparatorParameterClass *param = new SeparatorParameterClass;			\
-		param->Set_Name (name);																\
-		GENERIC_EDITABLE_PARAM(_class, param); }
+		SeparatorParameterClass *EDITABLE_PARAM_TMP = new SeparatorParameterClass;			\
+		EDITABLE_PARAM_TMP->Set_Name (name);																\
+		GENERIC_EDITABLE_PARAM(_class, EDITABLE_PARAM_TMP); }
 
 	#define GENERIC_DEFID_PARAM(_class, data, root_class_id) {						\
-		GenericDefParameterClass *param = new GenericDefParameterClass (&data);	\
-		param->Set_Class_ID (root_class_id);												\
-		param->Set_Name (#data);																\
-		plist_##_class.Add (param); }
+		GenericDefParameterClass *EDITABLE_PARAM_TMP = new GenericDefParameterClass (&data);	\
+		EDITABLE_PARAM_TMP->Set_Class_ID (root_class_id);												\
+		EDITABLE_PARAM_TMP->Set_Name (#data);																\
+		plist_##_class.Add (EDITABLE_PARAM_TMP); }
 
 
 #else

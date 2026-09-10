@@ -615,7 +615,7 @@ bool cConnection::Receive_Packet()
 				LaggedPackets.Delete(p);
 				LaggedPacketTimes.Delete(p);
 				ret_code = LaggedPacketRetCodes[p];
-				LaggedPacketRetCodes.Delete(p);
+				LaggedPacketRetCodes.Delete_Index(p);
 				break;
 			}
 		}

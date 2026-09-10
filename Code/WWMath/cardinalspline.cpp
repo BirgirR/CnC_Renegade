@@ -151,11 +151,11 @@ void CardinalSpline3DClass::Update_Tangents(void)
 		Tangents[i].InTangent.Z = (1.0f - Tightness[i])*(Keys[i+1].Point.Z - Keys[i-1].Point.Z);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float in_factor_inner = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float out_factor_inner = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
 		
-		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
-		Tangents[i].OutTangent *= out_factor;
+		Tangents[i].InTangent *= in_factor_inner;			// compensating for the un-even keys
+		Tangents[i].OutTangent *= out_factor_inner;
 	}
 	TangentsDirty = false;
 }
@@ -290,11 +290,11 @@ void CardinalSpline1DClass::Update_Tangents(void)
 		Tangents[i].InTangent = (1.0f - Tightness[i])*(Keys[i+1].Point - Keys[i-1].Point);
 		Tangents[i].OutTangent = Tangents[i].InTangent;
 
-		float in_factor = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
-		float out_factor = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float in_factor_inner = 2.0f * (Keys[i].Time - Keys[i-1].Time) / (Keys[i+1].Time - Keys[i-1].Time);
+		float out_factor_inner = 2.0f * (Keys[i+1].Time - Keys[i].Time) / (Keys[i+1].Time - Keys[i-1].Time);
 		
-		Tangents[i].InTangent *= in_factor;			// compensating for the un-even keys
-		Tangents[i].OutTangent *= out_factor;
+		Tangents[i].InTangent *= in_factor_inner;			// compensating for the un-even keys
+		Tangents[i].OutTangent *= out_factor_inner;
 	}
 	TangentsDirty = false;
 }

@@ -1657,8 +1657,8 @@ WWAudioClass::Get_2D_Sample (const AudibleSoundClass &sound_obj)
 		if (sample != NULL) {
 
 			// Get a pointer to the object that is currently using this sample
-			AudibleSoundClass *sound_obj = (AudibleSoundClass *)::AIL_sample_user_data (sample, INFO_OBJECT_PTR);
-			if (sound_obj == NULL) {
+			AudibleSoundClass *sound_obj_inner = (AudibleSoundClass *)::AIL_sample_user_data (sample, INFO_OBJECT_PTR);
+			if (sound_obj_inner == NULL) {
 
 				// Return this sample handle to the caller
 				free_sample = sample;
@@ -1670,13 +1670,13 @@ WWAudioClass::Get_2D_Sample (const AudibleSoundClass &sound_obj)
 				// This is done by comparing both the designer-specified priority and the current
 				// runtime priority (which is calculated by distance to the listener).
 				//
-				float priority				= sound_obj->Get_Priority ();
-				float runtime_priority	= sound_obj->Get_Runtime_Priority ();
+				float priority				= sound_obj_inner->Get_Priority ();
+				float runtime_priority	= sound_obj_inner->Get_Runtime_Priority ();
 				if (	(priority < lowest_priority) ||
 						(priority == lowest_priority && runtime_priority <= lowest_runtime_priority))
 				{
 					lowest_priority			= priority;
-					lowest_pri_sound			= sound_obj;
+					lowest_pri_sound			= sound_obj_inner;
 					lowest_pri_sample			= sample;
 					lowest_runtime_priority = runtime_priority;
 				}
@@ -1726,8 +1726,8 @@ WWAudioClass::Get_3D_Sample (const Sound3DClass &sound_obj)
 		if (sample != NULL) {
 
 			// Get a pointer to the object that is currently using this sample
-			AudibleSoundClass *sound_obj = (AudibleSoundClass *)::AIL_3D_object_user_data (sample, INFO_OBJECT_PTR);
-			if (sound_obj == NULL) {
+			AudibleSoundClass *sound_obj_inner = (AudibleSoundClass *)::AIL_3D_object_user_data (sample, INFO_OBJECT_PTR);
+			if (sound_obj_inner == NULL) {
 
 				// Return this sample handle to the caller
 				free_sample = sample;
@@ -1739,13 +1739,13 @@ WWAudioClass::Get_3D_Sample (const Sound3DClass &sound_obj)
 				// This is done by comparing both the designer-specified priority and the current
 				// runtime priority (which is calculated by distance to the listener).
 				//
-				float priority				= sound_obj->Get_Priority ();
-				float runtime_priority	= sound_obj->Get_Runtime_Priority ();
+				float priority				= sound_obj_inner->Get_Priority ();
+				float runtime_priority	= sound_obj_inner->Get_Runtime_Priority ();
 				if (	(priority < lowest_priority) ||
 						(priority == lowest_priority && runtime_priority <= lowest_runtime_priority))
 				{
 					lowest_priority			= priority;
-					lowest_pri_sound			= sound_obj;
+					lowest_pri_sound			= sound_obj_inner;
 					lowest_pri_sample			= sample;
 					lowest_runtime_priority = runtime_priority;
 				}

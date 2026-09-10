@@ -411,7 +411,7 @@ bool SaveGameManager::Peek_Description
 	//
 	if (mission_name_id == 0) {
 		mission_name.Convert_From ( map_filename );
-		WCHAR *extension = ::wcsrchr (mission_name, L'.');
+		WCHAR *extension = const_cast<WCHAR *>(::wcsrchr (mission_name, L'.'));
 		if (extension != NULL) {
 			extension[0] = 0;
 		}
@@ -479,7 +479,7 @@ bool SaveGameManager::Peek_Map_Name( const char * filename, StringClass &map_nam
 */
 void	SaveGameManager::Save_Level( void )
 {
-	Debug_Say(( "Save Level %s\n", MapFilename ));
+	Debug_Say(( "Save Level %s\n", (const char *)MapFilename));
 	Save_Save_Load_System(	MapFilename,	
 									&_PhysStaticDataSaveSystem, 
 									&_PhysStaticObjectsSaveSystem,
@@ -492,7 +492,7 @@ void	SaveGameManager::Save_Level( void )
 
 void	SaveGameManager::Load_Level( void )
 {
-	Debug_Say(( "Load Level %s\n", MapFilename ));
+	Debug_Say(( "Load Level %s\n", (const char *)MapFilename));
 	Load_Save_Load_System( MapFilename, false );	// false = no automatic post load processing (needs to be called explicitly)
 }
 

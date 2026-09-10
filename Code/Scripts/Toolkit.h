@@ -206,4 +206,34 @@ inline int Get_Int_Random(int min, int max)
 #define TEXT_COLOR_YELLOW						Vector3 (  1.0f,  1.0f,  0.0f)
 
 
+/*
+**	Find_Object_Position -- the position of an object that may not be there.
+**
+**	Scripts habitually write
+**
+**		Commands->Get_Position (Commands->Find_Object (id))
+**
+**	Find_Object answers NULL for an object that is not present -- destroyed, or
+**	never placed -- and Get_Position then answers (0,0,0). That is an ordinary
+**	looking spot at the map origin, so the caller uses it without noticing:
+**	units are ordered to drive there, Set_Position teleports the player there,
+**	explosions and sounds are created there, and Get_Distance measures to it.
+**
+**	This reports whether the object was found and leaves 'pos' untouched when it
+**	was not, so each caller can do whatever is right for its own situation
+**	rather than silently acting on the origin.
+*/
+inline bool Find_Object_Position (int obj_id, Vector3 &pos)
+{
+	GameObject *object = Commands->Find_Object (obj_id);
+
+	if (object == NULL) {
+		return false;
+	}
+
+	pos = Commands->Get_Position (object);
+	return true;
+}
+
+
 #endif // _TOOLKIT_H_

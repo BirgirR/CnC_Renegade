@@ -3713,7 +3713,7 @@ void	SoldierGameObj::Apply_Damage_Extended( const OffenseObjectClass & damager, 
 	float armor_before = Get_Defense_Object()->Get_Shield_Strength();
 
 	if ( collision_box_name != NULL ) {
-		char * start = ::strchr( collision_box_name, '.' );
+		char * start = const_cast<char *>(::strchr( collision_box_name, '.' ));
 		if ( start != NULL ) {
 			start++;
 			float bone_scale = BonesManager::Get_Bone_Damage_Scale( start );
@@ -3817,9 +3817,9 @@ void	SoldierGameObj::Apply_Damage_Extended( const OffenseObjectClass & damager, 
 		if ( FreeRandom.Get_Float() < probability ) {
 			// if skin is not impervious to the damage
 			int skin = Get_Defense_Object()->Get_Skin();
-			ArmorWarheadManager::SpecialDamageType special_damage = ArmorWarheadManager::Get_Special_Damage_Type( warhead );
-			if ( !ArmorWarheadManager::Is_Skin_Impervious( special_damage, skin ) ) {
-				Set_Special_Damage_Mode( special_damage, damager.Get_Owner() );
+			ArmorWarheadManager::SpecialDamageType special_damage_inner = ArmorWarheadManager::Get_Special_Damage_Type( warhead );
+			if ( !ArmorWarheadManager::Is_Skin_Impervious( special_damage_inner, skin ) ) {
+				Set_Special_Damage_Mode( special_damage_inner, damager.Get_Owner() );
 			}
 		}
 	}
@@ -3853,8 +3853,8 @@ void	SoldierGameObj::Apply_Damage_Extended( const OffenseObjectClass & damager, 
 
 		// Check for creating visceroids
 		if ( IS_MISSION ) {
-			int warhead = damager.Get_Warhead();
-			float visceroid_probability = ArmorWarheadManager::Get_Visceroid_Probability( warhead );
+			int warhead_inner = damager.Get_Warhead();
+			float visceroid_probability = ArmorWarheadManager::Get_Visceroid_Probability( warhead_inner );
 			if ( !Is_Human_Controlled() && visceroid_probability != 0 ) {
 				if ( FreeRandom.Get_Float() < visceroid_probability ) {
 
@@ -4426,7 +4426,7 @@ void SoldierGameObj::Get_Description(StringClass & description)
 	line += "\n";
 	description += line;
 
-	line.Format("ANIM:  %s\n", AnimationName);
+	line.Format("ANIM:  %s\n", (const char *)AnimationName);
 	description += line;
 
    if (Vehicle != NULL) {

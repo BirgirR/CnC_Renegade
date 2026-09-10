@@ -377,11 +377,14 @@ DECLARE_SCRIPT (M09_Mobius_Suit_Objective, "")
 		{
 			GameObject *mobius = Commands->Find_Object (2000010);
 
-			Vector3 havoc_loc = Commands->Get_Position (Commands->Find_Object (1100497));
-			Vector3 mobius_loc = Commands->Get_Position (Commands->Find_Object (2002239));
-
-			Commands->Set_Position (STAR, havoc_loc );
-			Commands->Set_Position (mobius, mobius_loc );
+			Vector3 havoc_loc;
+			Vector3 mobius_loc;
+			bool havoc_loc_found = Find_Object_Position (1100497, havoc_loc);
+			bool mobius_loc_found = Find_Object_Position (2002239, mobius_loc);
+			if (havoc_loc_found && mobius_loc_found) {
+				Commands->Set_Position (STAR, havoc_loc );
+				Commands->Set_Position (mobius, mobius_loc );
+			}
 		}
 	}
 
@@ -597,7 +600,11 @@ DECLARE_SCRIPT (M09_Evac_Point_Objective, "")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 99, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000969)), 1.2f, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (2000969, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (mobius, params);
 
@@ -615,9 +622,16 @@ DECLARE_SCRIPT (M09_Evac_Point_Objective, "")
 		if (timer_id == TIMER_RESET)
 		{
 			GameObject *mobius = Commands->Find_Object (2000010);
-			float mobius_distance = Commands->Get_Distance(Commands->Get_Position (Commands->Find_Object (2000969)), Commands->Get_Position (mobius));
 
-			if (mobius_distance < 15.0f)
+			//	Both ends of this measurement have to exist. With either one
+			//	missing the distance is measured to the map origin and the
+			//	proximity test fires on a coincidence.
+			Vector3 marker_pos;
+			bool ends_found = (mobius != NULL) && Find_Object_Position (2000969, marker_pos);
+			float mobius_distance = ends_found ?
+				Commands->Get_Distance (marker_pos, Commands->Get_Position (mobius)) : 0.0f;
+
+			if (ends_found && mobius_distance < 15.0f)
 			{
 				//Commands->Send_Custom_Event (obj, Commands->Find_Object(2000071), 903, 1, 0.0f);
 			
@@ -636,7 +650,11 @@ DECLARE_SCRIPT (M09_Evac_Point_Objective, "")
 				ActionParamsStruct params;
 
 				params.Set_Basic( this, 99, MOBIUS_GOTO );
-				params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000969)), 1.2f, 0.8f );
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (2000969, _obj_pos)) {
+						params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+					}
+				}
 
 				Commands->Action_Goto (mobius, params);
 
@@ -945,7 +963,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, 96, MOBIUS_GOTO );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (waypath_id)), 1.2f, 0.8f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (waypath_id, _obj_pos)) {
+				params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+			}
+		}
 
 		Commands->Action_Goto (obj, params);
 
@@ -962,7 +984,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 		ActionParamsStruct params;
 
 		params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_path)), 1.2f, 1.0f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (attack_path, _obj_pos)) {
+				params.Set_Movement( _obj_pos, 1.2f, 1.0f );
+			}
+		}
 		//params.WaypathID = attack_path;
 		params.Set_Attack(enemy, 100.0f, 1.0f, true);
 		params.AttackCheckBlocked = true;
@@ -1054,7 +1080,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (param)), 1.2f, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (param, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+				}
+			}
 			params.MovePathfind = false;
 
 			Commands->Action_Goto (obj, params);
@@ -1068,7 +1098,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 99, ELEV_WAYPOINT );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (param)), 1.2f, 1.0f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (param, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 1.0f);
+				}
+			}
 						
 			Commands->Action_Goto (obj, params);
 								
@@ -1082,7 +1116,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 99, ELEV_WAYPOINT2 );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (param)), 1.2f, 1.0f);
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (param, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 1.0f);
+				}
+			}
 						
 			Commands->Action_Goto (obj, params);
 								
@@ -1254,7 +1292,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_path)), 1.2f, 1.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_path, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 1.0f );
+				}
+			}
 
 			Commands->Action_Goto (obj, params);
 		}
@@ -1264,7 +1306,11 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN - 5, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (attack_path)), 1.2f, 1.0f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (attack_path, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 1.0f );
+				}
+			}
 			params.MovePathfind = false;
 
 			Commands->Action_Goto (obj, params);
@@ -1274,9 +1320,16 @@ DECLARE_SCRIPT (M09_Mobius_Follow, "")  //Mobius (Pre-Suit): 2000010
 		{
 			if (!nofollow)
 			{
-				float distance = (Commands->Get_Distance ( Commands->Get_Position (STAR), Commands->Get_Position (Commands->Find_Object (2000010))) );
+				//	Mobius has to be in the level for this to mean anything.
+				//	Note the test is "far away", so an absent Mobius would pass
+				//	it -- the distance to the map origin is almost always more
+				//	than 25 -- and he would be ordered to walk to the player.
+				Vector3 mobius_pos;
+				bool mobius_found = Find_Object_Position (2000010, mobius_pos);
+				float distance = mobius_found ?
+					Commands->Get_Distance (Commands->Get_Position (STAR), mobius_pos) : 0.0f;
 
-				if (distance >= 25.0f)
+				if (mobius_found && distance >= 25.0f)
 				{
 					ActionParamsStruct params;
 
@@ -1771,13 +1824,13 @@ DECLARE_SCRIPT (M09_Vehicle_Attack_01, "")
 			{
 				Commands->Action_Reset ( obj, 100 );
 				charge = true;
-				ActionParamsStruct params;
-				params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
-				params.Set_Movement( STAR, 1.5f, 0 );
-				params.Set_Attack(STAR, 100.0f, 5.0f, true);
-				params.AttackCheckBlocked = false;
-				params.AttackActive = true;
-				Commands->Action_Attack (obj, params);
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN + 5, 10 );
+				params_inner.Set_Movement( STAR, 1.5f, 0 );
+				params_inner.Set_Attack(STAR, 100.0f, 5.0f, true);
+				params_inner.AttackCheckBlocked = false;
+				params_inner.AttackActive = true;
+				Commands->Action_Attack (obj, params_inner);
 
 				Commands->Start_Timer(obj, this, 6.0f, CHARGE_COMPLETE);
 			}
@@ -1789,14 +1842,14 @@ DECLARE_SCRIPT (M09_Vehicle_Attack_01, "")
 			charge = false;
 			charging = false;
 
-			ActionParamsStruct params;
-			params.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
-			params.Set_Movement( Vector3(0,0,0), 1.0f, 0 );
-			params.WaypathID = 2000095;
-			params.Set_Attack(STAR, 100.0f, 5.0f, true);
-			params.AttackCheckBlocked = false;
-			params.AttackActive = true;
-			Commands->Action_Attack (obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic( this, INNATE_PRIORITY_ENEMY_SEEN +5, 10 );
+			params_inner.Set_Movement( Vector3(0,0,0), 1.0f, 0 );
+			params_inner.WaypathID = 2000095;
+			params_inner.Set_Attack(STAR, 100.0f, 5.0f, true);
+			params_inner.AttackCheckBlocked = false;
+			params_inner.AttackActive = true;
+			Commands->Action_Attack (obj, params_inner);
 
 		}
 
@@ -1878,7 +1931,11 @@ DECLARE_SCRIPT (M09_Sam_Engineer_1, "")
 	{
 		ActionParamsStruct params;
 		params.Set_Basic( this, 99, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000102)), RUN, 1.5f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (2000102, _obj_pos)) {
+				params.Set_Movement( _obj_pos, RUN, 1.5f );
+			}
+		}
 		Commands->Action_Goto (obj, params);
 	}
 
@@ -1900,7 +1957,11 @@ DECLARE_SCRIPT (M09_Sam_Engineer_2, "")
 	{
 		ActionParamsStruct params;
 		params.Set_Basic( this, 99, 10 );
-		params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000103)), RUN, 1.5f );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (2000103, _obj_pos)) {
+				params.Set_Movement( _obj_pos, RUN, 1.5f );
+			}
+		}
 		Commands->Action_Goto (obj, params);
 	}
 
@@ -2948,7 +3009,11 @@ DECLARE_SCRIPT (M09_Containment_Key_1, "")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 99, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000988)), 1.2f, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (2000988, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (mobius, params);
 		}
@@ -2968,7 +3033,11 @@ DECLARE_SCRIPT (M09_Containment_Key_2, "")
 			ActionParamsStruct params;
 
 			params.Set_Basic( this, 99, MOBIUS_GOTO );
-			params.Set_Movement( Commands->Get_Position (Commands->Find_Object (2000988)), 1.2f, 0.8f );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (2000988, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 1.2f, 0.8f );
+				}
+			}
 
 			Commands->Action_Goto (mobius, params);
 
@@ -3128,9 +3197,14 @@ DECLARE_SCRIPT (M09_MrShuman_Zone, "")
 	{
 		if (timer_id == DIST_CHECK && star_in_zone)
 		{
-			float mobius_distance = Commands->Get_Distance(Commands->Get_Position (STAR), Commands->Get_Position (Commands->Find_Object (2000010)));
+			//	See above: measuring to a Mobius who is not there means
+			//	measuring to the map origin.
+			Vector3 mobius_pos;
+			bool mobius_found = Find_Object_Position (2000010, mobius_pos);
+			float mobius_distance = mobius_found ?
+				Commands->Get_Distance (Commands->Get_Position (STAR), mobius_pos) : 0.0f;
 
-			if (mobius_distance <= 7.0 && star_in_zone && !fired_off)
+			if (mobius_found && mobius_distance <= 7.0 && star_in_zone && !fired_off)
 			{
 				fired_off = true;
 
@@ -3175,9 +3249,15 @@ DECLARE_SCRIPT (M09_MrShuman_Zone, "")
 	{
 		star_in_zone = true;
 
-		float mobius_distance = Commands->Get_Distance(Commands->Get_Position (STAR), Commands->Get_Position (Commands->Find_Object (2000010)));
+		//	Mobius has to actually be in the level. Without the check the
+		//	distance is measured to the map origin instead, and the proximity
+		//	test fires wherever the player happens to stand near it.
+		Vector3 mobius_pos;
+		bool mobius_found = Find_Object_Position (2000010, mobius_pos);
+		float mobius_distance = mobius_found ?
+			Commands->Get_Distance (Commands->Get_Position (STAR), mobius_pos) : 0.0f;
 
-		if (mobius_distance <= 7.0 && star_in_zone && !fired_off)
+		if (mobius_found && mobius_distance <= 7.0 && star_in_zone && !fired_off)
 		{
 			fired_off = true;
 
@@ -3544,17 +3624,19 @@ DECLARE_SCRIPT (M09_Mutant_Attack, "Target_num:int")
 		
 		if ( sound.Type == M09_INNATE_ENABLE )
 		{
-			Vector3 loc = Commands->Get_Position (Commands->Find_Object (target));
-
-			Commands->Set_Innate_Aggressiveness ( obj, 100.0f );
+			Vector3 loc;
+			bool loc_found = Find_Object_Position (target, loc);
+Commands->Set_Innate_Aggressiveness ( obj, 100.0f );
 			Commands->Set_Innate_Take_Cover_Probability ( obj, 100.0 );
 
-			ActionParamsStruct params;
+			ActionParamsStruct params_inner;
 
-			params.Set_Basic( this, 99, RUN_TO_TARGET );
-			params.Set_Movement( loc, 1.2f, 0.75f);
-						
-			Commands->Action_Goto (obj, params);
+			params_inner.Set_Basic( this, 99, RUN_TO_TARGET );
+			if (loc_found) {
+				params_inner.Set_Movement( loc, 1.2f, 0.75f);
+							
+				Commands->Action_Goto (obj, params_inner);
+			}
 		}
 	}
 
@@ -3918,31 +4000,33 @@ DECLARE_SCRIPT(M09_Evac_Transport, "")  //2000969
 
 			facing = Commands->Get_Facing (Commands->Find_Object (2000969));
 
-			Vector3 loc = Commands->Get_Position (Commands->Find_Object (2000969));
-			
-			GameObject * bone = Commands->Create_Object ( "Invisible_Object", loc );
-			Commands->Set_Facing(bone, facing);
-			Commands->Attach_Script(bone, "M09_Evac_Bone", "");
-			Commands->Set_Model ( bone, "XG_TransprtBone" );
-			Commands->Set_Animation ( bone, "XG_TransprtBone.XG_EV2_PathA", false );
-			
-			GameObject * chinook = Commands->Create_Object_At_Bone( bone, "GDI_Transport_Helicopter", "XG_TransprtBone" );
-			GameObject * troop = Commands->Create_Object_At_Bone( bone, "GDI_RocketSoldier_2SF", "SPAWNER" );
-			Commands->Attach_Script(troop, "M00_Damage_Modifier_DME", "0.05f, 1, 1, 0, 0");
-			
-			char param1[10];
-			sprintf(param1, "%d", Commands->Get_ID(troop));
-			
-			Commands->Set_Facing(chinook, facing);
-			Commands->Attach_Script(chinook, "M09_Evac_Helicopter", param1);
-			Commands->Attach_To_Object_Bone ( chinook, bone, "BN_Trajectory" );
-			Commands->Set_Animation ( chinook, "v_GDI_trnspt.XG_EV2_trnsA", false );
-						
-			Commands->Attach_Script(troop, "M09_Gunner", "");
-			Commands->Attach_Script(chinook, "M09_No_Obj_Damage", "");
-			Commands->Attach_To_Object_Bone ( troop, chinook, "SPAWNER" );
-
-			//Commands->Set_Facing(troop, facing - 180.0);			
+			Vector3 loc;
+			bool loc_found = Find_Object_Position (2000969, loc);
+			if (loc_found) {
+				GameObject * bone = Commands->Create_Object ( "Invisible_Object", loc );
+				Commands->Set_Facing(bone, facing);
+				Commands->Attach_Script(bone, "M09_Evac_Bone", "");
+				Commands->Set_Model ( bone, "XG_TransprtBone" );
+				Commands->Set_Animation ( bone, "XG_TransprtBone.XG_EV2_PathA", false );
+				
+				GameObject * chinook = Commands->Create_Object_At_Bone( bone, "GDI_Transport_Helicopter", "XG_TransprtBone" );
+				GameObject * troop = Commands->Create_Object_At_Bone( bone, "GDI_RocketSoldier_2SF", "SPAWNER" );
+				Commands->Attach_Script(troop, "M00_Damage_Modifier_DME", "0.05f, 1, 1, 0, 0");
+				
+				char param1[10];
+				sprintf(param1, "%d", Commands->Get_ID(troop));
+				
+				Commands->Set_Facing(chinook, facing);
+				Commands->Attach_Script(chinook, "M09_Evac_Helicopter", param1);
+				Commands->Attach_To_Object_Bone ( chinook, bone, "BN_Trajectory" );
+				Commands->Set_Animation ( chinook, "v_GDI_trnspt.XG_EV2_trnsA", false );
+							
+				Commands->Attach_Script(troop, "M09_Gunner", "");
+				Commands->Attach_Script(chinook, "M09_No_Obj_Damage", "");
+				Commands->Attach_To_Object_Bone ( troop, chinook, "SPAWNER" );
+	
+				//Commands->Set_Facing(troop, facing - 180.0);
+			}
 		}
 	}
 };
@@ -4149,12 +4233,14 @@ DECLARE_SCRIPT(M09_Innate_Enable_Zone, "SoundProjector:int, Radius=7.0:float, To
 	{
 		if (timer_id == INNATE_RECYCLE && !all_checked_in)
 		{
-			Vector3 projector = Commands->Get_Position (Commands->Find_Object (Get_Int_Parameter ("SoundProjector")));
-			float rad = Get_Float_Parameter("Radius");
-			
-			Commands->Create_Logical_Sound (obj, M09_INNATE_ENABLE, projector, rad);
-
-			//Commands->Start_Timer (obj, this, 4.0f, INNATE_RECYCLE);
+			Vector3 projector;
+			bool projector_found = Find_Object_Position (Get_Int_Parameter ("SoundProjector"), projector);
+float rad = Get_Float_Parameter("Radius");
+			if (projector_found) {
+				Commands->Create_Logical_Sound (obj, M09_INNATE_ENABLE, projector, rad);
+	
+				//Commands->Start_Timer (obj, this, 4.0f, INNATE_RECYCLE);
+			}
 		}
 	}
 
@@ -4165,12 +4251,14 @@ DECLARE_SCRIPT(M09_Innate_Enable_Zone, "SoundProjector:int, Radius=7.0:float, To
 		{
 			already_entered = true;
 
-			Vector3 projector = Commands->Get_Position (Commands->Find_Object (Get_Int_Parameter ("SoundProjector")));
-			float rad = Get_Float_Parameter("Radius");
-			
-			Commands->Create_Logical_Sound (obj, M09_INNATE_ENABLE, projector, rad);
-
-			Commands->Start_Timer (obj, this, 4.0f, INNATE_RECYCLE);
+			Vector3 projector;
+			bool projector_found = Find_Object_Position (Get_Int_Parameter ("SoundProjector"), projector);
+float rad = Get_Float_Parameter("Radius");
+			if (projector_found) {
+				Commands->Create_Logical_Sound (obj, M09_INNATE_ENABLE, projector, rad);
+	
+				Commands->Start_Timer (obj, this, 4.0f, INNATE_RECYCLE);
+			}
 		}
 	}
 };
@@ -4270,7 +4358,11 @@ DECLARE_SCRIPT (M09_Ambient_Clutter, "")
 			exp_point [4] = 2006124;
 
 			int exp_num = Commands->Get_Random_Int (0, 5);
-			Commands->Create_Explosion("Air Explosions Twiddler", Commands->Get_Position (Commands->Find_Object (exp_point [exp_num])));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (exp_point [exp_num], _obj_pos)) {
+					Commands->Create_Explosion("Air Explosions Twiddler", _obj_pos);
+				}
+			}
 
 			float delayTimer = Commands->Get_Random ( 1, 5 );
 			Commands->Start_Timer(obj, this, (8.0f + delayTimer), AMB_EXPLOSION);

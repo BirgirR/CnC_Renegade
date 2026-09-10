@@ -53,12 +53,11 @@
 	#include "vector3.h"
 #endif
 
-#include "cdverify.h"
 #include "wwstring.h"
 
 
 // Game Mode to do movies
-class	MovieGameModeClass : public GameMajorModeClass, public Observer<CDVerifyEvent>
+class	MovieGameModeClass : public GameMajorModeClass
 {
 public:
 	virtual	const char *Name()	{ return "Movie"; }	// the name of this mode
@@ -72,15 +71,9 @@ public:
 	void	Startup_Movies( void );
 	void	Movie_Done( void );
 
-	//
-	//	Notification
-	//
-	void		HandleNotification (CDVerifyEvent &event);
-
 protected:
 	void	Play_Movie( const char * filename );
 
-	CDVerifyClass		CDVerifier;
 	StringClass			PendingMovieFilename;
 	bool					IsPending;
 	bool					IsPlaying;

@@ -593,7 +593,16 @@ WWINLINE int WWMath::Float_To_Int_Floor (const float& f)
 // Inverse square root
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+// A/B switch: RENEGADE_PORTABLE_INV_SQRT replaces the hand-written version
+// with plain C while keeping __fastcall, so the declaration above still
+// matches. The asm one is naked and writes to [esp-8] and [esp-12] -- below
+// the stack pointer, which Win32 has no red zone for.
+#if defined(_MSC_VER) && defined(_M_IX86) && defined(RENEGADE_PORTABLE_INV_SQRT)
+WWINLINE float __fastcall WWMath::Inv_Sqrt(float a)
+{
+	return 1.0f / sqrtf(a);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE __declspec(naked) float __fastcall WWMath::Inv_Sqrt(float a)
 {
 	__asm {

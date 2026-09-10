@@ -734,9 +734,9 @@ VehicleDriverClass::Drive_Tracked (void)
 		//
 		//	Calculate our (current) normalized speed
 		//
-		Vector3 vel_vector;
-		Get_Velocity (tm, vel_vector);
-		float speed				= vel_vector.X;
+		Vector3 vel_vector_inner;
+		Get_Velocity (tm, vel_vector_inner);
+		float speed				= vel_vector_inner.X;
 		float norm_speed		= speed / max_speed;
 
 		//

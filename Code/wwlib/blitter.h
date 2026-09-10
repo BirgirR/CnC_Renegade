@@ -49,6 +49,14 @@
 class Blitter {
 	public:
 
+		//
+		//	Virtual, because ConvertClass's destructor deletes these through
+		//	a base pointer (convert.cpp:160-202). Without it that is undefined
+		//	behaviour and the derived destructors never run. The class is
+		//	already polymorphic, so this costs nothing.
+		//
+		virtual ~Blitter(void) {}
+
 		/*
 		**	Blits from source to dest (starts at first pixel). This is the preferred
 		**	method of pixel blitting and this routine will be called 99% of the time under
@@ -79,6 +87,14 @@ class Blitter {
 */
 class RLEBlitter {
 	public:
+
+		//
+		//	Virtual, because ConvertClass's destructor deletes these through
+		//	a base pointer (convert.cpp:160-202). Without it that is undefined
+		//	behaviour and the derived destructors never run. The class is
+		//	already polymorphic, so this costs nothing.
+		//
+		virtual ~RLEBlitter(void) {}
 
 		/*
 		**	Blits from the RLE compressed source to the destination buffer. An optional

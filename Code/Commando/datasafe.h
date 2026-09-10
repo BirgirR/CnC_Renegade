@@ -2886,10 +2886,10 @@ inline T &SafeDataClass<T>::operator += (T const &value)
 			*data_ptr = *data_ptr + value;
 
 #ifdef WWDEBUG
-			bool ok =
+			bool set_ok =
 #endif //WWDEBUG
 				DataSafeClass<T>::Set(Handle, data_ptr);
-			ds_assert(ok);
+			ds_assert(set_ok);
 #ifdef WWDEBUG
 			DebugData = *data_ptr;
 #endif //WWDEBUG
@@ -3155,10 +3155,10 @@ inline T &SafeDataClass<T>::operator -= (T const &value)
 			*data_ptr = *data_ptr - value;
 
 #ifdef WWDEBUG
-			bool ok =
+			bool set_ok =
 #endif //WWDEBUG
 				DataSafeClass<T>::Set(Handle, data_ptr);
-			ds_assert(ok);
+			ds_assert(set_ok);
 #ifdef WWDEBUG
 			DebugData = *data_ptr;
 #endif //WWDEBUG
@@ -3428,10 +3428,10 @@ inline T &SafeDataClass<T>::operator *= (T const &value)
 			*data_ptr = *data_ptr * value;
 
 #ifdef WWDEBUG
-			bool ok =
+			bool set_ok =
 #endif //WWDEBUG
 				DataSafeClass<T>::Set(Handle, data_ptr);
-			ds_assert(ok);
+			ds_assert(set_ok);
 #ifdef WWDEBUG
 			DebugData = *data_ptr;
 #endif //WWDEBUG
@@ -3698,10 +3698,10 @@ inline T &SafeDataClass<T>::operator /= (T const &value)
 			*data_ptr = *data_ptr / value;
 
 #ifdef WWDEBUG
-			bool ok =
+			bool set_ok =
 #endif //WWDEBUG
 				DataSafeClass<T>::Set(Handle, data_ptr);
-			ds_assert(ok);
+			ds_assert(set_ok);
 #ifdef WWDEBUG
 			DebugData = *data_ptr;
 #endif //WWDEBUG

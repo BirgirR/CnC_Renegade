@@ -320,9 +320,9 @@ void	ExplosionManager::Create_Explosion_At( int explosion_def_id, const Matrix3D
 #ifdef WWDEBUG
 if (!WWMath::Is_Valid_Float(dist)) {
 	WWDEBUG_SAY(("Explosion Distance Bug!\r\n"));
-	Vector3 obj_pos;
-	obj->Get_Position(&obj_pos);
-	WWDEBUG_SAY(("  explosion pos: %f, %f, %f  object pos: %f, %f, %f\r\n",pos.X,pos.Y,pos.Z,obj_pos.X,obj_pos.Y,obj_pos.Z));
+	Vector3 obj_pos_inner;
+	obj->Get_Position(&obj_pos_inner);
+	WWDEBUG_SAY(("  explosion pos: %f, %f, %f  object pos: %f, %f, %f\r\n",pos.X,pos.Y,pos.Z,obj_pos_inner.X,obj_pos_inner.Y,obj_pos_inner.Z));
 	WWDEBUG_SAY(("  object definition name: %s\r\n", obj->Get_Definition().Get_Name()));
 	WWDEBUG_SAY(("  explosion definition name; %s\r\n", explosion_def->Get_Name()));
 }

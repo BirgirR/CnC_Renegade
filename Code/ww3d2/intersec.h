@@ -267,18 +267,18 @@ public:
 	inline void Get_Screen_Ray(float ScreenX, float ScreenY, const LayerClass &Layer); 
 	
 	// uses the Result's range & the Ray_Direction to calculate the actual point of intersection.
-	inline void Calculate_Intersection(IntersectionResultClass *Result);
+	inline void Calculate_Intersection(IntersectionResultClass *FinalResult);
 
 	// interpolate the normal for a polygon intersection. Will ONLY work for polygon intersections,
 	// and the Results.Intersection_Data must refer to a polygon with a valid ->mesh pointer.
 	inline void Interpolate_Intersection_Normal(IntersectionResultClass *FinalResult);
 
 	// various methods for performing intersections.
-	inline bool Intersect_Plane(IntersectionResultClass *Result, Vector3 &Plane_Normal, Vector3 &Plane_Point);
-	inline bool Intersect_Plane_Quick(IntersectionResultClass *Result, Vector3 &Plane_Normal, Vector3 &Plane_Point);
-	inline bool Intersect_Polygon(IntersectionResultClass *Result, Vector3 &PolygonNormal, Vector3 &v1, Vector3 &v2, Vector3 &v3);
-	inline bool Intersect_Polygon(IntersectionResultClass *Result, Vector3 &v1, Vector3 &v2, Vector3 &v3);
-	inline bool Intersect_Polygon_Z(IntersectionResultClass *Result, Vector3 &PolygonNormal, Vector3 &v1, Vector3 &v2, Vector3 &v3);
+	inline bool Intersect_Plane(IntersectionResultClass *FinalResult, Vector3 &Plane_Normal, Vector3 &Plane_Point);
+	inline bool Intersect_Plane_Quick(IntersectionResultClass *FinalResult, Vector3 &Plane_Normal, Vector3 &Plane_Point);
+	inline bool Intersect_Polygon(IntersectionResultClass *FinalResult, Vector3 &PolygonNormal, Vector3 &v1, Vector3 &v2, Vector3 &v3);
+	inline bool Intersect_Polygon(IntersectionResultClass *FinalResult, Vector3 &v1, Vector3 &v2, Vector3 &v3);
+	inline bool Intersect_Polygon_Z(IntersectionResultClass *FinalResult, Vector3 &PolygonNormal, Vector3 &v1, Vector3 &v2, Vector3 &v3);
 
 	/*
 	**	This function will fill the passed array with the set of points & uv values that represent

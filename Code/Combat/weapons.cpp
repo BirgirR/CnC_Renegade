@@ -1285,8 +1285,8 @@ void	WeaponClass::Do_Continuous_Effects( bool enable )
 			}
 
 			ContinuousEmitters.Resize( num_muzzles );
-			for ( int i = 0; i < ContinuousEmitters.Length(); i++ ) {
-				ContinuousEmitters[i] = NULL;
+			for ( int i_inner = 0; i_inner < ContinuousEmitters.Length(); i_inner++ ) {
+				ContinuousEmitters[i_inner] = NULL;
 			}
 		}
 

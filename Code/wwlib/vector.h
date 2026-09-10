@@ -489,6 +489,26 @@ class DynamicVectorClass : public VectorClass<T>
 	public:
 		DynamicVectorClass(unsigned size=0, T const * array=0);
 
+		/*
+		**	ActiveCount is declared here, in the derived class, but the buffer it
+		**	counts is freed by ~VectorClass, which sets Vector to NULL. Nothing
+		**	otherwise resets ActiveCount on the way out: the virtual Clear()
+		**	below does, but base-class destruction cannot dispatch to a derived
+		**	override, so it never runs.
+		**
+		**	A destroyed vector is then self-contradictory -- Vector is NULL while
+		**	Count() still reports the old size -- and any caller that reaches one
+		**	indexes off a null pointer instead of seeing an empty list. That is
+		**	not hypothetical: NetworkObjectMgrClass::_ObjectList is a static, and
+		**	~NetworkObjectClass calls Unregister_Object, so every object
+		**	destroyed after it during static teardown crashed on exit inside
+		**	Find_Object's binary search.
+		**
+		**	Clearing the count here makes a destroyed vector read as empty, which
+		**	is what such callers are equipped to handle.
+		*/
+		virtual ~DynamicVectorClass(void) { ActiveCount = 0; }
+
 		// Stubbed equality operators so you can have dynamic vectors of dynamic vectors
 		bool operator== (const DynamicVectorClass &src)	{ return false; }
 		bool operator!= (const DynamicVectorClass &src)	{ return true; }
@@ -516,6 +536,9 @@ class DynamicVectorClass : public VectorClass<T>
 
 		// Delete object at this vector index.
 		bool Delete(int index);
+		// Delete(int) and Delete(T const &) are ambiguous when T is int.
+		// Call this instead when the argument is meant as an index.
+		bool Delete_Index(int index);
 
 		// Deletes all objects in the vector.
 		void Delete_All(void);
@@ -845,6 +868,13 @@ bool DynamicVectorClass<T>::Delete(T const & object)
  *=============================================================================================*/
 template<class T>
 bool DynamicVectorClass<T>::Delete(int index)
+{
+	return Delete_Index(index);
+}
+
+
+template<class T>
+bool DynamicVectorClass<T>::Delete_Index(int index)
 {
 	if (index < ActiveCount) {
 		ActiveCount--;

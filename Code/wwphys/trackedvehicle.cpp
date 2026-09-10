@@ -269,11 +269,11 @@ void TrackedVehicleClass::Add_Track_Mappers(MeshClass * mesh,int track_type)
 	if (has_mapper) {
 		mesh->Make_Unique();
 		
-		MaterialInfoClass * matinfo = mesh->Get_Material_Info();
+		MaterialInfoClass * matinfo_inner = mesh->Get_Material_Info();
 
-		if (matinfo != NULL) {
-			for (int i=0; i<matinfo->Vertex_Material_Count(); i++) {
-				VertexMaterialClass * vmtl = matinfo->Peek_Vertex_Material(i);
+		if (matinfo_inner != NULL) {
+			for (int i=0; i<matinfo_inner->Vertex_Material_Count(); i++) {
+				VertexMaterialClass * vmtl = matinfo_inner->Peek_Vertex_Material(i);
 				if (vmtl != NULL) {
 					TextureMapperClass * mapper = vmtl->Get_Mapper(0);
 					if ((mapper != NULL) && (mapper->Mapper_ID() == TextureMapperClass::MAPPER_ID_LINEAR_OFFSET)) {
@@ -296,7 +296,7 @@ void TrackedVehicleClass::Add_Track_Mappers(MeshClass * mesh,int track_type)
 					REF_PTR_RELEASE(mapper);
 				}
 			}			
-			REF_PTR_RELEASE(matinfo);
+			REF_PTR_RELEASE(matinfo_inner);
 		}
 	}
 }

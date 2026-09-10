@@ -159,10 +159,10 @@ PurchaseSettingsDefClass::PurchaseSettingsDefClass (void)	:
 				NAMED_EDITABLE_PARAM (PurchaseSettingsDefClass, ParameterClass::TYPE_STRING, AlternateTextureList[index][alt_index], name);
 
 				name.Format ("Alt Object %d", alt_index + 1);		
-				GenericDefParameterClass *param = new GenericDefParameterClass (&(AlternateDefinitionList[index][alt_index]));
-				param->Set_Class_ID (CLASSID_GAME_OBJECTS);
-				param->Set_Name (name);
-				GENERIC_EDITABLE_PARAM (PurchaseSettingsDefClass, param)
+				GenericDefParameterClass *param_inner = new GenericDefParameterClass (&(AlternateDefinitionList[index][alt_index]));
+				param_inner->Set_Class_ID (CLASSID_GAME_OBJECTS);
+				param_inner->Set_Name (name);
+				GENERIC_EDITABLE_PARAM (PurchaseSettingsDefClass, param_inner)
 			}
 
 		#endif //PARAM_EDITING_ON

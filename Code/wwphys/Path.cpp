@@ -1075,6 +1075,35 @@ PathClass::Clip_Control_Point
 
 /////////////////////////////////////////////////////////////////////////////////
 //
+//	Parameterize_Key
+//
+//	Position of a key along the spline, in [0, 1]. Normally that is the distance
+//	travelled so far over the total, but a degenerate path -- every node on top
+//	of the start position, which happens whenever an object is asked to path to
+//	where it already stands -- has a total of zero and would give 0/0. Fall back
+//	to even spacing there: with no distance to divide up, any monotonic
+//	parameterisation describes the same curve, and the keys stay ordered.
+//
+/////////////////////////////////////////////////////////////////////////////////
+float
+PathClass::Parameterize_Key (float current_dist, int index, int count) const
+{
+	const float MIN_PATH_LENGTH = 0.0001F;
+
+	if (m_TotalDist > MIN_PATH_LENGTH) {
+		return current_dist / m_TotalDist;
+	}
+
+	if (count > 1) {
+		return (float)index / (float)(count - 1);
+	}
+
+	return 0.0F;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
 //	Initialize_Vehicle_Spline
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -1098,7 +1127,20 @@ PathClass::Initialize_Vehicle_Spline (DynamicVectorClass<PATH_NODE> &node_list)
 		//	Add this point as a key along the spline
 		//
 		current_dist		+= (point - last_point).Length ();
-		float curr_time	= current_dist / m_TotalDist;
+
+		//
+		//	A path whose nodes all coincide -- an object already standing on its
+		//	destination -- has m_TotalDist == 0, and current_dist is 0 too, so
+		//	this division is 0/0: the indefinite NaN. Every key then carries a
+		//	NaN time, and Curve3DClass::Find_Interval's precondition
+		//	(time >= Keys[0].Time) can never hold afterwards, because every
+		//	comparison against a NaN is false -- including the range checks the
+		//	Evaluate() functions use to clamp before calling it.
+		//
+		//	With no distance to measure, one parameterisation is as good as
+		//	another, so space the keys evenly and keep the curve well formed.
+		//
+		float curr_time	= Parameterize_Key (current_dist, index, node_list.Count ());
 		m_Spline->Add_Key (point, curr_time);
 
 		//
@@ -1156,7 +1198,10 @@ PathClass::Initialize_Human_Spline(DynamicVectorClass<PATH_NODE> &node_list)
 		//	Add this point as a key along the spline
 		//
 		current_dist		+= (point - last_point).Length ();
-		float curr_time	= current_dist / m_TotalDist;
+
+		//	See Initialize_Vehicle_Spline: a zero-length path would make this
+		//	0/0 and fill the curve with NaN key times.
+		float curr_time	= Parameterize_Key (current_dist, index, node_list.Count ());
 		temp_spline.Add_Key (point, curr_time);
 
 		//
@@ -1384,8 +1429,14 @@ PathClass::Initialize_Spline (DynamicVectorClass<PATH_NODE> &node_list)
 		//	Setup the variables to look-ahead 8 frames and switch
 		// the new look-ahead after the unit has traveled 4 frames
 		//
+		//
+		//	The same zero-length path that makes the spline parameterisation
+		//	degenerate leaves approx_frames at zero, and 8.0F / 0 is infinity.
+		//	A path with no length is covered in its entirety immediately, so
+		//	look ahead across all of it rather than an infinite distance.
+		//
 		float approx_frames	= (m_TotalDist * ASSUMED_FPS) / m_Velocity;
-		m_LookAheadTime		= 8.0F / approx_frames;
+		m_LookAheadTime		= (approx_frames > 0.0F) ? (8.0F / approx_frames) : 1.0F;
 		m_LookAheadDist		= (m_Velocity * 4.0F) / ASSUMED_FPS;
 
 		//

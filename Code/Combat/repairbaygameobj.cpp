@@ -674,7 +674,9 @@ RepairBayGameObj::Repair_Vehicle (void)
 				if (	driver != NULL && 
 						driver->Get_Player_Type () == BaseController->Get_Player_Type() )
 				{
-					PlayerDataClass *player_data = driver->Get_Player_Data ();
+					//	Unused until the commented-out Purchase_Item call below is
+					//	finished; see the (TSS) pragma about available_funds.
+					//PlayerDataClass *player_data = driver->Get_Player_Data ();
 
 					float shield_max	= vehicle->Get_Defense_Object ()->Get_Shield_Strength_Max ();
 					float health_max	= vehicle->Get_Defense_Object ()->Get_Health_Max ();
@@ -704,7 +706,7 @@ RepairBayGameObj::Repair_Vehicle (void)
 					int points_restored			= int(available_funds / repair_cost_per_pt);
 					points_restored				= max (points_restored, 0);
 					points_restored				= min (points_restored, damage_points);
-					float total_cost			= points_restored * repair_cost_per_pt;
+					//float total_cost			= points_restored * repair_cost_per_pt;
 
 					int health_restored			= min (int(health_max - curr_health), points_restored);
 					int shield_restored			= min (int(shield_max - curr_shield), (points_restored - health_restored));
@@ -908,22 +910,22 @@ RepairBayGameObj::Emit_Welding_Arc (RenderObjClass *vehicle_model)
 			//	Now scale the bone's that control the length of the arc so it
 			// will fit perfectly between the start and endpoints.
 			//
-			for (int bone_index = 0; bone_index < BONE_COUNT; bone_index ++) {
+			for (int bone_index_inner = 0; bone_index_inner < BONE_COUNT; bone_index_inner ++) {
 				
-				float percent		= WWMath::Fabs (Bones[bone_index].Get_Translation ().X / EndTM.Get_Translation ().X);
+				float percent		= WWMath::Fabs (Bones[bone_index_inner].Get_Translation ().X / EndTM.Get_Translation ().X);
 				Vector3 new_pos	= startpoint + (endpoint - startpoint) * percent;
 
 				//
 				//	Calculate the world space position of the bone
 				//
-				Vector3 world_space_pos		= start_tm * Bones[bone_index].Get_Translation ();
+				Vector3 world_space_pos		= start_tm * Bones[bone_index_inner].Get_Translation ();
 				Vector3 world_space_offset	= new_pos - world_space_pos;
 				Matrix3D bone_tm (world_space_offset);
 				
 				//
 				//	Control the bone
 				//
-				int bone_id = model->Get_Bone_Index (BoneNames[bone_index]);
+				int bone_id = model->Get_Bone_Index (BoneNames[bone_index_inner]);
 				model->Capture_Bone (bone_id);
 				model->Control_Bone (bone_id, bone_tm, true);
 			}			

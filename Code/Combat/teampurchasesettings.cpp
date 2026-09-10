@@ -152,10 +152,10 @@ TeamPurchaseSettingsDefClass::TeamPurchaseSettingsDefClass (void)	:
 		NAMED_EDITABLE_PARAM (TeamPurchaseSettingsDefClass, ParameterClass::TYPE_STRING,			TextureList[index], "Texture");
 
 		#ifdef PARAM_EDITING_ON
-			GenericDefParameterClass *param = new GenericDefParameterClass (&(DefinitionList[index]));
-			param->Set_Class_ID (CLASSID_GAME_OBJECTS);
-			param->Set_Name ("Object");
-			GENERIC_EDITABLE_PARAM(TeamPurchaseSettingsDefClass, param)
+			GenericDefParameterClass *param_inner = new GenericDefParameterClass (&(DefinitionList[index]));
+			param_inner->Set_Class_ID (CLASSID_GAME_OBJECTS);
+			param_inner->Set_Name ("Object");
+			GENERIC_EDITABLE_PARAM(TeamPurchaseSettingsDefClass, param_inner)
 		#endif //PARAM_EDITING_ON
 
 	}

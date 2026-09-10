@@ -75,7 +75,11 @@ DECLARE_SCRIPT (DAY_TestScriptOne, "")
 		action = 1;
 		ActionParamsStruct params;
 		params.Set_Basic( this, 99, 1 );
-		params.Set_Movement( Commands->Get_Position( Commands->Find_Object(100077) ), 0.6f, 1.0f, false );
+		{	Vector3 _obj_pos;
+			if (Find_Object_Position (100077, _obj_pos)) {
+				params.Set_Movement( _obj_pos, 0.6f, 1.0f, false );
+			}
+		}
 		params.Set_Attack( Commands->Find_Object(100079), 40.0f, 0.0f, true );
 		params.AttackCrouched = true;
 		params.MoveCrouched = true;
@@ -90,7 +94,11 @@ DECLARE_SCRIPT (DAY_TestScriptOne, "")
 			action = 2;
 			ActionParamsStruct params;
 			params.Set_Basic( this, 99, 2 );
-			params.Set_Movement( Commands->Get_Position( Commands->Find_Object(100078) ), 0.6f, 1.0f, false );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (100078, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 0.6f, 1.0f, false );
+				}
+			}
 			params.Set_Attack( Commands->Find_Object(100079), 40.0f, 0.0f, true );
 			params.AttackCrouched = true;
 			params.MoveCrouched = true;
@@ -103,7 +111,11 @@ DECLARE_SCRIPT (DAY_TestScriptOne, "")
 			action = 1;
 			ActionParamsStruct params;
 			params.Set_Basic( this, 99, 1 );
-			params.Set_Movement( Commands->Get_Position( Commands->Find_Object(100077) ), 0.6f, 1.0f, false );
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (100077, _obj_pos)) {
+					params.Set_Movement( _obj_pos, 0.6f, 1.0f, false );
+				}
+			}
 			params.Set_Attack( Commands->Find_Object(100079), 40.0f, 0.0f, true );
 			params.AttackCrouched = true;
 			params.MoveCrouched = true;

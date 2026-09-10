@@ -411,14 +411,6 @@ SOURCE=.\buildnum.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\cdverify.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\cdverify.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\cominit.cpp
 # End Source File
 # Begin Source File

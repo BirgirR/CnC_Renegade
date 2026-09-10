@@ -1134,9 +1134,9 @@ void ShatterSystem::Process_Clip_Pools
 				if (model->Peek_Single_Material(ipass) != NULL) {
 					matinfo->Add_Vertex_Material(model->Peek_Single_Material(ipass));
 				}
-				for (int istage=0; istage<MeshMatDescClass::MAX_TEX_STAGES; istage++) {
-					if (model->Peek_Single_Texture(ipass,istage) != NULL) {
-						matinfo->Add_Texture(model->Peek_Single_Texture(ipass,istage));
+				for (int istage_inner=0; istage_inner<MeshMatDescClass::MAX_TEX_STAGES; istage_inner++) {
+					if (model->Peek_Single_Texture(ipass,istage_inner) != NULL) {
+						matinfo->Add_Texture(model->Peek_Single_Texture(ipass,istage_inner));
 						has_textures = true;
 					}
 				}

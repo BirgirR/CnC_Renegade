@@ -228,36 +228,6 @@ MovieOptionsMenuClass::Begin_Play_Movie (void)
 		//
 		if (::GetFileAttributes (filename->Peek_Buffer ()) != 0xFFFFFFFF) {
 			Play_Movie (filename->Peek_Buffer ());
-		} else {
-
-			//
-			//	Strip any path information off the filename
-			//
-			StringClass filename_only (filename->Peek_Buffer (), true);
-			const char *delimiter = ::strrchr (filename->Peek_Buffer (), '\\');
-			if (delimiter != NULL) {
-				filename_only = delimiter + 1;
-			}
-
-			//
-			//	Try to find the CD...
-			//
-			StringClass cd_path;
-			if (CDVerifier.Get_CD_Path (cd_path)) {
-				
-				//
-				//	Build a full-path to the movie on the CD
-				//
-				StringClass full_path = cd_path;
-				if (cd_path[cd_path.Get_Length () - 1] != '\\') {
-					full_path += "\\";
-				}
-				full_path += filename_only;
-				Play_Movie (full_path);
-			} else {
-				PendingMovieFilename = filename_only;
-				CDVerifier.Display_UI (this);
-			}
 		}
 	}
 
@@ -358,35 +328,4 @@ MovieOptionsMenuClass::On_Key_Down (uint32 key_id, uint32 key_data)
 }
 
 
-////////////////////////////////////////////////////////////////
-//
-//	HandleNotification
-//
-////////////////////////////////////////////////////////////////
-void
-MovieOptionsMenuClass::HandleNotification (CDVerifyEvent &event)
-{
-	if (event.Event () == CDVerifyEvent::VERIFIED) {
-
-		//
-		//	Get the path to the CD...
-		//
-		StringClass cd_path;
-		if (CDVerifier.Get_CD_Path (cd_path)) {
-			
-			//
-			//	Build a full-path to the movie on the CD
-			//
-			StringClass full_path = cd_path;
-			if (cd_path[cd_path.Get_Length () - 1] != '\\') {
-				full_path += "\\";
-			}
-			full_path += PendingMovieFilename;
-			Play_Movie (full_path);
-		}		
-	}
-
-	PendingMovieFilename = "";
-	return ;
-}
 

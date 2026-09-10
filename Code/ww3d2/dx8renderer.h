@@ -112,7 +112,7 @@ public:
 		unsigned vertex_offset,
 		unsigned index_offset,
 		IndexBufferClass* index_buffer,
-		unsigned pass);
+		unsigned mesh_pass);
 	void Log(bool only_visible);
 
 	void Remove_Polygon_Renderer(DX8PolygonRendererClass* p_renderer);

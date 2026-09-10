@@ -2,15 +2,16 @@
 # Ignore RUNable folder
 [Rr]un
 
-# Dependencies
+# Dependencies -- anchored to the SDK drop locations under Code/ so they do
+# not also swallow our own stub implementations in Code/Stubs/.
 [Ll]ibs/
-Miles6/
-Bink/
-Lightscape/
-NvDXTLib/
-Umbra/
-GameSpy/
-DirectX/
+/Code/Miles6/
+/Code/Bink/
+/Code/Lightscape/
+/Code/NvDXTLib/
+/Code/Umbra/
+/Code/GameSpy/
+/Code/DirectX/
 
 # Output build folders
 [Rr]elease*
@@ -53,3 +54,11 @@ GMax_Hybrid/
 wwconfig_ids.rpt
 wwconfig_ids.h
 IDL_*.loc
+
+# CMake
+/build/
+/out/
+CMakeUserPresets.json
+
+# JetBrains IDE
+/.idea/

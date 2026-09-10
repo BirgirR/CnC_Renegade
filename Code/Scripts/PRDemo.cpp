@@ -1308,7 +1308,8 @@ DECLARE_SCRIPT(MPR_A01_Orca_Strike_On_Turret_RAD, "Target_Number:int, AnimationN
 			
 			// Find the location of the turret, and start the attack animation on the ORCA.
 
-			v_target_loc = Commands->Get_Position(Commands->Find_Object(n_target_number));
+			//	Leaves v_target_loc alone when the object is gone, rather than overwriting it with the origin.
+			Find_Object_Position (n_target_number, v_target_loc);
 			v_target_loc.Z += 0.5f;
 			Commands->Set_Animation(p_obj, Get_Parameter("AnimationName"), 0);
 			
@@ -1613,7 +1614,8 @@ DECLARE_SCRIPT(MPR_A04_Obelisk_Weapon_RAD, "ObeliskWeaponID:int, NodLightTankID:
 		int n_nontargets;
 
 		n_nontargets = 0;
-		v_obeliskloc = 	Commands->Get_Position(Commands->Find_Object(n_obelisk_id));
+		//	Leaves v_obeliskloc alone when the object is gone, rather than overwriting it with the origin.
+		Find_Object_Position (n_obelisk_id, v_obeliskloc);
 
 		if ((b_obelisk_firing) && (n_timer_id == MPR_A04_TIMER_OBELISK_PREFIRING_RAD))
 		{
@@ -1628,7 +1630,8 @@ DECLARE_SCRIPT(MPR_A04_Obelisk_Weapon_RAD, "ObeliskWeaponID:int, NodLightTankID:
 			{
 				if ((Commands->Find_Object(a_obelisk_targets[n_counter])) && (Commands->Find_Object(n_obelisk_id)))
 				{
-					v_targetloc = Commands->Get_Position(Commands->Find_Object(a_obelisk_targets[n_counter]));
+					//	Leaves v_targetloc alone when the object is gone, rather than overwriting it with the origin.
+					Find_Object_Position (a_obelisk_targets[n_counter], v_targetloc);
 					//Commands->Display_Text("RAD - shooting at target.\n");
 					if (Commands->Find_Object(a_obelisk_targets[n_counter]) != Commands->Get_The_Star())
 					{
@@ -2551,7 +2554,11 @@ DECLARE_SCRIPT(MPR_A02_Drill_Instructor_JDG, "")
 			{
 				//DebugPrint("JDG. Demo, Drill Instructor, Choose_Cadet, C1 makes mistake\n");
 			
-				Commands->Create_Sound ("GonnaDieHere02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_cadet_1_id_JDG))), (Commands->Find_Object(MPR_A02_cadet_1_id_JDG)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (MPR_A02_cadet_1_id_JDG, _obj_pos)) {
+						Commands->Create_Sound ("GonnaDieHere02", (_obj_pos), (Commands->Find_Object(MPR_A02_cadet_1_id_JDG)));
+					}
+				}
 				//insert "Doh!" sound when ready
 
 				Commands->Set_Animation ((Commands->Find_Object(MPR_A02_cadet_1_id_JDG)), "S_A_HUMAN.H_A_J09C", 0);
@@ -2632,7 +2639,11 @@ DECLARE_SCRIPT(MPR_A02_Drill_Instructor_JDG, "")
 			{
 				//DebugPrint("JDG. Demo, Drill Instructor, Choose_Cadet, C2 makes mistake\n");
 			
-				Commands->Create_Sound ("GonnaDieHere02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_cadet_2_id_JDG))), (Commands->Find_Object(MPR_A02_cadet_2_id_JDG)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (MPR_A02_cadet_2_id_JDG, _obj_pos)) {
+						Commands->Create_Sound ("GonnaDieHere02", (_obj_pos), (Commands->Find_Object(MPR_A02_cadet_2_id_JDG)));
+					}
+				}
 
 				Commands->Set_Animation ((Commands->Find_Object(MPR_A02_cadet_2_id_JDG)), "S_A_HUMAN.H_A_J09C", 0);
 		
@@ -2712,7 +2723,11 @@ DECLARE_SCRIPT(MPR_A02_Drill_Instructor_JDG, "")
 			{
 				//DebugPrint("JDG. Demo, Drill Instructor, Choose_Cadet, C3 makes mistake\n");
 			
-				Commands->Create_Sound ("GonnaDieHere02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_cadet_3_id_JDG))), (Commands->Find_Object(MPR_A02_cadet_3_id_JDG)));
+				{	Vector3 _obj_pos;
+					if (Find_Object_Position (MPR_A02_cadet_3_id_JDG, _obj_pos)) {
+						Commands->Create_Sound ("GonnaDieHere02", (_obj_pos), (Commands->Find_Object(MPR_A02_cadet_3_id_JDG)));
+					}
+				}
 
 				Commands->Set_Animation ((Commands->Find_Object(MPR_A02_cadet_3_id_JDG)), "S_A_HUMAN.H_A_J09C", 0);
 
@@ -2855,22 +2870,38 @@ DECLARE_SCRIPT(MPR_A02_Drill_Instructor_JDG, "")
 
 		if ((n > 0) && (n <= 25)  && (Commands->Find_Object(MPR_A02_cadet_1_id_JDG)))
 		{
-			Commands->Create_Sound ("KillHim02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG))), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG))); 
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (MPR_A02_drill_instructor_id_JDG, _obj_pos)) {
+					Commands->Create_Sound ("KillHim02", (_obj_pos), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+				}
+			} 
 		}
 
 		else if ((n > 25) && (n <= 50) && (Commands->Find_Object(MPR_A02_cadet_1_id_JDG)))
 		{
-			Commands->Create_Sound ("KeepYourHeadDown02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG))), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (MPR_A02_drill_instructor_id_JDG, _obj_pos)) {
+					Commands->Create_Sound ("KeepYourHeadDown02", (_obj_pos), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+				}
+			}
 		}
 
 		else if ((n < 50) && (n <= 75) && (Commands->Find_Object(MPR_A02_cadet_1_id_JDG)))
 		{
-			Commands->Create_Sound ("SoundAlarm02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG))), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (MPR_A02_drill_instructor_id_JDG, _obj_pos)) {
+					Commands->Create_Sound ("SoundAlarm02", (_obj_pos), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+				}
+			}
     	}
 
 		else 
 		{
-			Commands->Create_Sound ("FireAtWill02", (Commands->Get_Position (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG))), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (MPR_A02_drill_instructor_id_JDG, _obj_pos)) {
+					Commands->Create_Sound ("FireAtWill02", (_obj_pos), (Commands->Find_Object(MPR_A02_drill_instructor_id_JDG)));
+				}
+			}
 		}
 	}
 

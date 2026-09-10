@@ -74,7 +74,18 @@ cRegistryBool		cUserOptions::DoneClientBandwidthTest(			APPLICATION_SUB_KEY_NAME
 
 
 cRegistryInt cUserOptions::PreferredLanNic(						APPLICATION_SUB_KEY_NAME_NETOPTIONS, "PreferredLanNic",					0);
-cRegistryInt cUserOptions::NetUpdateRate(							APPLICATION_SUB_KEY_NAME_NETOPTIONS, "NetUpdateRate",						10);
+//
+//	NetUpdateRate was 10 Hz, chosen when a 56k modem was a realistic target. The
+//	net_update_rate console command has always accepted up to 30 in release
+//	builds, so 30 is the ceiling the original authors sanctioned rather than an
+//	arbitrary increase. Clients still throttle themselves down to the server's
+//	frame rate when it is the slower of the two (comnetrcvinst.cpp:261), so a
+//	higher value here cannot flood a server that cannot keep up.
+//
+//	NB: per-player bandwidth scales with this value. AutoStart.cpp's automatic
+//	MaxPlayers calculation reads it for exactly that reason -- keep them in step.
+//
+cRegistryInt cUserOptions::NetUpdateRate(							APPLICATION_SUB_KEY_NAME_NETOPTIONS, "NetUpdateRate",						30);
 cRegistryFloat cUserOptions::ClientHintFactor(					APPLICATION_SUB_KEY_NAME_NETOPTIONS, "ClientHintFactor",					10.0f);
 cRegistryFloat cUserOptions::MaxFacingPenalty(					APPLICATION_SUB_KEY_NAME_NETOPTIONS, "MaxFacingPenalty",					0.3f);
 cRegistryFloat cUserOptions::IrrelevancePenalty(				APPLICATION_SUB_KEY_NAME_NETOPTIONS, "IrrelevancePenalty",				0.2f);

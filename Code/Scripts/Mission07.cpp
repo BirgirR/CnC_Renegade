@@ -1534,10 +1534,26 @@ DECLARE_SCRIPT(M07_Cathedral_Controller, "")  // 100663
 		}
 		if(timer_id == NUKEBITS)
 		{
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(119890))); 
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(119891))); 
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(119892))); 
-			Commands->Create_Explosion("Ground Explosions Twiddler", Commands->Get_Position(Commands->Find_Object(119893))); 
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (119890, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			} 
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (119891, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			} 
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (119892, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			} 
+			{	Vector3 _obj_pos;
+				if (Find_Object_Position (119893, _obj_pos)) {
+					Commands->Create_Explosion("Ground Explosions Twiddler", _obj_pos);
+				}
+			} 
 			GameObject * nukebits = Commands->Create_Object("M07_Nukebits", Vector3(-128.295f, 71.892f, 26.754f));
 			Commands->Set_Facing( nukebits, -10.000f );
 			Commands->Start_Timer(obj, this, 3.0f, ESCAPED);

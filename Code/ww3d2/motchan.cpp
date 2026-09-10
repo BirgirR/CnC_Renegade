@@ -273,8 +273,6 @@ void BitChannelClass::Free(void)
 bool BitChannelClass::Load_W3D(ChunkLoadClass & cload)
 {
 	Free();
-	
-	int chunk_size = cload.Cur_Chunk_Length();
 
 	W3dBitChannelStruct chan;
 	if (cload.Read(&chan,sizeof(W3dBitChannelStruct)) != sizeof(W3dBitChannelStruct)) {
@@ -754,8 +752,6 @@ void TimeCodedBitChannelClass::Free(void)
 bool TimeCodedBitChannelClass::Load_W3D(ChunkLoadClass & cload)
 {
 	Free();
-	
-	int chunk_size = cload.Cur_Chunk_Length();
 
 	W3dTimeCodedBitChannelStruct chan;
 	if (cload.Read(&chan,sizeof(W3dTimeCodedBitChannelStruct)) != sizeof(W3dTimeCodedBitChannelStruct)) {
@@ -1275,7 +1271,30 @@ Quaternion AdaptiveDeltaMotionChannelClass::Get_QuatVector(float32 frame)
 void MotionChannelClass::
 Do_Data_Compression(int datasize)
 {
-return;
+	//
+	//	The quantising compression below is disabled, and must stay disabled:
+	//	its tail does 'delete[] Data; Data=NULL;' and leaves only
+	//	CompressedData, but Get_Vector() only ever reads Data. Enabling it
+	//	would make every animation channel silently return nothing.
+	//
+	//	The bare 'return' that used to be the first statement also disabled the
+	//	NaN and out-of-range scrubbing, which is unrelated to compression and
+	//	is pure defence against malformed .w3d data -- a NaN here propagates
+	//	through the skeleton and explodes the model. That part is restored
+	//	here; the scope keeps it clear of the dead code's own declarations.
+	//
+	{
+		int sanitise_count = datasize / sizeof(float);
+		for (int s = 0; s < sanitise_count; s++) {
+			float value = Data[s];
+			if (_isnan(value)) value = 0.0f;
+			if (value >  100000.0f) value = 0.0f;
+			if (value < -100000.0f) value = 0.0f;
+			Data[s] = value;
+		}
+	}
+
+	return;
 	//Find Min_Max
 	float value_min=FLT_MAX;
 	float value_max=-FLT_MAX;
@@ -1310,9 +1329,10 @@ return;
 		int ivalue=WWMath::Float_To_Int_Floor(value);
 		CompressedData[i]=unsigned short(ivalue);
 
-		float new_scale=ValueScale/65535.0f;
-		float new_value=int(CompressedData[i]);
-		float new_float = new_value*new_scale+ValueOffset;
+		//	Round-trip check, disabled upstream:
+		//float new_scale=ValueScale/65535.0f;
+		//float new_value=int(CompressedData[i]);
+		//float new_float = new_value*new_scale+ValueOffset;
 //			if (fabs(new_float-Data[i])>ValueScale/65536.0f) {
 //				int ii=0;
 //			}

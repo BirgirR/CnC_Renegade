@@ -635,15 +635,15 @@ void StarfieldClass::Render()
 			DynamicVBAccessClass::WriteLockClass lock (&dynamicvb);
 			VertexFormatXYZNDUV2 *vertex = lock.Get_Formatted_Vertex_Array();
 
-			for (unsigned v = 0; v < ActiveVertexCount; v += VERTICES_PER_TRIANGLE) {
+			for (unsigned v_inner = 0; v_inner < ActiveVertexCount; v_inner += VERTICES_PER_TRIANGLE) {
 				for (unsigned t = 0; t < VERTICES_PER_TRIANGLE; t++) {
 
-					unsigned i = v + t;
+					unsigned i_inner = v_inner + t;
 
-					vertex->x		 = VertexArray [i].X;
-					vertex->y		 = VertexArray [i].Y;
-					vertex->z		 = VertexArray [i].Z;
-					vertex->diffuse = DiffuseArray [i];
+					vertex->x		 = VertexArray [i_inner].X;
+					vertex->y		 = VertexArray [i_inner].Y;
+					vertex->z		 = VertexArray [i_inner].Z;
+					vertex->diffuse = DiffuseArray [i_inner];
 					vertex->u1		 = texcoordarray [t][0];
 					vertex->v1		 = texcoordarray [t][1];
 					vertex++;
@@ -1619,14 +1619,14 @@ LightningBoltClass::LightningBoltClass (int branchcount, Matrix3D &m, float leng
 		const float amplitudefactor = 0.85f;
 
 		float	oobranchcount;
-		int	branchcount;
+		int	branchcount_inner;
 		float	minlength, maxlength, w, a;
 
 		Branches = new BranchStruct [BranchCount];
 		WWASSERT (Branches != NULL);
 		oobranchcount = 1.0f / BranchCount;
 		branchrandomness = vertexcount / (BranchCount * 2);
-		branchcount = BranchCount * branchfactor;
+		branchcount_inner = BranchCount * branchfactor;
 		minlength = childlength * minlengthfactor;
 		maxlength = childlength * maxlengthfactor;
 		w = MAX (minwidth, width * widthfactor);
@@ -1646,7 +1646,7 @@ LightningBoltClass::LightningBoltClass (int branchcount, Matrix3D &m, float leng
 
 			// If the lightning bolt originates below the horizon don't bother generating it.
 			if (m0.Get_Translation().Z > 0.0f) {
-				Branches [b].LightningBolt = NEW_REF (LightningBoltClass, (branchcount, m0, l, l, w, a));
+				Branches [b].LightningBolt = NEW_REF (LightningBoltClass, (branchcount_inner, m0, l, l, w, a));
 			} else {
 				Branches [b].LightningBolt = NULL;
 			}

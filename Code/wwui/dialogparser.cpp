@@ -261,13 +261,13 @@ DialogParserClass::Parse_Template
 			//			
 			buffer = Skip_Dlg_Field (buffer, text_buffer, 256);
 
-			WCHAR *string_id = ::wcsstr (text_buffer, L"IDS_");
-			if (string_id != NULL) {
-				WideStringClass wide_string_id = string_id;				
+			WCHAR *string_id_inner = ::wcsstr (text_buffer, L"IDS_");
+			if (string_id_inner != NULL) {
+				WideStringClass wide_string_id = string_id_inner;				
 				StringClass ascii_string_id;
 				wide_string_id.Convert_To (ascii_string_id);
 				WideStringClass translation = TRANSLATE_BY_DESC(ascii_string_id);
-				::wcscpy (string_id, translation);
+				::wcscpy (string_id_inner, translation);
 			}
 
 			//

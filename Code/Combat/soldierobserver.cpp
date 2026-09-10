@@ -963,7 +963,7 @@ void	SoldierObserverClass::Get_Information( StringClass & string )
 	string += "-----------\n";
 	temp.Format( "State: %s\n", SoldierAIStateNames[ State ] );
 	string += temp;
-	temp.Format( "Sub: %s\n", SubStateString );
+	temp.Format( "Sub: %s\n", (const char *)SubStateString);
 	string += temp;
 	if ( IsStationary ) {
 		string += "Stationary\n";

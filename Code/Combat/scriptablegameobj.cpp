@@ -654,9 +654,9 @@ void	ScriptableGameObj::Post_Think( void )
 			if ( !found ) {
 				Debug_Say(( "Failed to find observer id %d for timer expired....\n", ObserverTimerList[i]->ObserverID ));
 
-				const GameObjObserverList & observer_list = Get_Observers();
-				for( int index = 0; index < observer_list.Count(); index++ ) {
-					Debug_Say(( "have %d\n", observer_list[ index ]->Get_ID() ));
+				const GameObjObserverList & observer_list_inner = Get_Observers();
+				for( int index = 0; index < observer_list_inner.Count(); index++ ) {
+					Debug_Say(( "have %d\n", observer_list_inner[ index ]->Get_ID() ));
 				}
 			}
 

@@ -296,10 +296,33 @@ void WWDebug_Assert_Fail(const char * expr,const char * file, int line)
 	} else {
 
 		/*
+		**	No handler yet. This is the path every assert raised from a static
+		**	initialiser takes, since those run before WinMain can install one.
+		**	Record it first -- the dialog below can only report one assert and
+		**	loses it entirely when Abort exits the process.
+		*/
+		{
+			FILE * log = ::fopen("startup_asserts.txt", "at");
+			if (log != NULL) {
+				::fprintf(log, "%s (%d) Assert: %s\n", file, line, expr);
+				::fflush(log);
+				::fclose(log);
+			}
+		}
+
+		/*
 		// If the exception handler is try to quit the game then don't show an assert.
 		*/
 		if (Is_Trying_To_Exit()) {
 			ExitProcess(0);
+		}
+
+		/*
+		**	Unattended runs: keep going so one pass reports every early assert
+		**	instead of stopping at the first modal box.
+		*/
+		if (::getenv("RENEGADE_ASSERT_NONINTERACTIVE") != NULL) {
+			return;
 		}
 
       char assertbuf[4096];

@@ -2542,11 +2542,11 @@ DECLARE_SCRIPT(M01_HON_Medlab_DropOff_Guy_JDG, "")
 
 		else
 		{
-			ActionParamsStruct params;
-			params.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
-			params.Set_Movement(Vector3 (0,0,0), RUN, 1);
-			params.WaypathID = 125265;
-			Commands->Action_Goto(obj, params);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic(this, 100, M01_WALKING_WAYPATH_01_JDG);
+			params_inner.Set_Movement(Vector3 (0,0,0), RUN, 1);
+			params_inner.WaypathID = 125265;
+			Commands->Action_Goto(obj, params_inner);
 		}
 	}
 };
@@ -5699,11 +5699,14 @@ DECLARE_SCRIPT(M01_TailGunner_01_JDG, "")//M01_TAILGUNNER_01_ID  101470
 		if ( Commands->Find_Object ( M01_TAILGUN_01_ID ))
 		{
 			ActionParamsStruct params;
-			Vector3 tailgunPosition = Commands->Get_Position ( Commands->Find_Object ( M01_TAILGUN_01_ID ) );
-			params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
-			params.Set_Movement( tailgunPosition, .25f, .25f );
-			
-			Commands->Action_Goto( obj, params );
+			Vector3 tailgunPosition;
+			bool tailgunPosition_found = Find_Object_Position (M01_TAILGUN_01_ID, tailgunPosition);
+params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
+			if (tailgunPosition_found) {
+				params.Set_Movement( tailgunPosition, .25f, .25f );
+				
+				Commands->Action_Goto( obj, params );
+			}
 		}
 	}
 
@@ -5736,11 +5739,14 @@ DECLARE_SCRIPT(M01_TailGunner_02_JDG, "")//M01_TAILGUNNER_02_ID  101471
 		if ( Commands->Find_Object ( M01_TAILGUN_02_ID ))
 		{
 			ActionParamsStruct params;
-			Vector3 tailgunPosition = Commands->Get_Position ( Commands->Find_Object ( M01_TAILGUN_02_ID ) );
-			params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
-			params.Set_Movement( tailgunPosition, .25f, .25f );
-			
-			Commands->Action_Goto( obj, params );
+			Vector3 tailgunPosition;
+			bool tailgunPosition_found = Find_Object_Position (M01_TAILGUN_02_ID, tailgunPosition);
+params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
+			if (tailgunPosition_found) {
+				params.Set_Movement( tailgunPosition, .25f, .25f );
+				
+				Commands->Action_Goto( obj, params );
+			}
 		}
 	}
 
@@ -5773,11 +5779,14 @@ DECLARE_SCRIPT(M01_TailGunner_03_JDG, "")//M01_TAILGUNNER_03_ID  101472
 		if ( Commands->Find_Object ( M01_TAILGUN_03_ID ))
 		{
 			ActionParamsStruct params;
-			Vector3 tailgunPosition = Commands->Get_Position ( Commands->Find_Object ( M01_TAILGUN_03_ID ) );
-			params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
-			params.Set_Movement( tailgunPosition, .25f, .35f );
-			
-			Commands->Action_Goto( obj, params );
+			Vector3 tailgunPosition;
+			bool tailgunPosition_found = Find_Object_Position (M01_TAILGUN_03_ID, tailgunPosition);
+params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
+			if (tailgunPosition_found) {
+				params.Set_Movement( tailgunPosition, .25f, .35f );
+				
+				Commands->Action_Goto( obj, params );
+			}
 		}
 	}
 
@@ -5874,12 +5883,14 @@ DECLARE_SCRIPT(M01_Civ_To_Minigunner_Guy_JDG, "")
 
 		if (Commands->Find_Object (M01_COMMCENTER_BASE_SCAPEGOAT_JDG))
 		{
-			Vector3 myGotoSpot = Commands->Get_Position ( Commands->Find_Object (M01_COMMCENTER_BASE_SCAPEGOAT_JDG) );
-
-			params.Set_Basic( this, 50, M01_WALKING_WAYPATH_01_JDG );
-			params.Set_Movement( myGotoSpot, RUN, 20 );
-			
-			Commands->Action_Goto( obj, params );
+			Vector3 myGotoSpot;
+			bool myGotoSpot_found = Find_Object_Position (M01_COMMCENTER_BASE_SCAPEGOAT_JDG, myGotoSpot);
+params.Set_Basic( this, 50, M01_WALKING_WAYPATH_01_JDG );
+			if (myGotoSpot_found) {
+				params.Set_Movement( myGotoSpot, RUN, 20 );
+				
+				Commands->Action_Goto( obj, params );
+			}
 		}
 	}
 };
@@ -8175,12 +8186,15 @@ DECLARE_SCRIPT(M01_DetentionPen_CivDeathMonitor, "")
 		{
 			case M01_GOING_TO_EVAC_SPOT02_JDG: 
 				{
-					Vector3 myEvacSpot = Commands->Get_Position ( Commands->Find_Object ( 103380 ) );
-					ActionParamsStruct params;
+					Vector3 myEvacSpot;
+					bool myEvacSpot_found = Find_Object_Position (103380, myEvacSpot);
+ActionParamsStruct params;
 					params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT02_JDG);
-					params.Set_Movement(myEvacSpot, RUN, 0.25f);
-
-					Commands->Action_Goto(obj, params);
+					if (myEvacSpot_found) {
+						params.Set_Movement(myEvacSpot, RUN, 0.25f);
+	
+						Commands->Action_Goto(obj, params);
+					}
 				}
 				break;
 		}
@@ -8223,12 +8237,15 @@ DECLARE_SCRIPT(M01_DetentionPen_GDIDeathMonitor, "")
 		{
 			case M01_GOING_TO_EVAC_SPOT02_JDG: 
 				{
-					Vector3 myEvacSpot = Commands->Get_Position ( Commands->Find_Object ( 103381 ) );
-					ActionParamsStruct params;
+					Vector3 myEvacSpot;
+					bool myEvacSpot_found = Find_Object_Position (103381, myEvacSpot);
+ActionParamsStruct params;
 					params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT02_JDG);
-					params.Set_Movement(myEvacSpot, RUN, 0.25f);
-
-					Commands->Action_Goto(obj, params);
+					if (myEvacSpot_found) {
+						params.Set_Movement(myEvacSpot, RUN, 0.25f);
+	
+						Commands->Action_Goto(obj, params);
+					}
 				}
 				break;
 		}
@@ -9069,14 +9086,14 @@ DECLARE_SCRIPT(M01_BuggyScript_New_JDG, "")
 
 			else
 			{
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
-				params.Set_Movement( Vector3(0,0,0), 0.5f, 5 );
-				params.WaypathID = 103289;
-				params.Set_Attack( STAR, 50, 2, true );
+				params_inner.Set_Basic( this, 100, M01_WALKING_WAYPATH_01_JDG );
+				params_inner.Set_Movement( Vector3(0,0,0), 0.5f, 5 );
+				params_inner.WaypathID = 103289;
+				params_inner.Set_Attack( STAR, 50, 2, true );
 
-				Commands->Modify_Action ( obj, M01_WALKING_WAYPATH_01_JDG, params, false, true );
+				Commands->Modify_Action ( obj, M01_WALKING_WAYPATH_01_JDG, params_inner, false, true );
 			}
 		}
 	}
@@ -11690,13 +11707,16 @@ DECLARE_SCRIPT(M01_Objective_Pog_Controller_JDG, "")//M01_MISSION_POG_CONTROLLER
 
 			else if (param == M01_CHURCH_OBJECTIVE_JDG)//
 			{
-				Vector3 churchLocation = Commands->Get_Position ( Commands->Find_Object ( M01_CHURCH_PRIEST_ID ) );
-				Commands->Set_Objective_HUD_Info_Position( M01_CHURCH_OBJECTIVE_JDG, 94, "POG_M01_2_06.tga", IDS_POG_RESCUE, churchLocation );
-
-				//Commands->Send_Custom_Event( obj, obj, M01_REMOVE_OBJECTIVE_POG_JDG, M01_CHURCH_OBJECTIVE_JDG, SECONDARY_POG_DELAY );
-
-				//Vector3 blue (0,0,1);
-				Commands->Set_HUD_Help_Text ( IDS_Enc_ObjTitle_Secondary_M01_05, TEXT_COLOR_OBJECTIVE_PRIMARY );
+				Vector3 churchLocation;
+				bool churchLocation_found = Find_Object_Position (M01_CHURCH_PRIEST_ID, churchLocation);
+				if (churchLocation_found) {
+					Commands->Set_Objective_HUD_Info_Position( M01_CHURCH_OBJECTIVE_JDG, 94, "POG_M01_2_06.tga", IDS_POG_RESCUE, churchLocation );
+	
+					//Commands->Send_Custom_Event( obj, obj, M01_REMOVE_OBJECTIVE_POG_JDG, M01_CHURCH_OBJECTIVE_JDG, SECONDARY_POG_DELAY );
+	
+					//Vector3 blue (0,0,1);
+					Commands->Set_HUD_Help_Text ( IDS_Enc_ObjTitle_Secondary_M01_05, TEXT_COLOR_OBJECTIVE_PRIMARY );
+				}
 			}
 
 			else if (param == M01_HON_OBJECTIVE_JDG)
@@ -12159,10 +12179,13 @@ DECLARE_SCRIPT(M01_Church_Priest_JDG, "")
 
 			else
 			{
-				Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( 103394 ) );
-				params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-				params.Set_Movement( evacSpot, RUN, 0.5f );
-				Commands->Action_Goto( obj, params );
+				Vector3 evacSpot;
+				bool evacSpot_found = Find_Object_Position (103394, evacSpot);
+params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+				if (evacSpot_found) {
+					params.Set_Movement( evacSpot, RUN, 0.5f );
+					Commands->Action_Goto( obj, params );
+				}
 			}
 			
 			//ActionParamsStruct params;
@@ -12259,10 +12282,13 @@ DECLARE_SCRIPT(M01_Church_Priest_JDG, "")
 
 			else if (action_id == M01_DOING_ANIMATION_04_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//priest is by Havoc--cue lucky charms conversation
 			{
-				Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( 103394 ) );
-				params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-				params.Set_Movement( evacSpot, RUN, 0.5f );
-				Commands->Action_Goto( obj, params );
+				Vector3 evacSpot;
+				bool evacSpot_found = Find_Object_Position (103394, evacSpot);
+params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+				if (evacSpot_found) {
+					params.Set_Movement( evacSpot, RUN, 0.5f );
+					Commands->Action_Goto( obj, params );
+				}
 			}
 		}
 
@@ -12344,13 +12370,16 @@ DECLARE_SCRIPT(M01_Church_Interior_Nun_JDG, "")
 
 		else if ((param == M01_GOING_TO_EVAC_SPOT_JDG))//your ride is here--go get in
 		{
-			Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( 103394 ) );
-			ActionParamsStruct params;
+			Vector3 evacSpot;
+			bool evacSpot_found = Find_Object_Position (103394, evacSpot);
+ActionParamsStruct params_inner;
 			Commands->Action_Reset ( obj, 100 );
-			params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-			params.Set_Movement( evacSpot, RUN, 1 );
-				
-			Commands->Action_Goto( obj, params );
+			params_inner.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+			if (evacSpot_found) {
+				params_inner.Set_Movement( evacSpot, RUN, 1 );
+					
+				Commands->Action_Goto( obj, params_inner );
+			}
 		}
 	}
 
@@ -12492,13 +12521,16 @@ DECLARE_SCRIPT(M01_Church_LoveShack_Nun_JDG, "")
 
 		else if ((param == M01_GOING_TO_EVAC_SPOT_JDG))//your ride is here--go get in
 		{
-			Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( 103394 ) );
-			ActionParamsStruct params;
+			Vector3 evacSpot;
+			bool evacSpot_found = Find_Object_Position (103394, evacSpot);
+ActionParamsStruct params_inner;
 			Commands->Action_Reset ( obj, 100 );
-			params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-			params.Set_Movement( evacSpot, RUN, 1 );
-				
-			Commands->Action_Goto( obj, params );
+			params_inner.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+			if (evacSpot_found) {
+				params_inner.Set_Movement( evacSpot, RUN, 1 );
+					
+				Commands->Action_Goto( obj, params_inner );
+			}
 		}
 	}
 
@@ -12844,21 +12876,24 @@ DECLARE_SCRIPT(M01_Barn_Prisoner_01_JDG, "")//this guys ID is M01_BARN_PRISONER_
 		else if (param == M01_GOING_TO_EVAC_SPOT02_JDG)
 		{
 			Commands->Enable_Hibernation(obj, false );
-			Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( M01_BARNAREA_EVAC_MONITOR_JDG ) );
-			ActionParamsStruct params;
-			params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-			params.Set_Movement( evacSpot, RUN, 1 );
-				
-			Commands->Action_Goto( obj, params );
-			Commands->Set_Player_Type ( obj, SCRIPT_PLAYERTYPE_GDI );
-
-			//Commands->Set_Obj_Radar_Blip_Shape ( obj, RADAR_BLIP_SHAPE_OBJECTIVE );
-			Commands->Set_Obj_Radar_Blip_Color ( obj, RADAR_BLIP_COLOR_NEUTRAL );
-
-			GameObject * babushkazone = Commands->Find_Object ( 101662 );
-			if (babushkazone != NULL)//kill babushka talk zone
-			{
-				Commands->Destroy_Object ( babushkazone );
+			Vector3 evacSpot;
+			bool evacSpot_found = Find_Object_Position (M01_BARNAREA_EVAC_MONITOR_JDG, evacSpot);
+ActionParamsStruct params_inner;
+			params_inner.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+			if (evacSpot_found) {
+				params_inner.Set_Movement( evacSpot, RUN, 1 );
+					
+				Commands->Action_Goto( obj, params_inner );
+				Commands->Set_Player_Type ( obj, SCRIPT_PLAYERTYPE_GDI );
+	
+				//Commands->Set_Obj_Radar_Blip_Shape ( obj, RADAR_BLIP_SHAPE_OBJECTIVE );
+				Commands->Set_Obj_Radar_Blip_Color ( obj, RADAR_BLIP_COLOR_NEUTRAL );
+	
+				GameObject * babushkazone = Commands->Find_Object ( 101662 );
+				if (babushkazone != NULL)//kill babushka talk zone
+				{
+					Commands->Destroy_Object ( babushkazone );
+				}
 			}
 		}
 	}
@@ -13009,17 +13044,20 @@ DECLARE_SCRIPT(M01_Barn_Prisoner_02_JDG, "")//this guys ID is M01_BARN_PRISONER_
 		else if (param == M01_GOING_TO_EVAC_SPOT02_JDG)
 		{
 			Commands->Enable_Hibernation(obj, false );
-			Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( M01_BARNAREA_EVAC_MONITOR_JDG ) );
-			ActionParamsStruct params;
-			params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-			params.Set_Movement( evacSpot, RUN, 1 );
-				
-			Commands->Action_Goto( obj, params );
-
-			GameObject * billyszone = Commands->Find_Object ( 101661 );
-			if (billyszone != NULL)//kill billy's talk zone
-			{
-				Commands->Destroy_Object ( billyszone );
+			Vector3 evacSpot;
+			bool evacSpot_found = Find_Object_Position (M01_BARNAREA_EVAC_MONITOR_JDG, evacSpot);
+ActionParamsStruct params_inner;
+			params_inner.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+			if (evacSpot_found) {
+				params_inner.Set_Movement( evacSpot, RUN, 1 );
+					
+				Commands->Action_Goto( obj, params_inner );
+	
+				GameObject * billyszone = Commands->Find_Object ( 101661 );
+				if (billyszone != NULL)//kill billy's talk zone
+				{
+					Commands->Destroy_Object ( billyszone );
+				}
 			}
 		}
 	}
@@ -13171,11 +13209,11 @@ DECLARE_SCRIPT(M01_Barn_Prisoner_03_JDG, "")//this guys ID is M01_BARN_PRISONER_
 
 			//Commands->Action_Face_Location ( obj, params );
 
-			ActionParamsStruct params;
-			params.Set_Basic(this, 100, M01_MODIFY_YOUR_ACTION_JDG);
+			ActionParamsStruct params_inner;
+			params_inner.Set_Basic(this, 100, M01_MODIFY_YOUR_ACTION_JDG);
 			//params.Set_Look( STAR, 15 );
-			params.Set_Attack( STAR, 0, 0, true );
-			Commands->Action_Attack ( obj, params );
+			params_inner.Set_Attack( STAR, 0, 0, true );
+			Commands->Action_Attack ( obj, params_inner );
 		}
 
 		else if (param == M01_SEND_BARN_CIVILIANS_RESCUE_CHINOOK_JDG)//your ride is on the way--disable hibernation
@@ -13191,13 +13229,15 @@ DECLARE_SCRIPT(M01_Barn_Prisoner_03_JDG, "")//this guys ID is M01_BARN_PRISONER_
 			Commands->Enable_Hibernation(obj, false );
 			Commands->Set_Innate_Is_Stationary ( obj, false );
 
-			Vector3 evacSpot = Commands->Get_Position ( Commands->Find_Object ( M01_BARNAREA_EVAC_MONITOR_JDG ) );
-			ActionParamsStruct params;
-			params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
-			params.Set_Movement( evacSpot, RUN, 1 );
-					
-			Commands->Action_Goto( obj, params );
-			
+			Vector3 evacSpot;
+			bool evacSpot_found = Find_Object_Position (M01_BARNAREA_EVAC_MONITOR_JDG, evacSpot);
+ActionParamsStruct params_inner;
+			params_inner.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
+			if (evacSpot_found) {
+				params_inner.Set_Movement( evacSpot, RUN, 1 );
+						
+				Commands->Action_Goto( obj, params_inner );
+			}
 		}
 	}
 
@@ -13210,13 +13250,13 @@ DECLARE_SCRIPT(M01_Barn_Prisoner_03_JDG, "")//this guys ID is M01_BARN_PRISONER_
 			if (action_id == M01_WALKING_WAYPATH_01_JDG)//civ is at hiding spot--crouch
 			{
 				Commands->Set_Innate_Is_Stationary ( obj, true );
-				ActionParamsStruct params;
-				params.Set_Basic(this, 100, M01_MODIFY_YOUR_ACTION_JDG);
-				params.Set_Look( STAR, 15 );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic(this, 100, M01_MODIFY_YOUR_ACTION_JDG);
+				params_inner.Set_Look( STAR, 15 );
 				//params.Set_Attack( STAR, 0, 0, true );
 				//Commands->Action_Attack ( obj, params );
 
-				Commands->Action_Face_Location ( obj, params );
+				Commands->Action_Face_Location ( obj, params_inner );
 
 				if (Commands->Find_Object ( 101662 ))//sending custom to babushka conversation zone--okay to play conversation
 				{
@@ -18319,13 +18359,13 @@ DECLARE_SCRIPT(M01_TurretBeach_Turret_01_Script_JDG, "")//M01_TURRETBEACH_TURRET
 			GameObject * gunboat = Commands->Find_Object ( M01_TURRETBEACH_GUNBOAT_ID );
 			if (gunboat != NULL)
 			{
-				ActionParamsStruct params;
+				ActionParamsStruct params_inner;
 
-				params.Set_Basic(this, 100, M01_START_ACTING_JDG);
-				params.Set_Attack( gunboat, 3000, 3, true );
-				params.AttackCheckBlocked = false;
+				params_inner.Set_Basic(this, 100, M01_START_ACTING_JDG);
+				params_inner.Set_Attack( gunboat, 3000, 3, true );
+				params_inner.AttackCheckBlocked = false;
 
-				Commands->Action_Attack ( obj, params );
+				Commands->Action_Attack ( obj, params_inner );
 			}
 		}
 	}
@@ -19405,11 +19445,14 @@ DECLARE_SCRIPT(M01_Base_POW01_JDG, "")//116386
 				Commands->Enable_Hibernation( obj, false );
 				Commands->Set_Innate_Is_Stationary ( obj, false );
 
-				Vector3 myEvacSpot = Commands->Get_Position ( Commands->Find_Object ( M01_GDIBASE_POWSCENE02_MONITOR_JDG ) );
-				params.Set_Basic( this, 100, M01_WALKING_WAYPATH_02_JDG );
-				params.Set_Movement( myEvacSpot, RUN, 1 );
-
-				Commands->Action_Goto( obj, params );
+				Vector3 myEvacSpot;
+				bool myEvacSpot_found = Find_Object_Position (M01_GDIBASE_POWSCENE02_MONITOR_JDG, myEvacSpot);
+params.Set_Basic( this, 100, M01_WALKING_WAYPATH_02_JDG );
+				if (myEvacSpot_found) {
+					params.Set_Movement( myEvacSpot, RUN, 1 );
+	
+					Commands->Action_Goto( obj, params );
+				}
 			}
 
 			else if (param == M01_GOTO_INNATE_JDG)
@@ -19527,11 +19570,14 @@ DECLARE_SCRIPT(M01_Base_POW02_JDG, "")//116385
 				Commands->Enable_Hibernation( obj, false );
 				Commands->Set_Innate_Is_Stationary ( obj, false );
 
-				Vector3 myEvacSpot = Commands->Get_Position ( Commands->Find_Object ( M01_GDIBASE_POWSCENE02_MONITOR_JDG ) );
-				params.Set_Basic( this, 100, M01_WALKING_WAYPATH_02_JDG );
-				params.Set_Movement( myEvacSpot, RUN, 1 );
-
-				Commands->Action_Goto( obj, params );
+				Vector3 myEvacSpot;
+				bool myEvacSpot_found = Find_Object_Position (M01_GDIBASE_POWSCENE02_MONITOR_JDG, myEvacSpot);
+params.Set_Basic( this, 100, M01_WALKING_WAYPATH_02_JDG );
+				if (myEvacSpot_found) {
+					params.Set_Movement( myEvacSpot, RUN, 1 );
+	
+					Commands->Action_Goto( obj, params );
+				}
 			}
 
 			else if (param == M01_GOTO_INNATE_JDG)
@@ -19906,11 +19952,11 @@ DECLARE_SCRIPT(M01_GuardTower02_Sniper_Target01_JDG, "")
 				acting = false;
 				Commands->Set_Innate_Is_Stationary ( obj, false );
 				Vector3 myGotoSpot (46.749f, 197.062f, 6.211f);
-				ActionParamsStruct params;
-				params.Set_Basic( this, 50, M01_WALKING_WAYPATH_02_JDG );
-				params.Set_Movement( myGotoSpot, RUN, 1 );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic( this, 50, M01_WALKING_WAYPATH_02_JDG );
+				params_inner.Set_Movement( myGotoSpot, RUN, 1 );
 
-				Commands->Action_Goto( obj, params );
+				Commands->Action_Goto( obj, params_inner );
 
 				GameObject * guy02 = Commands->Find_Object ( guy02_id );
 				if (guy02 != NULL)
@@ -21763,10 +21809,10 @@ DECLARE_SCRIPT(M01_Base_GDI_Minigunner_JDG, "")//116382
 			else if (param == M01_MODIFY_YOUR_ACTION_03_JDG)//greet havoc M01_GDI01_Conversation_01
 			{
 				Vector3 playersPosition = Commands->Get_Position ( STAR );
-				ActionParamsStruct params;
-				params.Set_Basic( this, 100, M01_START_ACTING_JDG );
-				params.Set_Face_Location( playersPosition, 2 );
-				Commands->Action_Face_Location ( obj, params );
+				ActionParamsStruct params_inner;
+				params_inner.Set_Basic( this, 100, M01_START_ACTING_JDG );
+				params_inner.Set_Face_Location( playersPosition, 2 );
+				Commands->Action_Face_Location ( obj, params_inner );
 
 				gdi01conv01 = Commands->Create_Conversation( "M01_GDI01_Conversation_01", 100, 1000, false);
 				Commands->Join_Conversation( obj, gdi01conv01, true, true, true );
@@ -21825,10 +21871,10 @@ DECLARE_SCRIPT(M01_Base_GDI_Minigunner_JDG, "")//116382
 				if (havocDownPath == false)
 				{
 					Vector3 playersPosition = Commands->Get_Position ( STAR );
-					ActionParamsStruct params;
-					params.Set_Basic( this, 100, M01_START_ACTING_JDG );
-					params.Set_Face_Location( playersPosition, 2 );
-					Commands->Action_Face_Location ( obj, params );
+					ActionParamsStruct params_inner;
+					params_inner.Set_Basic( this, 100, M01_START_ACTING_JDG );
+					params_inner.Set_Face_Location( playersPosition, 2 );
+					Commands->Action_Face_Location ( obj, params_inner );
 
 					gdi01conv03 = Commands->Create_Conversation( "M01_GDI01_Conversation_05", 100, 1000, false);
 					Commands->Join_Conversation( obj, gdi01conv03, true, true, true );
