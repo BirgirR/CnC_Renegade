@@ -180,6 +180,16 @@ enum
 	M00_ENABLE_DAMAGE_MOD,								// 37
 
 	// This type and the next 20+ are used to set a slot in a cinematic script to an ID
+	/*
+	**	Asks a running Test_Cinematic to finish now, playing out the rest of its
+	**	timeline in one go so the scene still ends properly. Sent by the engine
+	**	when the player presses the skip key -- see Input::Update.
+	**
+	**	Well clear of the block above, which ends at 9030, and below 10000, where
+	**	Test_Cinematic starts reading the type as a slot index instead.
+	*/
+	M00_CUSTOM_CINEMATIC_SKIP = 9500,					// 9500
+
 	M00_CUSTOM_CINEMATIC_SET_SLOT = 10000,				// 10000
 };
 

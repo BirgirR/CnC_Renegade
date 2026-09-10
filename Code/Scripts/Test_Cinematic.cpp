@@ -135,6 +135,7 @@ public:
 	float				Time;
 	float				FrameSync;
 	bool				PrimaryKilled;
+	bool				SkipRequested;
 
 	bool				IsCameraCinematic;
 
@@ -912,9 +913,63 @@ public:
 		return false;
 	}
 
-	void	Parse_Command( char *command ) 
+	/*
+	**	True if the command is one whose only purpose is to be seen or heard at a
+	**	particular moment. Collapsing a timeline into a single frame turns these
+	**	into a burst -- every line of dialogue at once, a shake for a scene the
+	**	player has just chosen not to watch, every explosion together -- so a skip
+	**	drops them.
+	**
+	**	Everything else is kept, because it is state the rest of the mission
+	**	relies on: the camera, the letterbox and screen fade, objects created or
+	**	destroyed, scripts attached, customs sent.
+	**
+	**	Peeks rather than matches: Title_Match advances the pointer it is given,
+	**	so it is handed a copy.
+	*/
+	bool	Is_Presentation_Only( char *command )
+	{
+		static char * const TRANSIENT[] = { "Play_Audio", "Shake_Camera", "Create_Explosion" };
+
+		for ( int i = 0; i < (int)( sizeof( TRANSIENT ) / sizeof( TRANSIENT[0] ) ); i++ ) {
+			char *peek = command;
+			if ( Title_Match( &peek, TRANSIENT[i] ) ) {
+				return true;
+			}
+		}
+
+		/*
+		**	The dialogue does not come through Play_Audio. Timelines attach
+		**	M00_Generic_Conv_DME to an object, and that script starts a
+		**	conversation the moment it is created -- so a skipped scene with
+		**	twenty-six of them speaks every line simultaneously.
+		**
+		**	Dropping the attach is safe: the script creates, joins, starts and
+		**	monitors its conversation and nothing else. It has no
+		**	Action_Complete, so no part of the mission is waiting on it to
+		**	finish.
+		**
+		**	Every other Attach_Script is kept -- the attack orders, the loiter
+		**	disables, the engineers -- because those set behaviour that outlives
+		**	the cinematic.
+		*/
+		char *peek = command;
+		if ( Title_Match( &peek, "Attach_Script" ) ) {
+			if ( ::strstr( command, "M00_Generic_Conv_DME" ) != NULL ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void	Parse_Command( char *command )
 	{
 //		Commands->Debug_Message( "Parse %s\n", (int)command );
+
+		if ( SkipRequested && Is_Presentation_Only( command ) ) {
+			return;
+		}
 
 				if ( Title_Match( &command, "Create_Object" ) )			Command_Create_Object( command );
 		else	if ( Title_Match( &command, "Create_Real_Object" ) )	Command_Create_Real_Object( command );
@@ -953,12 +1008,33 @@ public:
 
 		// If Primary Destroyed, 
 		if ( PrimaryKilled ) {
-			// skip all timestamps < LAST_VALID_TIMESTAMP  
+			// skip all timestamps < LAST_VALID_TIMESTAMP
 			while ( Controls != NULL && Controls->Time <= LAST_VALID_TIMESTAMP ) {
 				Remove_Head_Control_Line();
 			}
 
 			// Run all remaining commands
+			while ( Controls != NULL ) {
+				Parse_Command( Controls->Command );
+				Remove_Head_Control_Line();
+			}
+		}
+
+		/*
+		**	A player-requested skip runs the rest of the timeline at once rather
+		**	than discarding it, which is the difference between this and the
+		**	PrimaryKilled path above. That one drops every line up to
+		**	LAST_VALID_TIMESTAMP -- in practice the whole file, since scenes are
+		**	timed in seconds -- so it only tears down for cinematics whose author
+		**	parked cleanup past that marker. Most do not, and the camera is left
+		**	hosted with the scene stuck.
+		**
+		**	Running the commands instead means the ending still happens: the
+		**	camera is released and whatever the scene was due to leave behind is
+		**	left behind. The cost is that the visuals it would have played out
+		**	over the next minute all land in one frame.
+		*/
+		if ( SkipRequested ) {
 			while ( Controls != NULL ) {
 				Parse_Command( Controls->Command );
 				Remove_Head_Control_Line();
@@ -1005,6 +1081,7 @@ public:
 		LastSyncTime = Commands->Get_Sync_Time();
 		Time = 0;
 		PrimaryKilled = false;
+		SkipRequested = false;
 		IsCameraCinematic = false;
 
 		Load_Control_File( Get_Parameter( "ControlFilename" ) );
@@ -1023,6 +1100,13 @@ public:
 			if ( !PrimaryKilled ) {		// Prevent loops
 				Commands->Debug_Message("Cinematic:Primary Killed\n");
 				PrimaryKilled = true;
+				Parse_Commands( obj );
+			}
+		}
+		if ( type == M00_CUSTOM_CINEMATIC_SKIP ) {
+			if ( !SkipRequested ) {		// Prevent loops, as above
+				Commands->Debug_Message("Cinematic:Skipped\n");
+				SkipRequested = true;
 				Parse_Commands( obj );
 			}
 		}

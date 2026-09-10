@@ -49,6 +49,10 @@
 #include "vehicle.h"
 #include "combat.h"
 #include "ccamera.h"
+#include "gameobjmanager.h"
+#include "scriptablegameobj.h"
+#include "gameobjobserver.h"
+#include <string.h>
 
 
 #define DIRECTINPUT_VERSION 0x0800
@@ -840,6 +844,67 @@ void	Input::Update_Sliders( void )
 }
 
 
+/*
+**	Let the player skip a cinematic with the space bar.
+**
+**	Every running Test_Cinematic is asked to finish now, and plays out the rest
+**	of its timeline in one go rather than being cut off -- so the camera is
+**	released, the letterbox and screen fade resolve, and the objects the scene
+**	was due to leave behind are left behind. See Test_Cinematic.cpp, which
+**	decides what a skip runs and what it drops.
+**
+**	Note the DIK_SPACE read rather than an entry in the function-key table: this
+**	has to work while the camera is in a cinematic, which is exactly when
+**	Input::Update stops filling that table in. It is also why the key can be
+**	space without taking anything from normal play, where space is jump.
+*/
+static void	Skip_Active_Cinematic( void )
+{
+	//	M00_CUSTOM_CINEMATIC_SKIP, from Code/Scripts/toolkit.h. The scripts are a
+	//	separate DLL with its own headers, so the value is repeated here rather
+	//	than included; keep the two in step.
+	const int CINEMATIC_SKIP = 9500;
+
+	SLNode<BaseGameObj> *node = GameObjManager::Get_Game_Obj_List()->Head();
+	while ( node != NULL ) {
+
+		BaseGameObj *base = node->Data();
+
+		//	Advance first: handing a script this custom is what makes it tear the
+		//	scene down, which can take this object with it.
+		node = node->Next();
+
+		ScriptableGameObj *obj = ( base != NULL ) ? base->As_ScriptableGameObj() : NULL;
+		if ( obj == NULL ) {
+			continue;
+		}
+
+		const GameObjObserverList &observers = obj->Get_Observers();
+		for ( int index = 0; index < observers.Count(); index++ ) {
+			GameObjObserverClass *observer = observers[ index ];
+			if ( observer == NULL ) continue;
+
+			const char *name = observer->Get_Name();
+			if ( name != NULL && ::strcmp( name, "Test_Cinematic" ) == 0 ) {
+				observer->Custom( obj, CINEMATIC_SKIP, 0, NULL );
+			}
+		}
+	}
+}
+
+static void	Update_Cinematic_Skip( void )
+{
+	//	Edge triggered: a held key must not skip every cinematic in a row.
+	static bool _was_down = false;
+
+	const bool is_down = ( DirectInput::Get_Keyboard_Button( DIK_SPACE ) != 0 );
+	if ( is_down && !_was_down ) {
+		Skip_Active_Cinematic();
+	}
+	_was_down = is_down;
+}
+
+
 void	Input::Update( void )
 {
 	if (!UsingDirectInput) {
@@ -859,6 +924,10 @@ void	Input::Update( void )
 	// zero all values
 	//
 	memset( FunctionValue, 0, sizeof( FunctionValue ) );
+
+	//	Ahead of the cinematic gate below, so the skip is reachable whether or not
+	//	the camera is hosted by one.
+	Update_Cinematic_Skip();
 
 	// No ESC, O, M, F1, etc in cinematics!
 	if ( COMBAT_CAMERA && COMBAT_CAMERA->Is_In_Cinematic() && !DebugManager::Allow_Cinematic_Keys() ) {
