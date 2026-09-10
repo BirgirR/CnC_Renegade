@@ -62,11 +62,24 @@ deliberate: `WWDEBUG` is defined in every configuration here, which makes a
 Release build the original workspace's *Profile* configuration, and
 `ScriptManager::Init` picks the DLL name to match.
 
+For sound and video you also need the runtimes the game shipped with, which are
+loaded by name at startup and are not required to build:
+
+| Copy from your install | For |
+| --- | --- |
+| `mss32.dll`, `*.m3d`, `Mp3dec.asi` | effects, 3D audio and MP3 music |
+| `binkw32.dll`, `Data/Movies/` | the intro and mission movies |
+
+Anything missing degrades quietly rather than failing: no `mss32.dll` means a
+silent game, no `binkw32.dll` means movies are skipped. `Run/_audio.txt` and
+`Run/_bink.txt` record which backend bound and what it opened.
+
 ### Build options
 
 | Option | Default | Effect |
 | --- | --- | --- |
-| `RENEGADE_XAUDIO2_AUDIO` | `ON` | Implement the Miles audio API on XAudio2. `OFF` gives the silent stub. |
+| `RENEGADE_MILES_RUNTIME` | `ON` | Bind the retail `mss32.dll` at runtime; music included. `OFF` uses the XAudio2 backend. |
+| `RENEGADE_XAUDIO2_AUDIO` | `ON` | The self-contained backend, used when `RENEGADE_MILES_RUNTIME` is `OFF`. |
 | `RENEGADE_MILES_STUB` | `ON` | `OFF` links the real Miles 6 SDK from `Code/Miles6/`, if you have it. |
 | `RENEGADE_BUILD_SCRIPTS` | `ON` | Build the mission-script DLL. |
 | `RENEGADE_BUILD_TESTS` | `ON` | Build the `wwmath`/`wwlib` unit tests. |
@@ -99,10 +112,15 @@ implementation under `Code/Stubs/`:
   is needed either. `Code/Stubs/d3dx` supplies the handful of D3DX entry points
   the engine uses, since D3DX has never been part of the Windows SDK.
 - **Miles Sound System** — 91 files include `mss.h`, so something has to answer
-  to it. `Code/Stubs/miles6` implements the API the engine actually uses on top
-  of **XAudio2** and X3DAudio, both part of the Windows SDK, with
-  `XAudio2_9.dll` shipping in Windows itself. The engine drives it without
-  knowing the difference. A silent stub is available as a fallback.
+  to it. By default `Code/Stubs/miles6` binds the retail `mss32.dll` at runtime,
+  as it does for Bink: Renegade shipped Miles 6 with the game, so owners already
+  have a licensed copy, and it is the only backend that plays the streamed MP3
+  music (via the `Mp3dec.asi` beside it). Copy `mss32.dll`, the `*.m3d`
+  providers and `Mp3dec.asi` from your install into `Run/`. With
+  `-DRENEGADE_MILES_RUNTIME=OFF` the self-contained backend is used instead:
+  the API implemented on **XAudio2** and X3DAudio, both part of the Windows SDK,
+  which plays effects and 3D positioning but has no MP3 decoder, so no music. A
+  silent stub is the last fallback, and a missing `mss32.dll` degrades to it.
 - **Bink** — bound to `binkw32.dll` at runtime, the way Direct3D 9 is. The retail
   game ships that DLL beside its executable, so anyone who owns Renegade already
   has a licensed decoder and the movies play as they originally did; nothing of

@@ -115,7 +115,18 @@ target_link_libraries(directx8 INTERFACE
 option(RENEGADE_XAUDIO2_AUDIO
     "Implement the Miles audio API on XAudio2 instead of the silent stub" ON)
 
-if(RENEGADE_XAUDIO2_AUDIO)
+# RENEGADE_MILES_RUNTIME binds the retail mss32.dll at runtime instead, the way
+# Code/Stubs/bink does for binkw32.dll. Renegade shipped Miles 6 with the game,
+# so owners already have a licensed copy, and it is the only backend here that
+# plays the streamed MP3 music -- the XAudio2 one has no decoder for it. Still
+# nothing to build against and nothing redistributed; a missing DLL degrades to
+# silence at runtime rather than failing the build or the link.
+option(RENEGADE_MILES_RUNTIME
+    "Bind the retail mss32.dll at runtime (music included) instead of XAudio2" ON)
+
+if(RENEGADE_MILES_RUNTIME)
+    add_library(miles6 STATIC "${STUBS}/miles6/mss_runtime.cpp")
+elseif(RENEGADE_XAUDIO2_AUDIO)
     add_library(miles6 STATIC "${STUBS}/miles6/mss_xaudio2.cpp")
     target_link_libraries(miles6 PUBLIC xaudio2)
 else()
@@ -566,6 +577,8 @@ message(STATUS "  architecture     x86 (32-bit)")
 message(STATUS "  graphics         Direct3D 9 (Windows SDK headers, no DirectX SDK)")
 if(NOT RENEGADE_MILES_STUB)
     message(STATUS "  audio            real Miles SDK")
+elseif(RENEGADE_MILES_RUNTIME)
+    message(STATUS "  audio            retail mss32.dll at runtime (music included)")
 elseif(RENEGADE_XAUDIO2_AUDIO)
     message(STATUS "  audio            XAudio2 (effects; music not yet streamed)")
 else()
