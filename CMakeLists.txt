@@ -15,8 +15,22 @@
 #   cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release .
 #   cmake --build build
 #
-# 32-bit only. 35 files contain x86 inline assembly and the DirectX 8 import
-# libraries are 32-bit, so there is no x64 path short of a substantial port.
+# 32-bit only, and deliberately so.
+#
+# Around twenty files carry x86 inline assembly, which MSVC does not accept at
+# all for x64 -- though that is the smaller half of it, since most of them
+# (__cpuid, __rdtsc, Interlocked, SSE intrinsics) have direct modern
+# equivalents.
+#
+# The binding constraint is that the retail runtimes are 32-bit. mss32.dll and
+# binkw32.dll ship with the game and are bound at runtime for the original audio
+# mix and for movie playback; a 64-bit executable cannot load either, so an x64
+# build would trade both away and gain nothing a 2002 game needs. See the Miles
+# and Bink sections below.
+#
+# NB: this used to cite the DirectX 8 import libraries as the reason. They are
+# long gone -- the renderer moved to Direct3D 9 out of the Windows SDK and
+# resolves Direct3DCreate9 at runtime, so no DirectX import library is linked.
 #
 
 cmake_minimum_required(VERSION 3.20)
@@ -554,16 +568,17 @@ target_link_libraries(commando PRIVATE
     user32 gdi32 winspool comdlg32 advapi32 ole32 oleaut32 uuid
     winmm vfw32 wsock32 kernel32 shell32 version)
 
-# The DirectX 8 import libraries were built with VC6 and carry embedded
-# default-lib directives for CRTs that no longer ship. Ignore them; the modern
-# CRT selected by CMAKE_MSVC_RUNTIME_LIBRARY supplies the same symbols.
+# This used to carry a row of /NODEFAULTLIB entries -- libc, libcd, libcmtd,
+# msvcrt, msvcrtd and libci -- against the VC6-built DirectX 8 import libraries,
+# which embedded default-lib directives naming CRTs that no longer ship. Those
+# import libraries are gone: the renderer moved to Direct3D 9 out of the Windows
+# SDK, and nothing in this build links a .lib older than the toolchain, so there
+# is no longer anything to embed a stale directive. Removed after confirming the
+# Release link is clean without them -- no LNK4098, no unresolved symbols.
+#
+# Unverified for Debug only because Debug does not currently compile at all
+# (ww3d2/motchan.cpp:292, 'chunk_size' undeclared), which is a separate matter.
 target_link_options(commando PRIVATE
-    /NODEFAULTLIB:libci.lib
-    /NODEFAULTLIB:libc.lib
-    /NODEFAULTLIB:libcd.lib
-    /NODEFAULTLIB:libcmtd.lib
-    /NODEFAULTLIB:msvcrt.lib
-    /NODEFAULTLIB:msvcrtd.lib
     # Except.cpp reports a bare EIP whenever IMAGEHLP cannot resolve a
     # symbol. A link map plus a fixed image base makes that address
     # mean the same thing on every run: RVA = EIP - 0x400000.
