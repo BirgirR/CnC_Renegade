@@ -79,7 +79,7 @@ silent game, no `binkw32.dll` means movies are skipped. `Run/_audio.txt` and
 | Option | Default | Effect |
 | --- | --- | --- |
 | `RENEGADE_MILES_RUNTIME` | `ON` | Bind the retail `mss32.dll` at runtime; music included. `OFF` uses the XAudio2 backend. |
-| `RENEGADE_XAUDIO2_AUDIO` | `ON` | The self-contained backend, used when `RENEGADE_MILES_RUNTIME` is `OFF`. |
+| `RENEGADE_XAUDIO2_AUDIO` | `ON` | The self-contained backend (XAudio2 + Media Foundation), used when `RENEGADE_MILES_RUNTIME` is `OFF`. |
 | `RENEGADE_MILES_STUB` | `ON` | `OFF` links the real Miles 6 SDK from `Code/Miles6/`, if you have it. |
 | `RENEGADE_BUILD_SCRIPTS` | `ON` | Build the mission-script DLL. |
 | `RENEGADE_BUILD_TESTS` | `ON` | Build the `wwmath`/`wwlib` unit tests. |
@@ -114,13 +114,14 @@ implementation under `Code/Stubs/`:
 - **Miles Sound System** — 91 files include `mss.h`, so something has to answer
   to it. By default `Code/Stubs/miles6` binds the retail `mss32.dll` at runtime,
   as it does for Bink: Renegade shipped Miles 6 with the game, so owners already
-  have a licensed copy, and it is the only backend that plays the streamed MP3
-  music (via the `Mp3dec.asi` beside it). Copy `mss32.dll`, the `*.m3d`
-  providers and `Mp3dec.asi` from your install into `Run/`. With
+  have a licensed copy, and it reproduces the original mix exactly — effects, 3D
+  positioning, EAX reverb and MP3 music, the last via the `Mp3dec.asi` beside it.
+  Copy `mss32.dll`, the `*.m3d` providers and `Mp3dec.asi` into `Run/`. With
   `-DRENEGADE_MILES_RUNTIME=OFF` the self-contained backend is used instead:
-  the API implemented on **XAudio2** and X3DAudio, both part of the Windows SDK,
-  which plays effects and 3D positioning but has no MP3 decoder, so no music. A
-  silent stub is the last fallback, and a missing `mss32.dll` degrades to it.
+  the API implemented on **XAudio2** and X3DAudio, with **Media Foundation**
+  decoding the MP3 music out of the MIX archives. All three are part of the
+  Windows SDK and ship in Windows, so that build needs no retail runtime at all.
+  A silent stub is the last fallback, and a missing `mss32.dll` degrades to it.
 - **Bink** — bound to `binkw32.dll` at runtime, the way Direct3D 9 is. The retail
   game ships that DLL beside its executable, so anyone who owns Renegade already
   has a licensed decoder and the movies play as they originally did; nothing of

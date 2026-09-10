@@ -18,6 +18,12 @@
 **	ADPCM is expanded to 16-bit PCM up front. Sounds are short; the memory cost
 **	is a few hundred KB at worst and it keeps the mixing path simple.
 **
+**	Music is the exception: the engine opens it by name (AIL_open_stream_by_
+**	sample) and it is MP3 inside a MIX archive, so it is read back through the
+**	file callbacks the engine registers and decoded by Media Foundation. See the
+**	Streams section, which explains why it decodes up front rather than feeding
+**	a buffer queue.
+**
 **	Miles has no end-of-sample callback in the surface the engine uses. It finds
 **	out a sound has finished by polling AIL_sample_ms_position, so that has to be
 **	accurate rather than approximate; it is derived from
@@ -38,6 +44,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+
+//	Media Foundation supplies the MP3 decoder the music streams need. It is part
+//	of the Windows SDK and ships in Windows, so it costs this backend nothing in
+//	dependencies -- which is the whole point of it existing next to the mss32.dll
+//	loader.
+#include <mfapi.h>
+#include <mfidl.h>
+#include <mfreadwrite.h>
+#include <mferror.h>
+#include <shlwapi.h>
 
 #pragma comment(lib, "xaudio2.lib")
 
@@ -483,6 +499,43 @@ static void Voice_Free_Audio(MilesVoice *v)
 }
 
 /*
+**	Hand a voice a block of 16-bit PCM to play and build the source voice for it.
+**
+**	Split out of Voice_Load because the music streams arrive as MP3 rather than
+**	WAV: they share everything from the decoded samples onwards.
+**
+**	Takes ownership of pcm, which must come from new[].
+*/
+static bool Voice_Install_Pcm(MilesVoice *v, short *pcm, unsigned samples,
+										int channels, unsigned rate)
+{
+	v->Pcm        = pcm;
+	v->PcmSamples = samples;
+	v->Channels   = channels;
+	v->Rate       = rate;
+
+	if (_XAudio2 == NULL) {
+		return false;
+	}
+
+	WAVEFORMATEX fmt;
+	memset(&fmt, 0, sizeof(fmt));
+	fmt.wFormatTag      = WAVE_FORMAT_PCM;
+	fmt.nChannels       = (WORD)channels;
+	fmt.nSamplesPerSec  = rate;
+	fmt.wBitsPerSample  = 16;
+	fmt.nBlockAlign     = (WORD)(channels * 2);
+	fmt.nAvgBytesPerSec = rate * fmt.nBlockAlign;
+
+	if (FAILED(_XAudio2->CreateSourceVoice(&v->Voice, &fmt))) {
+		v->Voice = NULL;
+		return false;
+	}
+
+	return true;
+}
+
+/*
 **	Decode a WAV image and give the voice a source to play. Shared by the 2D and
 **	3D setters, which differ only in the handle type they are given.
 */
@@ -537,30 +590,7 @@ static bool Voice_Load(MilesVoice *v, const void *image, unsigned image_bytes)
 		}
 	}
 
-	v->Pcm        = pcm;
-	v->PcmSamples = samples;
-	v->Channels   = wav.Channels;
-	v->Rate       = wav.Rate;
-
-	if (_XAudio2 == NULL) {
-		return false;
-	}
-
-	WAVEFORMATEX fmt;
-	memset(&fmt, 0, sizeof(fmt));
-	fmt.wFormatTag      = WAVE_FORMAT_PCM;
-	fmt.nChannels       = (WORD)wav.Channels;
-	fmt.nSamplesPerSec  = wav.Rate;
-	fmt.wBitsPerSample  = 16;
-	fmt.nBlockAlign     = (WORD)(wav.Channels * 2);
-	fmt.nAvgBytesPerSec = wav.Rate * fmt.nBlockAlign;
-
-	if (FAILED(_XAudio2->CreateSourceVoice(&v->Voice, &fmt))) {
-		v->Voice = NULL;
-		return false;
-	}
-
-	return true;
+	return Voice_Install_Pcm(v, pcm, samples, wav.Channels, wav.Rate);
 }
 
 static void Voice_Apply_Volume(MilesVoice *v)
@@ -768,12 +798,26 @@ S32 AILEXPORT AIL_set_preference(U32 /*number*/, S32 /*value*/)
 	return AIL_NO_ERROR;
 }
 
-void AILEXPORT AIL_set_file_callbacks(AIL_file_open_callback  /*opencb*/,
-												  AIL_file_close_callback /*closecb*/,
-												  AIL_file_seek_callback  /*seekcb*/,
-												  AIL_file_read_callback  /*readcb*/)
+static AIL_file_open_callback  _FileOpen  = NULL;
+static AIL_file_close_callback _FileClose = NULL;
+static AIL_file_seek_callback  _FileSeek  = NULL;
+static AIL_file_read_callback  _FileRead  = NULL;
+
+/*
+**	The engine registers these so streams can be read out of its MIX archives
+**	(WWAudio.cpp:2440). Samples arrive already in memory and never need them,
+**	but music does: menu.mp3 and the rest do not exist as loose files, so a
+**	stream that went to the filesystem would find nothing.
+*/
+void AILEXPORT AIL_set_file_callbacks(AIL_file_open_callback  opencb,
+												  AIL_file_close_callback closecb,
+												  AIL_file_seek_callback  seekcb,
+												  AIL_file_read_callback  readcb)
 {
-	//	Only streams would read through these; samples arrive already in memory.
+	_FileOpen  = opencb;
+	_FileClose = closecb;
+	_FileSeek  = seekcb;
+	_FileRead  = readcb;
 }
 
 S32 AILEXPORT AIL_WAV_info(void const *data, AILSOUNDINFO *info)
@@ -1228,100 +1272,412 @@ S32 AILEXPORT AIL_3D_object_user_data(H3DPOBJECT obj, U32 index)
 //-----------------------------------------------------------------------------
 //	Streams
 //
-//	Music is MP3 and streamed from disk, which needs a decoder this first pass
-//	does not have. The entry points stay well-behaved so the music code runs
-//	without producing sound.
+//	Renegade's music is MP3, opened by name and read through the file callbacks
+//	the engine registers, because the tracks live inside the MIX archives rather
+//	than on disk.
+//
+//	These are "streams" in Miles' sense -- the engine's name for a sound it plays
+//	by filename instead of handing over an image in memory -- but nothing here
+//	streams incrementally. The file is read whole, decoded whole, and handed to
+//	the same voice machinery samples use, which buys the loop counting, volume,
+//	pan and millisecond position that the engine polls, all already written and
+//	working, in exchange for holding one decoded track in memory. A four-minute
+//	stereo track at 44.1kHz is about 42MB. Only one plays at a time, and the
+//	alternative -- a buffer queue fed off a service thread -- is a great deal
+//	more machinery to get subtly wrong for music that starts once per screen.
 //-----------------------------------------------------------------------------
 
-struct _STREAM
+/*
+**	Read a whole file through the engine's callbacks, falling back to the
+**	filesystem when none are registered (which is every case except the game
+**	itself -- the unit tests, say).
+**
+**	Returns a new[] buffer the caller frees, or NULL.
+*/
+static unsigned char *Stream_Read_File(const char *name, unsigned &bytes)
 {
-	S32 Volume;
-	S32 Pan;
-	S32 LoopCount;
-	S32 PlaybackRate;
+	bytes = 0;
+	if (name == NULL) return NULL;
 
-	_STREAM(void) : Volume(MILES_VOLUME_MAX), Pan(MILES_PAN_CENTRE),
-						 LoopCount(1), PlaybackRate(0) {}
-};
+	if (_FileOpen != NULL && _FileRead != NULL && _FileSeek != NULL && _FileClose != NULL) {
+		U32 handle = 0;
+		if (_FileOpen(name, &handle) == 0) {
+			return NULL;
+		}
 
-HSTREAM AILEXPORT AIL_open_stream(HDIGDRIVER /*dig*/, char const * /*filename*/,
-											 S32 /*stream_mem*/)
-{
-	return new _STREAM;
+		const S32 size = _FileSeek(handle, 0, AIL_FILE_SEEK_END);
+		_FileSeek(handle, 0, AIL_FILE_SEEK_BEGIN);
+
+		if (size <= 0) {
+			_FileClose(handle);
+			return NULL;
+		}
+
+		unsigned char *buffer = new unsigned char[size];
+		const U32 read = _FileRead(handle, buffer, (U32)size);
+		_FileClose(handle);
+
+		if (read != (U32)size) {
+			delete[] buffer;
+			return NULL;
+		}
+
+		bytes = (unsigned)size;
+		return buffer;
+	}
+
+	HANDLE file = ::CreateFileA(name, GENERIC_READ, FILE_SHARE_READ, NULL,
+										OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file == INVALID_HANDLE_VALUE) return NULL;
+
+	const DWORD size = ::GetFileSize(file, NULL);
+	if (size == 0 || size == INVALID_FILE_SIZE) {
+		::CloseHandle(file);
+		return NULL;
+	}
+
+	unsigned char *buffer = new unsigned char[size];
+	DWORD read = 0;
+	const BOOL ok = ::ReadFile(file, buffer, size, &read, NULL);
+	::CloseHandle(file);
+
+	if (!ok || read != size) {
+		delete[] buffer;
+		return NULL;
+	}
+
+	bytes = (unsigned)size;
+	return buffer;
 }
 
-HSTREAM AILEXPORT AIL_open_stream_by_sample(HDIGDRIVER /*dig*/, HSAMPLE /*S*/,
-														  char const * /*filename*/, S32 /*stream_mem*/)
+static bool _MediaFoundationUp = false;
+
+/*
+**	Decode a compressed audio image to 16-bit PCM with Media Foundation.
+**
+**	The source reader wants a byte stream rather than a pointer, so the image is
+**	wrapped in a memory IStream: no temporary file, and the MIX-archive bytes we
+**	already hold are used where they are.
+**
+**	This handles whatever Media Foundation handles, which is MP3 and rather more
+**	besides; the engine only asks it for MP3.
+**
+**	Returns a new[] buffer through pcm, or false.
+*/
+static bool Mf_Decode(const unsigned char *image, unsigned image_bytes,
+							 short *&pcm, unsigned &samples, int &channels, unsigned &rate)
 {
-	return new _STREAM;
+	pcm = NULL; samples = 0; channels = 0; rate = 0;
+
+	if (!_MediaFoundationUp) {
+		//	MFSTARTUP_LITE: this needs the decoders, not the media session.
+		if (FAILED(::MFStartup(MF_VERSION, MFSTARTUP_LITE))) {
+			Audio_Log("MFStartup failed; music cannot be decoded.");
+			return false;
+		}
+		_MediaFoundationUp = true;
+	}
+
+	IStream *memory = ::SHCreateMemStream(image, image_bytes);
+	if (memory == NULL) return false;
+
+	IMFByteStream *byte_stream = NULL;
+	IMFSourceReader *reader = NULL;
+	IMFMediaType *want = NULL;
+	IMFMediaType *got = NULL;
+	bool result = false;
+
+	if (SUCCEEDED(::MFCreateMFByteStreamOnStreamEx((IUnknown *)memory, &byte_stream)) &&
+		 SUCCEEDED(::MFCreateSourceReaderFromByteStream(byte_stream, NULL, &reader))) {
+
+		//	Ask for plain PCM; Media Foundation inserts the decoder.
+		if (SUCCEEDED(::MFCreateMediaType(&want)) &&
+			 SUCCEEDED(want->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio)) &&
+			 SUCCEEDED(want->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM)) &&
+			 SUCCEEDED(reader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+																NULL, want)) &&
+			 SUCCEEDED(reader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+																&got))) {
+
+			UINT32 got_channels = 0, got_rate = 0, got_bits = 0;
+			got->GetUINT32(MF_MT_AUDIO_NUM_CHANNELS, &got_channels);
+			got->GetUINT32(MF_MT_AUDIO_SAMPLES_PER_SECOND, &got_rate);
+			got->GetUINT32(MF_MT_AUDIO_BITS_PER_SAMPLE, &got_bits);
+
+			if (got_channels > 0 && got_rate > 0 && got_bits == 16) {
+				//	Grow geometrically rather than guessing the decoded length
+				//	from the bitrate, which VBR would make a lie.
+				unsigned capacity = got_rate * got_channels * 2 * 8;	// ~8 seconds
+				unsigned used = 0;
+				unsigned char *out = new unsigned char[capacity];
+				bool failed = false;
+
+				for (;;) {
+					DWORD flags = 0;
+					IMFSample *sample = NULL;
+					if (FAILED(reader->ReadSample((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM,
+															0, NULL, &flags, NULL, &sample))) {
+						failed = true;
+						break;
+					}
+					if (flags & MF_SOURCE_READERF_ENDOFSTREAM) {
+						if (sample != NULL) sample->Release();
+						break;
+					}
+					if (sample == NULL) continue;		// a gap, not an end
+
+					IMFMediaBuffer *buffer = NULL;
+					if (SUCCEEDED(sample->ConvertToContiguousBuffer(&buffer))) {
+						BYTE *data = NULL;
+						DWORD length = 0;
+						if (SUCCEEDED(buffer->Lock(&data, NULL, &length))) {
+							if (used + length > capacity) {
+								while (used + length > capacity) capacity *= 2;
+								unsigned char *bigger = new unsigned char[capacity];
+								memcpy(bigger, out, used);
+								delete[] out;
+								out = bigger;
+							}
+							memcpy(out + used, data, length);
+							used += length;
+							buffer->Unlock();
+						}
+						buffer->Release();
+					}
+					sample->Release();
+				}
+
+				const unsigned frame = (unsigned)got_channels * 2;
+				if (!failed && used >= frame) {
+					samples  = used / frame;
+					channels = (int)got_channels;
+					rate     = got_rate;
+					pcm      = new short[samples * got_channels];
+					memcpy(pcm, out, (size_t)samples * frame);
+					result   = true;
+				}
+				delete[] out;
+			} else {
+				Audio_Log("unexpected decoded format: %u channels, %u Hz, %u bits",
+							 got_channels, got_rate, got_bits);
+			}
+		}
+	}
+
+	if (got != NULL)         got->Release();
+	if (want != NULL)        want->Release();
+	if (reader != NULL)      reader->Release();
+	if (byte_stream != NULL) byte_stream->Release();
+	memory->Release();
+
+	return result;
+}
+
+/*
+**	Open a named sound and give the voice its samples. WAV goes through the
+**	existing parser, anything else through Media Foundation.
+*/
+static bool Stream_Load(MilesVoice *v, const char *name)
+{
+	if (v == NULL) return false;
+
+	unsigned bytes = 0;
+	unsigned char *image = Stream_Read_File(name, bytes);
+	if (image == NULL) {
+		Audio_Log("stream open failed: %s", (name != NULL) ? name : "(null)");
+		return false;
+	}
+
+	bool ok = false;
+	if (bytes > 12 && memcmp(image, "RIFF", 4) == 0) {
+		ok = Voice_Load(v, image, bytes);
+	} else {
+		short *pcm = NULL;
+		unsigned samples = 0, rate = 0;
+		int channels = 0;
+		if (Mf_Decode(image, bytes, pcm, samples, channels, rate)) {
+			Voice_Free_Audio(v);
+			ok = Voice_Install_Pcm(v, pcm, samples, channels, rate);
+		}
+	}
+
+	delete[] image;
+
+	Audio_Log("stream %s: %s (%u samples, %d ch, %u Hz)", name, ok ? "ok" : "FAILED",
+				 v->PcmSamples, v->Channels, v->Rate);
+	return ok;
+}
+
+/*
+**	A stream is a thin lease on a voice. When the engine opens one "by sample"
+**	it has already allocated the sample and expects to keep using that handle,
+**	so the stream borrows it and must not free it; AIL_open_stream has no such
+**	handle, so it owns the one it makes.
+*/
+struct _STREAM
+{
+	MilesVoice *	Voice;
+	bool				OwnsVoice;
+
+	_STREAM(void) : Voice(NULL), OwnsVoice(false) {}
+};
+
+/*
+**	A stream drives a voice, and every stream setting the engine touches has a
+**	sample equivalent that is already implemented and already correct, so these
+**	forward rather than duplicate. Anything the engine never calls on a stream
+**	is left out of that pattern only where the sample API has no counterpart.
+*/
+static MilesVoice *Stream_Voice(HSTREAM stream)
+{
+	return (stream != NULL) ? stream->Voice : NULL;
+}
+
+HSTREAM AILEXPORT AIL_open_stream(HDIGDRIVER /*dig*/, char const *filename, S32 /*stream_mem*/)
+{
+	_STREAM *stream = new _STREAM;
+
+	//	_SAMPLE rather than MilesVoice, so handing this to the sample entry
+	//	points below is a legitimate cast and not a reinterpretation.
+	_SAMPLE *voice = new _SAMPLE;
+	stream->Voice = voice;
+	stream->OwnsVoice = true;
+
+	if (!Stream_Load(voice, filename)) {
+		delete voice;
+		delete stream;
+		return NULL;
+	}
+	return stream;
+}
+
+/*
+**	The engine's usual route (soundstreamhandle.cpp:80). It has already
+**	allocated the sample and keeps using that handle for user data, so the
+**	stream plays through it rather than making one of its own.
+*/
+HSTREAM AILEXPORT AIL_open_stream_by_sample(HDIGDRIVER /*dig*/, HSAMPLE S,
+														  char const *filename, S32 /*stream_mem*/)
+{
+	if (S == NULL) return NULL;
+
+	_STREAM *stream = new _STREAM;
+	stream->Voice = S;
+	stream->OwnsVoice = false;
+
+	if (!Stream_Load(S, filename)) {
+		delete stream;
+		return NULL;
+	}
+	return stream;
 }
 
 void AILEXPORT AIL_close_stream(HSTREAM stream)
 {
+	if (stream == NULL) return;
+
+	if (stream->OwnsVoice) {
+		AIL_release_sample_handle((HSAMPLE)stream->Voice);
+	} else if (stream->Voice != NULL) {
+		//	Borrowed: stop it, but leave the handle for the engine to release.
+		AIL_end_sample((HSAMPLE)stream->Voice);
+	}
 	delete stream;
 }
 
-void AILEXPORT AIL_start_stream(HSTREAM /*stream*/)
+void AILEXPORT AIL_start_stream(HSTREAM stream)
 {
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_start_sample((HSAMPLE)v);
 }
 
-void AILEXPORT AIL_pause_stream(HSTREAM /*stream*/, S32 /*onoff*/)
+void AILEXPORT AIL_pause_stream(HSTREAM stream, S32 onoff)
 {
+	MilesVoice *v = Stream_Voice(stream);
+	if (v == NULL) return;
+
+	//	Miles: non-zero pauses.
+	if (onoff != 0) {
+		AIL_stop_sample((HSAMPLE)v);
+	} else {
+		AIL_resume_sample((HSAMPLE)v);
+	}
 }
 
 void AILEXPORT AIL_set_stream_volume(HSTREAM stream, S32 volume)
 {
-	if (stream != NULL) stream->Volume = volume;
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_set_sample_volume((HSAMPLE)v, volume);
 }
 
 S32 AILEXPORT AIL_stream_volume(HSTREAM stream)
 {
-	return (stream != NULL) ? stream->Volume : 0;
+	MilesVoice *v = Stream_Voice(stream);
+	return (v != NULL) ? v->Volume : 0;
 }
 
 void AILEXPORT AIL_set_stream_pan(HSTREAM stream, S32 pan)
 {
-	if (stream != NULL) stream->Pan = pan;
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_set_sample_pan((HSAMPLE)v, pan);
 }
 
 S32 AILEXPORT AIL_stream_pan(HSTREAM stream)
 {
-	return (stream != NULL) ? stream->Pan : MILES_PAN_CENTRE;
+	MilesVoice *v = Stream_Voice(stream);
+	return (v != NULL) ? v->Pan : MILES_PAN_CENTRE;
 }
 
 void AILEXPORT AIL_set_stream_playback_rate(HSTREAM stream, S32 rate)
 {
-	if (stream != NULL) stream->PlaybackRate = rate;
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_set_sample_playback_rate((HSAMPLE)v, rate);
 }
 
 S32 AILEXPORT AIL_stream_playback_rate(HSTREAM stream)
 {
-	return (stream != NULL) ? stream->PlaybackRate : 0;
+	MilesVoice *v = Stream_Voice(stream);
+	return (v != NULL) ? ((v->PlaybackRate != 0) ? v->PlaybackRate : (S32)v->Rate) : 0;
 }
 
 void AILEXPORT AIL_set_stream_loop_count(HSTREAM stream, S32 count)
 {
-	if (stream != NULL) stream->LoopCount = count;
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_set_sample_loop_count((HSAMPLE)v, count);
 }
 
 S32 AILEXPORT AIL_stream_loop_count(HSTREAM stream)
 {
-	return (stream != NULL) ? stream->LoopCount : 0;
+	MilesVoice *v = Stream_Voice(stream);
+	return (v != NULL) ? v->LoopCount : 0;
 }
 
+/*
+**	The engine asks for "the whole file" (soundstreamhandle.cpp:232 passes 0,-1),
+**	which is what looping a fully decoded buffer already does. A sub-range would
+**	need the loop points XAudio2 takes per buffer; nothing asks for one.
+*/
 void AILEXPORT AIL_set_stream_loop_block(HSTREAM /*stream*/, S32 /*loop_start_offset*/,
 													  S32 /*loop_end_offset*/)
 {
 }
 
-void AILEXPORT AIL_set_stream_ms_position(HSTREAM /*stream*/, S32 /*milliseconds*/)
+void AILEXPORT AIL_set_stream_ms_position(HSTREAM stream, S32 milliseconds)
 {
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) AIL_set_sample_ms_position((HSAMPLE)v, milliseconds);
 }
 
-void AILEXPORT AIL_stream_ms_position(HSTREAM /*stream*/, S32 *total_ms, S32 *current_ms)
+void AILEXPORT AIL_stream_ms_position(HSTREAM stream, S32 *total_ms, S32 *current_ms)
 {
-	if (total_ms   != NULL) *total_ms   = 0;
+	MilesVoice *v = Stream_Voice(stream);
+	if (v != NULL) {
+		AIL_sample_ms_position((HSAMPLE)v, total_ms, current_ms);
+		return;
+	}
+	if (total_ms != NULL)   *total_ms = 0;
 	if (current_ms != NULL) *current_ms = 0;
 }
+
 
 }	// extern "C"
