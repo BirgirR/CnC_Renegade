@@ -1777,20 +1777,6 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 							Commands->Send_Custom_Event (obj, controller, MX0_A02_CUSTOM_TYPE_APC_BLOWITUP, MX0_A02_CUSTOM_PARAM_DEFAULT, 1.0f);
 						}
 
-						/*
-						**	He can be shot from here on. Until this point he must
-						**	survive: the APC is destroyed by the custom just sent
-						**	to the controller, and the helicopter drop follows
-						**	from that, so killing him earlier stops the scene --
-						**	the APC lives and the Nod troops never arrive.
-						**
-						**	Sending it is the commitment, not the rocket. The
-						**	event carries a delay, which queues it on the
-						**	controller rather than on him, so the APC still blows
-						**	up if he dies in the moment between.
-						*/
-						can_damage = true;
-
 						ActionParamsStruct params;
 						params.Set_Basic(this, MX0_A02_PRIORITY_FORCED_ACTION, MX0_A02_ACTION_NOD_SHOOT_APC);
 						params.Set_Attack(apc, 300.0f, 0.0f, true);
@@ -2314,6 +2300,22 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 					}
 				case (MX0_A02_ACTION_NOD_SHOOT_APC):
 					{
+						/*
+						**	The rocket is away, so he can be shot from here on.
+						**
+						**	Up to this point he has to survive. He is the only
+						**	source of the two events the scene turns on: the
+						**	APC_BLOWITUP sent when he acquired the APC, and the
+						**	NEXT_SEQUENCE that brings the helicopters, which his
+						**	Killed handler now carries if he does not live to
+						**	send it himself.
+						**
+						**	Waiting for the attack to finish rather than for him
+						**	to commit to it means the player sees him fire before
+						**	he can drop, which is the point of his being here.
+						*/
+						can_damage = true;
+
 						GameObject * controller = Commands->Find_Object (MX0_A02_CONTROLLER_ID);
 						if (controller)
 						{
