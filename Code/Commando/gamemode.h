@@ -155,6 +155,19 @@ public:
 
 	static void Hide_Render_Frames(unsigned frame_count);		// hide rendering for n frames
 
+	/*
+	**	Whether the game should keep running while another window has focus.
+	**
+	**	Renegade was written to stop when it lost focus: single player is sent to
+	**	the menu, and the scene is not rendered. On one screen in 2002 that is
+	**	sensible. Alongside a second monitor it is not, and alt-tabbing back to
+	**	find yourself in the encyclopedia is its own small annoyance.
+	**
+	**	Read once from the registry, under Options as "PauseWhenUnfocused", so it
+	**	can be put back without rebuilding. Defaults to not pausing.
+	*/
+	static	bool	Should_Run_Unfocused( void );
+
 private:
 	static	Vector3	BackgroundColor;
 };

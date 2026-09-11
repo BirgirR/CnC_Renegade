@@ -221,7 +221,7 @@ void	CombatGameModeClass::Combat_Keyboard( void )
 #else
 	bool to_menu=Input::Get_State( INPUT_FUNCTION_MENU_TOGGLE );
 	// If game doesn't have a focus and combat is active, suspend combat by entering menu
-	if (!GameInFocus) {
+	if (!GameInFocus && !GameModeManager::Should_Run_Unfocused()) {
 		if (IS_SOLOPLAY && COMBAT_CAMERA && !COMBAT_CAMERA->Is_In_Cinematic() ) {
 			to_menu|=GameModeManager::Find( "Combat" )->Is_Active();
 		}

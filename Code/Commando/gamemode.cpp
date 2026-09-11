@@ -45,6 +45,8 @@
 #include "thread.h"
 #include <stdio.h>
 #include "backgroundmgr.h"
+#include "registry.h"
+#include "_globals.h"
 #include "render2d.h"
 #include "dazzle.h"
 #include "combat.h"
@@ -228,7 +230,9 @@ void	GameModeManager::Render( void )
 		DX8RendererDebugger::Update();
 
 		bool do_pscene = (COMBAT_SCENE != NULL) && !cNetwork::I_Am_Only_Server();
-		if (!GameInFocus) do_pscene=false;	// Don't render the game scene if the applicationisn't active
+		//	Rendering while another window has focus is the point of running
+		//	unfocused; without it the window sits on a stale frame.
+		if (!GameInFocus && !Should_Run_Unfocused()) do_pscene=false;
 		if (do_pscene) {
 
 			//
@@ -246,7 +250,7 @@ void	GameModeManager::Render( void )
 			WW3D::Begin_Render (clear, clear, BackgroundMgrClass::Get_Clear_Color());
 		}
 
-		if (GameInFocus) {
+		if (GameInFocus || Should_Run_Unfocused()) {
 			WWPROFILE( "Render Game Modes" );
 			for (	SLNode<GameModeClass> *game_mode_node = GameModeList.Head();
 					game_mode_node != NULL;
@@ -288,8 +292,9 @@ void	GameModeManager::Render( void )
 		}
 		*/
 
-		// Only update the movie when the application is active
-		if (GameInFocus) {
+		// Movies keep playing too, or a cutscene stalls on alt-tab and the
+		// audio runs on without it.
+		if (GameInFocus || Should_Run_Unfocused()) {
 			WWPROFILE( "BINK" );
 			BINKMovie::Render();
 		}
@@ -321,6 +326,28 @@ void	GameModeManager::Render( void )
 void GameModeManager::Hide_Render_Frames(unsigned frame_count)
 {
 	_HiddenFrameCount=frame_count;
+}
+
+/*
+**	See the comment on the declaration. Read once and remembered, because this
+**	is asked every frame.
+*/
+bool GameModeManager::Should_Run_Unfocused( void )
+{
+	static bool _known = false;
+	static bool _run_unfocused = true;
+
+	if ( !_known ) {
+		_known = true;
+
+		RegistryClass registry( APPLICATION_SUB_KEY_NAME_OPTIONS );
+		if ( registry.Is_Valid() ) {
+			_run_unfocused = !registry.Get_Bool( "PauseWhenUnfocused", false );
+			registry.Set_Bool( "PauseWhenUnfocused", !_run_unfocused );
+		}
+	}
+
+	return _run_unfocused;
 }
 
 /*
