@@ -238,7 +238,8 @@ const char *BandwidthCheckerClass::Get_Ping_Server_Name(void)
 		unsigned long total = 0;
 		int lowest = 0xffff;
 		int lowest_index = -1;
-		for (int i=0 ; i<list.Count() ; i++) {
+		int i;
+		for (i=0 ; i<list.Count() ; i++) {
 			int time = reg.Get_Int(list[i].Peek_Buffer(), 0);
 			if (time > 0 && time < 0xffff) {
 				total += (unsigned long) time;
@@ -768,7 +769,8 @@ BandwidthCheckerClass::PackedBandwidthType BandwidthCheckerClass::Get_Packed_Ban
 	*/
 	if (!automode || UpstreamBandwidth != 0) {
 
-		for (int i=0 ; i<NUM_BANDS+1 ; i++) {
+		int i;
+		for (i=0 ; i<NUM_BANDS+1 ; i++) {
 			if (bwu <= Bandwidths[(i*2)+1]) {
 				bandwidth.Bandwidth.Up = i;
 				break;

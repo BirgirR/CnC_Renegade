@@ -1179,7 +1179,8 @@ void Ping_Profile(SOCKADDR_IN *router_addr, unsigned long my_ip)
 	float min_ping = 10000.0f;
 	float max_ping = -1.0f;
 
-	for (int i=0 ; i<ping_number ; i++) {
+	int i;
+	for (i=0 ; i<ping_number ; i++) {
 		min_ping = min(min_ping, ping_averages[i]);
 		max_ping = max(max_ping, ping_averages[i]);
 	}

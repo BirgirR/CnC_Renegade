@@ -292,6 +292,12 @@ target_compile_definitions(renegade_common INTERFACE
     _WIN32_WINNT=0x0601
     _CRT_SECURE_NO_WARNINGS
     _WINSOCK_DEPRECATED_NO_WARNINGS
+    # dinput.h exposes different struct layouts per version, so every
+    # translation unit that sees it has to agree. Four files defined this
+    # before including it and three relied on the SDK's fallback; they
+    # happened to agree on 0x0800, which is the version the code actually
+    # uses (DirectInput8Create, IID_IDirectInput8). Stated once here instead.
+    DIRECTINPUT_VERSION=0x0800
     # VC6's time_t was a 32-bit long and the code stores it in longs. Modern
     # MSVC defaults to a 64-bit time_t, which breaks every ctime/time call site.
     _USE_32BIT_TIME_T
@@ -304,10 +310,6 @@ target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/EHsc>
     # this code predates two-phase lookup conformance
     $<$<COMPILE_LANGUAGE:C,CXX>:/permissive>
-    # VC6 leaked the for-loop variable into the enclosing scope. MSVC reports
-    # this switch as deprecated (D9035) once per translation unit; the noise is
-    # the price of not hand-fixing ~170 leaked loop variables.
-    $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:forScope->
     # VC6 treated wchar_t as unsigned short
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:wchar_t->
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->

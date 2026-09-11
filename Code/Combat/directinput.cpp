@@ -40,7 +40,6 @@
 #include "timemgr.h"
 
 
-#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 /*
@@ -518,7 +517,8 @@ void DirectInput::ReadMouse( void )
 {
 	if ( DIMouseDevice == NULL ) return;
 
-	for (int i = 0; i < sizeof( DIMouseButtons ); i++ ) {
+	int i;
+	for (i = 0; i < sizeof( DIMouseButtons ); i++ ) {
 		DIMouseButtons[i] &= DI_BUTTON_HELD;	// make off all but the STATE
 	}
 

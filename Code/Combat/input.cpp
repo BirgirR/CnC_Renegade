@@ -55,7 +55,6 @@
 #include <string.h>
 
 
-#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
 #include <stdio.h>
@@ -942,7 +941,8 @@ void	Input::Update( void )
 		//
 		//	Update the value of each function based on what keys are down
 		//
-		for (int index = 0; index < INPUT_FUNCTION_COUNT; index ++) {
+		int index;
+		for (index = 0; index < INPUT_FUNCTION_COUNT; index ++) {
 
 			float value1 = Get_Value (index, FunctionPrimaryKeys[index], 1.0F);
 			float value2 = Get_Value (index, FunctionSecondaryKeys[index], 1.0F);
@@ -1198,7 +1198,8 @@ const char *Input::Get_Key_Name( short key_id )
 	//
 	// Check each button name
 	//
-	for (int index = 0; index < NUM_BUTTON_NAMES; index ++) {
+	int index;
+	for (index = 0; index < NUM_BUTTON_NAMES; index ++) {
 		if (ButtonNames[index].ID == key_id) {
 			return ButtonNames[index].Name;
 		}
@@ -1227,7 +1228,8 @@ short	Input::Get_Key( const char *name )
 		//
 		// Check each button name
 		//
-		for (int index = 0; index < NUM_BUTTON_NAMES; index ++) {
+		int index;
+		for (index = 0; index < NUM_BUTTON_NAMES; index ++) {
 			if (::stricmp (name, ButtonNames[index].Name) == 0) {
 				return ButtonNames[index].ID;
 			}

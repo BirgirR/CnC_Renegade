@@ -1158,7 +1158,8 @@ void PointGroupClass::Update_Arrays(
    			float y_scale = (VPYMax - VPYMin) / yres;
    
 				Vector3 scaled_locs[2][3];
-				for (int i_inner = 0; i_inner < 2; i_inner++) {
+				int i_inner;
+				for (i_inner = 0; i_inner < 2; i_inner++) {
 					for (int j_inner = 0; j_inner < 3; j_inner++) {
 						scaled_locs[i_inner][j_inner].X = _ScreenspaceVertexLocationSizeTable[i_inner][j_inner].X * x_scale;
 						scaled_locs[i_inner][j_inner].Y = _ScreenspaceVertexLocationSizeTable[i_inner][j_inner].Y * y_scale;
@@ -1192,7 +1193,8 @@ void PointGroupClass::Update_Arrays(
    			float y_scale = (VPYMax - VPYMin) / yres;
    
 				Vector3 scaled_locs[2][3];
-				for (int i_inner = 0; i_inner < 2; i_inner++) {
+				int i_inner;
+				for (i_inner = 0; i_inner < 2; i_inner++) {
 					for (int j_inner = 0; j_inner < 3; j_inner++) {
 						scaled_locs[i_inner][j_inner].X = _ScreenspaceVertexLocationSizeTable[i_inner][j_inner].X * x_scale;
 						scaled_locs[i_inner][j_inner].Y = _ScreenspaceVertexLocationSizeTable[i_inner][j_inner].Y * y_scale;

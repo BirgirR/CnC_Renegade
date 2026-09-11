@@ -1760,7 +1760,8 @@ void ChatObserver::Kick_Spammer(WOL::User *wol_user)
 	const unsigned int count = user_list.size();
 	unsigned long ip = 0;
 
-	for (unsigned int index = 0; index < count; index++) {
+	unsigned int index;
+	for (index = 0; index < count; index++) {
 		const RefPtr<UserData>& user = user_list[index];
 		if (user.IsValid()) {
 			WOL::User userdata = user->GetData();

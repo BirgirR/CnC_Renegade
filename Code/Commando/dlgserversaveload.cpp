@@ -97,7 +97,8 @@ ServerSaveLoadMenuClass::On_Init_Dialog (void)
 		ServerSettingsManagerClass::Scan();
 		int count = ServerSettingsManagerClass::Get_Num_Settings_Files();
 
-		for (int index = 0; index < count; index ++) {
+		int index;
+		for (index = 0; index < count; index ++) {
 
 			//
 			//	Get information about this configuration
@@ -900,7 +901,8 @@ ServerSettingsClass *ServerSettingsManagerClass::Add_Configuration(WideStringCla
 			char filename[MAX_PATH];
 			int file_number = -1;
 
-			for (int i=0 ; i<ServerSettingsList.Count() ; i++) {
+			int i;
+			for (i=0 ; i<ServerSettingsList.Count() ; i++) {
 				ServerSettingsClass *settings = ServerSettingsList[i];
 				if (settings) {
 					WWASSERT(settings->FileNumber >= 0);

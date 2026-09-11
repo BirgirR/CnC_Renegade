@@ -313,7 +313,8 @@ int PacketManagerClass::Build_Delta_Packet_Patch(unsigned char *base_packet, uns
 		bool chunks = false;
 		bool this_match = false;
 
-		for (int i=0 ; i<base_packet_size - 7 ; i+=8) {
+		int i;
+		for (i=0 ; i<base_packet_size - 7 ; i+=8) {
 
 			this_match = false;
 
