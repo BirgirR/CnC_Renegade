@@ -219,6 +219,20 @@ builds from itself plus the Windows SDK. New third-party dependencies that mean 
 download, an SDK install or a redistributable defeat that; a stub or a
 Windows-SDK-based implementation is strongly preferred.
 
+**Never commit game data or the retail runtimes.** `Run/` is gitignored for a
+reason, and it is not only tidiness. The game's data — the `.mix` archives,
+`Always2.dat`, the `.bik` movies — is EA's, and the source release covers the
+code, not the assets. `mss32.dll`, `Mp3dec.asi`, the `*.m3d` providers and
+`binkw32.dll` are not even EA's: they are RAD Game Tools' runtimes, licensed to
+ship alongside the retail game and carrying no right to redistribute. This
+applies to release archives and CI artifacts exactly as it does to commits.
+
+That is why the loaders bind those DLLs with `LoadLibrary` from the copy the
+player already owns, rather than linking them. It costs nothing at build time
+and means we ship none of it. Adding a "convenience" copy of any of those files
+to make setup easier would undo it, so please do not — the README's table
+telling people what to copy from their own install is the supported answer.
+
 **It is 32-bit.** Inline assembly and pointer-size assumptions are pervasive, so
 new code should not assume otherwise. An actual x64 port would be very welcome,
 but as a deliberate piece of work rather than incidentally.
