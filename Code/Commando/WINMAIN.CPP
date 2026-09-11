@@ -222,15 +222,6 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	}
 #endif //WWDEBUG
 
-#ifdef _DEBUG // Denzil - DO NOT COMPILE INTO FINAL BUILD
-	bool webInstalled = WebBrowser::InstallPrerequisites();
-
-	if (!webInstalled) {
-		::MessageBox(NULL, "Embedded browser prerequisites missing\n\nBrowser functionality questionable.\n\n(Please call Denzil @ 27272)",
-				"Renegade Warning!", MB_ICONWARNING|MB_OK);
-	}
-#endif // WWDEBUG
-
    if (!cUserOptions::Parse_Command_Line(lpCmdLine)) {
 		return(0);
 	}

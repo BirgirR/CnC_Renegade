@@ -79,13 +79,6 @@ class WebBrowser :
 		public Notifier<WebEvent>
 	{
 	public:
-		// Initialize browser prerequisites.
-		// NOTE: This is for development purpose only; The game installer should handle
-		//       these tasks.
-		#ifdef _DEBUG
-		static bool InstallPrerequisites(void);
-		#endif
-
 		//! Test if a web page is currently displayed
 		static bool IsWebPageDisplayed(void);
 
