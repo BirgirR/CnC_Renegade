@@ -496,10 +496,14 @@ if(RENEGADE_BUILD_SCRIPTS)
     # build here IS the Profile configuration and loads SCRIPTSP.DLL. Naming
     # this "Scripts" made LoadLibrary fail and silently left the game with no
     # mission scripts at all.
+    #
+    # In the default target, not EXCLUDE_FROM_ALL: without this DLL the game
+    # loads and runs, but every mission is inert -- no enemy AI, no scripted
+    # events -- and the only evidence is one line in the log. RENEGADE_BUILD_SCRIPTS
+    # above is the switch for skipping it deliberately.
     set_target_properties(renegade_scripts PROPERTIES
         FOLDER "Game"
-        OUTPUT_NAME "$<IF:$<CONFIG:Debug>,ScriptsD,ScriptsP>"
-        EXCLUDE_FROM_ALL ON)
+        OUTPUT_NAME "$<IF:$<CONFIG:Debug>,ScriptsD,ScriptsP>")
 endif()
 
 # -----------------------------------------------------------------------------
