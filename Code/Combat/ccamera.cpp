@@ -35,6 +35,8 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "ccamera.h"
+#include "ww3d.h"
+#include <math.h>
 #include "timemgr.h"
 #include "physicalgameobj.h"
 #include "physcoltest.h"
@@ -246,7 +248,6 @@ const CCameraProfileClass & CCameraProfileClass::operator = ( const CCameraProfi
 //	Name					= src.Name;
 	FOV					= src.FOV;
 	Height				= src.Height;
-	ViewTilt				= src.ViewTilt;
 	TiltTweak			= src.TiltTweak;
 	TranslationTilt	= src.TranslationTilt;
 	Distance				= src.Distance;
@@ -293,6 +294,49 @@ CCameraProfileClass	*	CCameraProfileClass::Find( const char * name )
 //	return NULL;
 }
 
+/*
+**	Apply a field of view, corrected for the shape of the window.
+**
+**	CameraClass has a fixed AspectRatio of 4:3 and nothing in the tree ever
+**	changes it, so Set_View_Plane(hfov) always builds a 4:3 view plane. Render
+**	that into a 16:9 window and the result is stretched horizontally by a third:
+**	the game was written when 4:3 was the only shape a monitor came in.
+**
+**	The correction keeps the vertical field of view the original had and widens
+**	the horizontal to suit the window -- "Hor+", which shows more to the sides
+**	rather than less above and below. Taking it the other way would obey the
+**	hfov the profiles ask for but quietly crop the top and bottom of the view
+**	the mission designers framed.
+**
+**	Narrower than 4:3 is left alone: the game's own FOV is then the sensible
+**	answer, and widening vertically would be a change nobody asked for.
+*/
+static void	Set_Corrected_View_Plane( CameraClass *camera, float hfov )
+{
+	int width = 0, height = 0, bits = 0;
+	bool windowed = false;
+	WW3D::Get_Render_Target_Resolution( width, height, bits, windowed );
+
+	if ( width <= 0 || height <= 0 ) {
+		camera->Set_View_Plane( hfov );
+		return;
+	}
+
+	const float aspect = (float)width / (float)height;
+	const float original_aspect = 4.0f / 3.0f;
+
+	if ( aspect <= original_aspect ) {
+		camera->Set_View_Plane( hfov );
+		return;
+	}
+
+	//	The vertical the original 4:3 projection would have produced, kept as is.
+	const float vfov = 2.0f * (float)atan( tan( hfov / 2.0f ) / original_aspect );
+	const float wide_hfov = 2.0f * (float)atan( tan( vfov / 2.0f ) * aspect );
+
+	camera->Set_View_Plane( wide_hfov, vfov );
+}
+
 
 /*
 ** CCameraClass 
@@ -331,7 +375,7 @@ CCameraClass::CCameraClass() :
 	DisableLag( false )
 {
 	Set_Clip_Planes( NearClipPlane, FarClipPlane );
-	Set_View_Plane( DEG_TO_RAD( 90.0 ) );
+	Set_Corrected_View_Plane( this, DEG_TO_RAD( 90.0 ) );
 
 	SniperListener = new Listener3DClass;
 
@@ -605,7 +649,7 @@ void	CCameraClass::Use_Host_Model( void )
 	if ( !CinematicSnipingEnabled ) {
 		CurrentProfile->FOV = DEG_TO_RADF( 75.0f );
 	}
-	Set_View_Plane( CurrentProfile->FOV );
+	Set_Corrected_View_Plane( this, CurrentProfile->FOV );
 
 #ifdef ATI_DEMO_HACK
 	static GameObjReference DemoFocusObject;
@@ -816,7 +860,7 @@ void CCameraClass::Update()
 		LastHeading	= Heading;
 	}
 
-	Set_View_Plane( profile.FOV );	// Apply Zoom
+	Set_Corrected_View_Plane( this, profile.FOV );	// Apply Zoom
 
 
 	// Calculate the Camera Transform
