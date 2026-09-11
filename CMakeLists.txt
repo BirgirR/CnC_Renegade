@@ -174,7 +174,37 @@ endif()
 # intros are skipped rather than hung. See Code/Stubs/bink/include/Bink.h.
 # -----------------------------------------------------------------------------
 
+# libbinkdec decodes Bink 1 itself, so the movies play with no retail DLL at
+# all. Vendored under Code/ThirdParty/libbinkdec: LGPL-2.1-or-later, derived
+# from FFmpeg's Bink decoder, and self-contained -- every include it has is
+# standard library, so it costs the build nothing.
+#
+# It handles BIKf/g/h/i and explicitly not BIKb. Renegade's movies are all
+# BIKi, checked across all fourteen files in Data/Movies.
+option(RENEGADE_BINK_DECODER
+    "Decode Bink with the vendored libbinkdec when binkw32.dll is absent" ON)
+
+if(RENEGADE_BINK_DECODER)
+    file(GLOB BINKDEC_SOURCES
+        "${CODE}/ThirdParty/libbinkdec/src/*.cpp"
+        "${CODE}/ThirdParty/libbinkdec/src/*.c")
+
+    add_library(binkdec STATIC ${BINKDEC_SOURCES})
+    target_include_directories(binkdec PUBLIC "${CODE}/ThirdParty/libbinkdec/include")
+    # Third-party code, built at its own warning level rather than ours, and
+    # never with /permissive or the VC6 compatibility switches.
+    target_compile_options(binkdec PRIVATE /W0 /EHsc)
+    set_target_properties(binkdec PROPERTIES FOLDER "ThirdParty")
+endif()
+
 add_library(bink STATIC "${STUBS}/bink/bink_loader.cpp")
+
+if(RENEGADE_BINK_DECODER)
+    # xaudio2 plays the movie soundtrack; it ships in Windows, so this stays
+    # dependency-free.
+    target_link_libraries(bink PRIVATE binkdec xaudio2)
+    target_compile_definitions(bink PRIVATE RENEGADE_BINK_DECODER)
+endif()
 target_include_directories(bink PUBLIC "${STUBS}/bink/include")
 set_target_properties(bink PROPERTIES FOLDER "ThirdParty")
 

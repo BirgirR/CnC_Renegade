@@ -24,8 +24,10 @@ and [Steam](https://store.steampowered.com/bundle/39394/Command__Conquer_The_Ult
 - Visual Studio 2019 or newer, with the **x86** C++ toolset and the Windows SDK
 - CMake 3.20 or newer
 
-32-bit only. Thirty-five files contain x86 inline assembly, so there is no x64
-configuration short of a substantial further port.
+32-bit only, deliberately. Around twenty files carry x86 inline assembly, but the
+binding constraint is that the retail `mss32.dll` and `binkw32.dll` are 32-bit
+and are loaded at runtime: a 64-bit build could load neither, and would trade the
+original audio mix and original movie playback for nothing a 2002 game needs.
 
 
 ## Building
@@ -68,11 +70,14 @@ loaded by name at startup and are not required to build:
 | Copy from your install | For |
 | --- | --- |
 | `mss32.dll`, `*.m3d`, `Mp3dec.asi` | effects, 3D audio and MP3 music |
-| `binkw32.dll`, `Data/Movies/` | the intro and mission movies |
+| `Data/Movies/` | the intro and mission movies |
+| `binkw32.dll` | optional — plays those movies through the original decoder |
 
 Anything missing degrades quietly rather than failing: no `mss32.dll` means a
-silent game, no `binkw32.dll` means movies are skipped. `Run/_audio.txt` and
-`Run/_bink.txt` record which backend bound and what it opened.
+silent game, and without `binkw32.dll` the movies are decoded by the vendored
+libbinkdec instead, so only `Data/Movies/` is really needed for them to play.
+`Run/_audio.txt` and `Run/_bink.txt` record which backend bound and what it
+opened.
 
 ### Build options
 
@@ -80,6 +85,7 @@ silent game, no `binkw32.dll` means movies are skipped. `Run/_audio.txt` and
 | --- | --- | --- |
 | `RENEGADE_MILES_RUNTIME` | `ON` | Bind the retail `mss32.dll` at runtime; music included. `OFF` uses the XAudio2 backend. |
 | `RENEGADE_XAUDIO2_AUDIO` | `ON` | The self-contained backend (XAudio2 + Media Foundation), used when `RENEGADE_MILES_RUNTIME` is `OFF`. |
+| `RENEGADE_BINK_DECODER` | `ON` | Decode movies with the vendored libbinkdec when `binkw32.dll` is absent. |
 | `RENEGADE_MILES_STUB` | `ON` | `OFF` links the real Miles 6 SDK from `Code/Miles6/`, if you have it. |
 | `RENEGADE_BUILD_SCRIPTS` | `ON` | Build the mission-script DLL. |
 | `RENEGADE_BUILD_TESTS` | `ON` | Build the `wwmath`/`wwlib` unit tests. |
@@ -122,13 +128,15 @@ implementation under `Code/Stubs/`:
   decoding the MP3 music out of the MIX archives. All three are part of the
   Windows SDK and ship in Windows, so that build needs no retail runtime at all.
   A silent stub is the last fallback, and a missing `mss32.dll` degrades to it.
-- **Bink** — bound to `binkw32.dll` at runtime, the way Direct3D 9 is. The retail
-  game ships that DLL beside its executable, so anyone who owns Renegade already
-  has a licensed decoder and the movies play as they originally did; nothing of
-  RAD’s is redistributed and nothing is needed to build. Copy `binkw32.dll` and
-  `Data/Movies/` from your install into `Run/` to get them. Without the DLL,
-  `BinkOpen` fails and the player treats every movie as finished, so intros are
-  skipped rather than hanging.
+- **Bink** — two ways, neither of them a download. With `binkw32.dll` present —
+  the retail game ships it beside its executable — it is bound at runtime and the
+  movies play exactly as they originally did. Without it, the vendored
+  **libbinkdec** (`Code/ThirdParty/libbinkdec`, LGPL-2.1-or-later, derived from
+  FFmpeg's Bink decoder) decodes them here instead, with the soundtrack on
+  XAudio2 and the video paced from the audio clock. Either way you need
+  `Data/Movies/` from your install, and nothing of RAD's is redistributed. With
+  both compiled out, `BinkOpen` fails and the player treats every movie as
+  finished, so intros are skipped rather than hanging.
 - **GameSpy** — the services shut down in 2014. The used surface is four `qr_*`
   and five `gcd_*` calls, so it is stubbed; the cost is the server browser and
   CD-key validation, not the game.
