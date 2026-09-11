@@ -361,7 +361,6 @@ void BINKMovieClass::Render()
 		Renderer.Set_Texture(TextureInfos[t].Texture);
 		Renderer.Set_Coordinate_Range(RectClass(0.0f, 0.0f, 1.0f, 1.0f));//Bink->Width,Bink->Height));
 
-		RectClass rect(TextureInfos[t].TextureLocX, TextureInfos[t].TextureLocY, TextureInfos[t].TextureWidth, TextureInfos[t].TextureHeight);
 		Renderer.Add_Quad(TextureInfos[t].Rect, TextureInfos[t].UV, 0xffffffff);
 		Renderer.Render();
 	}
