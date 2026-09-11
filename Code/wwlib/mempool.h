@@ -56,6 +56,8 @@
 #include <new.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <typeinfo>
 
 
 
@@ -199,7 +201,30 @@ ObjectPoolClass<T,BLOCK_SIZE>::ObjectPoolClass(void) :
 template<class T,int BLOCK_SIZE> 
 ObjectPoolClass<T,BLOCK_SIZE>::~ObjectPoolClass(void)
 {
-	// assert that the user gave back all of the memory he was using
+	/*
+	**	Assert that the user gave back all of the memory he was using -- and say
+	**	which pool did not.
+	**
+	**	This fires at shutdown, rarely, and the assert alone reports only
+	**	mempool.h and a line number. Every pool in the game shares them, because
+	**	this is a template: list nodes, sound scene nodes, weather particles,
+	**	animation channels. That is not enough to act on, and the failure is too
+	**	infrequent to go looking for on purpose -- it depends on what happened to
+	**	still be alive when the player quit.
+	**
+	**	So the name is written down instead. The next occurrence, whenever it
+	**	comes, arrives already diagnosed. Nothing is paid for this until the
+	**	check has already failed.
+	*/
+	if (FreeObjectCount != TotalObjectCount) {
+		FILE *f = fopen("_pool.txt", "at");
+		if (f != NULL) {
+			fprintf(f, "pool leak: %s, %d of %d objects returned (%d outstanding)\n",
+					  typeid(T).name(), FreeObjectCount, TotalObjectCount,
+					  TotalObjectCount - FreeObjectCount);
+			fclose(f);
+		}
+	}
 	WWASSERT(FreeObjectCount == TotalObjectCount);
 
 	// delete all of the blocks we allocated
