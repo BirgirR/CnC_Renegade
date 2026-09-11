@@ -164,8 +164,20 @@ BINKMovieClass::BINKMovieClass(const char* filename, const char* subtitlename, F
 	unsigned max_height = poweroftwoheight;
 	unsigned x, y;
 
-	for (y = 0; y < Bink->Height; y += max_height-2) {		// Two pixels are lost due to duplicated edges to prevent bilinear artifacts
-		for (x = 0; x < Bink->Width; x += max_width-2) {
+	/*
+	**	This counting pass has to step exactly as the creating pass below does,
+	**	or TextureCount and the number of TextureInfos actually filled in do not
+	**	agree. It stepped by max-2 while the loop below steps by max-1, so it
+	**	counted more tiles than were built and Render walked off the end of the
+	**	initialised entries.
+	**
+	**	Latent rather than fatal: a frame only needs more than one tile when it
+	**	does not fit a single power-of-two texture, and anything made this
+	**	century allows 16384. Renegade's movies are 800x600, so both passes
+	**	produce exactly one.
+	*/
+	for (y = 0; y < Bink->Height; y += max_height-1) {
+		for (x = 0; x < Bink->Width; x += max_width-1) {
 			++TextureCount;
 		}
 	}
@@ -182,23 +194,35 @@ BINKMovieClass::BINKMovieClass(const char* filename, const char* subtitlename, F
 			TextureInfos[cnt].TextureLocX = x;
 			TextureInfos[cnt].TextureLocY = y;
 			TextureInfos[cnt].TextureWidth = max_width;
-			TextureInfos[cnt].UV.Right = float(max_width) / float(max_width);
 
 			if ((TextureInfos[cnt].TextureWidth + x) > Bink->Width) {
 				TextureInfos[cnt].TextureWidth = Bink->Width - x;
-				TextureInfos[cnt].UV.Right = float(TextureInfos[cnt].TextureWidth - 1) / float(max_width);
 			}
 
 			TextureInfos[cnt].TextureHeight = max_height;
-			TextureInfos[cnt].UV.Bottom = float(max_height) / float(max_height);
 
 			if ((TextureInfos[cnt].TextureHeight + y) > Bink->Height) {
 				TextureInfos[cnt].TextureHeight = Bink->Height - y;
-				TextureInfos[cnt].UV.Bottom = float(TextureInfos[cnt].TextureHeight + 1) / float(max_height);
 			}
 
-			TextureInfos[cnt].UV.Left = 1.0f / float(max_width);
-			TextureInfos[cnt].UV.Top = 1.0f / float(max_height);
+			/*
+			**	The texture is a power of two and the frame rarely fills it --
+			**	800x600 of picture in 1024x1024 -- so only [0, TextureWidth) by
+			**	[0, TextureHeight) ever gets written. These coordinates have to
+			**	stay inside that, and land on texel centres so bilinear filtering
+			**	does not fetch a neighbour.
+			**
+			**	They did not. The right edge subtracted a whole texel while the
+			**	bottom edge ADDED one, which put the last rows sampled at 600 and
+			**	601 of a texture only written to 599: the bottom of every frame
+			**	was blended against uninitialised memory, which is the line along
+			**	the bottom of the picture. Left and top were inset by a full texel
+			**	rather than half, quietly dropping the first row and column.
+			*/
+			TextureInfos[cnt].UV.Left	= 0.5f / float(max_width);
+			TextureInfos[cnt].UV.Top		= 0.5f / float(max_height);
+			TextureInfos[cnt].UV.Right	= (float(TextureInfos[cnt].TextureWidth) - 0.5f) / float(max_width);
+			TextureInfos[cnt].UV.Bottom	= (float(TextureInfos[cnt].TextureHeight) - 0.5f) / float(max_height);
 
 			TextureInfos[cnt].Rect.Left = float(TextureInfos[cnt].TextureLocX) / float(Bink->Width);
 			TextureInfos[cnt].Rect.Top = float(TextureInfos[cnt].TextureLocY) / float(Bink->Height);
