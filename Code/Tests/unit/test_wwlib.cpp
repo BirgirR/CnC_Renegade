@@ -16,6 +16,7 @@
 #include "index.h"
 #include "realcrc.h"
 #include "random.h"
+#include "regexpr.h"
 
 //-----------------------------------------------------------------------------
 //	StringClass
@@ -301,4 +302,104 @@ WWTEST(Random, SeedIsReproducible)
 	for (int i = 0; i < 32; ++i) {
 		CHECK_EQ((long)a(), (long)b());
 	}
+}
+
+//-----------------------------------------------------------------------------
+//	RegularExpressionClass
+//
+//	Nothing in the game calls this class, which is how it came to be excluded
+//	from the build for years -- so these tests are the only thing standing
+//	between its implementation and silent rot.
+//
+//	They pin the two behaviours that are easy to get wrong when reimplementing
+//	it: POSIX extended syntax, and matching anchored at the start of the string
+//	rather than searching anywhere within it.
+//-----------------------------------------------------------------------------
+
+WWTEST(RegularExpression, CompileAndValidity)
+{
+	RegularExpressionClass empty;
+	CHECK(!empty.Is_Valid());
+
+	RegularExpressionClass good("abc");
+	CHECK(good.Is_Valid());
+
+	//	Unbalanced bracket: invalid, and the object must say so rather than
+	//	throw or half-compile.
+	RegularExpressionClass bad("[abc");
+	CHECK(!bad.Is_Valid());
+
+	//	Compiling over a valid expression with an invalid one leaves it invalid.
+	CHECK(good.Compile("(unclosed") == false);
+	CHECK(!good.Is_Valid());
+}
+
+WWTEST(RegularExpression, MatchesFromTheStart)
+{
+	RegularExpressionClass expr("abc");
+	CHECK(expr.Is_Valid());
+
+	CHECK(expr.Match("abc"));
+	CHECK(expr.Match("abcdef"));		// need not reach the end
+
+	//	The original used re_match, not re_search: a match has to begin at the
+	//	first character. A search would accept this one, and should not.
+	CHECK(!expr.Match("xxabc"));
+	CHECK(!expr.Match("ab"));
+	CHECK(!expr.Match(""));
+}
+
+WWTEST(RegularExpression, ExtendedSyntax)
+{
+	//	( ) | + ? { } are operators without backslashes in POSIX extended
+	//	syntax, which is what the GNU flags this class used described.
+	RegularExpressionClass alt("(cat|dog)s?");
+	CHECK(alt.Is_Valid());
+	CHECK(alt.Match("cat"));
+	CHECK(alt.Match("dogs"));
+	CHECK(!alt.Match("bird"));
+
+	RegularExpressionClass interval("a{2,3}b");
+	CHECK(interval.Is_Valid());
+	CHECK(!interval.Match("ab"));
+	CHECK(interval.Match("aab"));
+	CHECK(interval.Match("aaab"));
+
+	RegularExpressionClass classes("[[:digit:]]+");
+	CHECK(classes.Is_Valid());
+	CHECK(classes.Match("2002"));
+	CHECK(!classes.Match("x1"));
+}
+
+WWTEST(RegularExpression, EmptyMatchIsAMatch)
+{
+	//	Zero characters matched is a match, and distinct from no match at all.
+	RegularExpressionClass expr("x*");
+	CHECK(expr.Is_Valid());
+	CHECK(expr.Match("xxx"));
+	CHECK(expr.Match("yyy"));		// matches zero x's at position zero
+}
+
+WWTEST(RegularExpression, CopyAssignAndCompare)
+{
+	RegularExpressionClass a("ab+c");
+	RegularExpressionClass b(a);
+
+	CHECK(b.Is_Valid());
+	CHECK(b.Match("abbc"));
+	CHECK(a == b);
+	CHECK(!(a != b));
+
+	RegularExpressionClass c("different");
+	CHECK(a != c);
+
+	c = a;
+	CHECK(a == c);
+	CHECK(c.Match("abc"));
+
+	//	Two invalid expressions compare equal; valid never equals invalid.
+	RegularExpressionClass bad1("[");
+	RegularExpressionClass bad2("(");
+	CHECK(bad1 == bad2);
+	CHECK(a != bad1);
 }

@@ -559,16 +559,21 @@ add_executable(commando WIN32 ${commando_sources} "${CODE}/Commando/chat.rc")
 # Renegade.ico from the same folder.
 target_include_directories(commando PRIVATE "${CODE}/Commando")
 
-# The excluded translation units define symbols the rest of the game references
-# -- cUserOptions::NetUpdateRate, GameInitMgrClass::End_Game,
-# ScriptManager::Create_Script, SoldierGameObj::Perturb_Position and others --
-# so while any of them are skipped the executable cannot link, however cleanly
-# the libraries build. Keep it out of the default target rather than making
-# every build end in a wall of LNK2001, but leave it buildable on request:
+# An excluded translation unit usually defines symbols the rest of the game
+# references -- cUserOptions::NetUpdateRate, GameInitMgrClass::End_Game,
+# ScriptManager::Create_Script, SoldierGameObj::Perturb_Position and the like --
+# so while any are skipped the executable cannot link, however cleanly the
+# libraries build. Rather than end every build in a wall of LNK2001, the game is
+# kept out of the default target whenever anything is actually being skipped.
+#
+# Nothing is, now that regexpr.cpp compiles, so `cmake --build build` produces
+# the game as you would expect. Exclude something again and this reverts to
+# libraries only, with the game still buildable on request:
 #
 #   cmake --build build --target commando
 #
-if(RENEGADE_EXCLUDE_UNPORTED)
+list(LENGTH RENEGADE_UNPORTED_SOURCES unported_count)
+if(RENEGADE_EXCLUDE_UNPORTED AND unported_count GREATER 0)
     set_target_properties(commando PROPERTIES EXCLUDE_FROM_ALL ON)
 endif()
 

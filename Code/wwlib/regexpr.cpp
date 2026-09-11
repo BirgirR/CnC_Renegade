@@ -18,30 +18,34 @@
 
 // regexpr.cpp
 
+//
+// Implemented over the C++ standard library's <regex>.
+//
+// This was written against GNU regex, which the source release does not
+// include and which is GPL in its own right. The class was the only thing in
+// the tree that needed it, and nothing in the tree uses the class, so it had
+// been excluded from the build entirely -- which in turn kept the game
+// executable out of the default target, for one file nobody calls.
+//
+// The behaviour it had is preserved rather than modernised:
+//
+//   * The GNU syntax flags it set -- NO_BK_PARENS, NO_BK_BRACES, NO_BK_VBAR,
+//     INTERVALS, CHAR_CLASSES, CONTEXT_INDEP_ANCHORS and OPS -- describe POSIX
+//     extended regular expressions, which is std::regex::extended.
+//
+//   * Match used re_match, not re_search. re_match anchors at the start of the
+//     string and returns how many characters matched, so a match had to begin
+//     at position zero but did not have to reach the end. match_continuous is
+//     that same rule. A search would quietly accept far more.
+//
+//   * A zero character match is a match, which both agree on.
+//
+
 #include "always.h"
 #include "regexpr.h"
 #include "wwstring.h"
 #include <assert.h>
-
-// Pull in the gnu_regex library's definitions.
-#define __STDC__ 1
-extern "C" {
-#include "gnu_regex.h"
-}
-
-
-// The regular expression syntax options that RegularExpressionClass uses.
-// The dirty details of each option are described in "gnu_regex.h"
-#define OUR_SYNTAX_OPTIONS																									\
-	RE_CHAR_CLASSES |					/* Support character classes such as [:alpha:] and [:digit:] */	\
-	RE_CONTEXT_INDEP_ANCHORS |		/* ^ and $ are always anchors (outside bracket expressions)  */	\
-	RE_CONTEXT_INDEP_OPS |			/* operators such as + * ? are always considered operators   */	\
-	RE_CONTEXT_INVALID_OPS |		/* operators are invalid as the first characters in a string */	\
-	RE_INTERVALS |						/* { } are used to define intervals                          */	\
-	RE_NO_BK_BRACES |					/* { } are interval markers and \{ \} are literals           */	\
-	RE_NO_BK_PARENS |					/* ( ) are group markers and \( \) are literals              */	\
-	RE_NO_BK_VBAR |					/* | is the OR operator and \| is a literal                  */	\
-	RE_NO_EMPTY_RANGES				/* [z-a] is an invalid range but [a-z] is valid              */
+#include <regex>
 
 
 /*
@@ -53,44 +57,25 @@ struct RegularExpressionClass::DataStruct
 	DataStruct (void)
 	:	IsValid(false)
 	{
-		// Blank out the expression structure.
-		memset(&CompiledExpr, 0, sizeof(CompiledExpr));
-	}
-
-	~DataStruct (void)
-	{
-		ClearExpression();
 	}
 
 	void ClearExpression (void)
 	{
-		// If the expression was valid, let the gnu_regex library
-		// deallocate any memory it had allocated for it.
-		if (IsValid)
-			regfree(&CompiledExpr);
-
-		// Blank out the expression structure.
-		memset(&CompiledExpr, 0, sizeof(CompiledExpr));
-
-		// Erase the expression string.
+		//	std::regex owns its own memory, so there is nothing to free here the
+		//	way there was with regfree.
 		ExprString = "";
-
-		// No longer a valid compiled expression.
 		IsValid = false;
 	}
-
 
 	// The regular expression that has been compiled.
 	StringClass	ExprString;
 
-	// gnu_regex compiled version of the regular expression used
-	// during matching or any form of evaluation
-	regex_t		CompiledExpr;
+	// Compiled form, used during matching. Only meaningful when IsValid.
+	std::regex	Compiled;
 
-	// True if CompiledExpr is valid.
+	// True if Compiled is valid.
 	bool			IsValid;
 };
-
 
 
 /*
@@ -142,25 +127,24 @@ bool RegularExpressionClass::Compile (const char *expression)
 	// call Compile() twice on one object.
 	Data->ClearExpression();
 
-	// Set the regular expression module to the syntax that we
-	// would like to use.
-	reg_syntax_t old_syntax = re_set_syntax(OUR_SYNTAX_OPTIONS);
+	if (expression == 0)
+		return false;
 
-	// Compile the given expression.
-	const char *error_str = re_compile_pattern(expression,
-		strlen(expression), &Data->CompiledExpr);
-
-	// Restore the old syntax setting.
-	re_set_syntax(old_syntax);
-
-	// If no error string was returned, the expression was good!
-	if (error_str == 0)
+	//	A malformed expression is reported by throwing, where GNU regex returned
+	//	an error string. Either way the answer to the caller is false, and the
+	//	object is left invalid rather than half compiled.
+	try
 	{
-		Data->IsValid = true;
-		Data->ExprString = expression;
-		return true;
+		Data->Compiled.assign(expression, std::regex::extended);
 	}
-	return false;
+	catch (const std::regex_error &)
+	{
+		return false;
+	}
+
+	Data->IsValid = true;
+	Data->ExprString = expression;
+	return true;
 }
 
 
@@ -176,27 +160,13 @@ bool RegularExpressionClass::Match (const char *string) const
 	assert(Data);
 
 	// If we have no valid compiled expression, we can't match Jack.
-	if (!Data->IsValid)
+	if (!Data->IsValid || string == 0)
 		return false;
 
-	// Set the regular expression module to the syntax that we
-	// would like to use.
-	reg_syntax_t old_syntax = re_set_syntax(OUR_SYNTAX_OPTIONS);
-
-	// Try to match the given string with our regular expression.
-	int retval = re_match(&Data->CompiledExpr, string, strlen(string), 0, 0);
-
-	// Restore the old syntax setting.
-	re_set_syntax(old_syntax);
-
-	// -1 means no match, -2 means internal gnu_regex lib error, otherwise
-	// re_match returned the number of characters matched. A 0 character
-	// match is valid, and distinctly different than no match at all.
-	if (retval < 0)
-		return false;
-
-	// The given string matched our regular expression!
-	return true;
+	//	match_continuous is re_match's rule: the match has to start at the
+	//	beginning of the string, and may end anywhere at or after it.
+	return std::regex_search(string, Data->Compiled,
+									 std::regex_constants::match_continuous);
 }
 
 
@@ -242,9 +212,10 @@ bool RegularExpressionClass::operator == (const RegularExpressionClass &rhs) con
 }
 
 
-inline bool RegularExpressionClass::operator != (const RegularExpressionClass &rhs) const
+//	Not inline, unlike the original: the header declares it, so a definition
+//	marked inline in this file gives it no external linkage and the first
+//	caller anywhere else fails to link.
+bool RegularExpressionClass::operator != (const RegularExpressionClass &rhs) const
 {
 	return !(*this == rhs);
 }
-
-

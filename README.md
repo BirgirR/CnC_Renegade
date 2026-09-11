@@ -36,7 +36,7 @@ With a CMake new enough to know your Visual Studio version:
 
 ```
 cmake -B build -A Win32 .
-cmake --build build --config Release --target commando renegade_scripts
+cmake --build build --config Release
 ```
 
 Otherwise, from an x86 developer command prompt:
@@ -44,14 +44,19 @@ Otherwise, from an x86 developer command prompt:
 ```
 vcvarsall.bat x86
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release .
-cmake --build build --target commando renegade_scripts
+cmake --build build
 ```
 
 Binaries land in `Run/` at the root of the repository.
 
-`commando` and `renegade_scripts` are named explicitly because both are excluded
-from the default target: a bare `cmake --build build` builds the engine libraries
-and the unit tests, which is the fast loop for working on the engine.
+That builds the game, the engine libraries and the unit tests. The mission
+scripts are the one thing left out of the default target, because they are a
+separate DLL the game loads rather than links, and rebuilding them is rarely
+what you want mid-change:
+
+```
+cmake --build build --target renegade_scripts
+```
 
 ### Running
 
@@ -89,7 +94,7 @@ opened.
 | `RENEGADE_MILES_STUB` | `ON` | `OFF` links the real Miles 6 SDK from `Code/Miles6/`, if you have it. |
 | `RENEGADE_BUILD_SCRIPTS` | `ON` | Build the mission-script DLL. |
 | `RENEGADE_BUILD_TESTS` | `ON` | Build the `wwmath`/`wwlib` unit tests. |
-| `RENEGADE_EXCLUDE_UNPORTED` | `ON` | Skip the translation units listed in `cmake/Unported.cmake`. |
+| `RENEGADE_EXCLUDE_UNPORTED` | `ON` | Skip the translation units listed in `cmake/Unported.cmake`, which is now empty. |
 | `RENEGADE_ENGINE_WARNINGS` | `OFF` | Compile the engine at `/W4`. The tree builds at `/W0`. |
 | `RENEGADE_SCRIPT_WARNINGS` | `OFF` | Compile the mission scripts at `/W4`. |
 | `RENEGADE_PORTABLE_INV_SQRT` | `OFF` | Substitute plain C for `WWMath::Inv_Sqrt`, a `__declspec(naked)` x87 routine, when debugging. |
@@ -140,9 +145,11 @@ implementation under `Code/Stubs/`:
 - **GameSpy** — the services shut down in 2014. The used surface is four `qr_*`
   and five `gcd_*` calls, so it is stubbed; the cost is the server browser and
   CD-key validation, not the game.
-- **GNU Regex** — absent from the release. `regexpr.cpp` is self-contained and
-  nothing in the tree references it, so it is the one file left in
-  `cmake/Unported.cmake`.
+- **GNU Regex** — absent from the release, and GPL in its own right.
+  `RegularExpressionClass` is now implemented over the standard library's
+  `<regex>` instead, preserving what it had: POSIX extended syntax, and matching
+  anchored at the start of the string rather than searching within it. Nothing
+  in the game calls the class, so `Code/Tests/unit` covers it.
 - **NvDXTLib, Lightscape, Umbra, SafeDisk, Cab, RTPatch, Java headers** — used
   only by the launcher, installer and the asset tools, none of which this build
   covers.
