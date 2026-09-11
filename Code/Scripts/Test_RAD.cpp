@@ -1266,6 +1266,7 @@ DECLARE_SCRIPT (MX0_A02_Controller, "")
 DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 {
 	bool can_damage;
+	bool sequence_advanced;
 	bool default_state;
 	bool active_actor;
 	bool death_animation;
@@ -1280,6 +1281,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 	REGISTER_VARIABLES()
 	{
 		SAVE_VARIABLE (can_damage, 1);
+
 		SAVE_VARIABLE (start_health, 2);
 		SAVE_VARIABLE (my_sniper_target, 3);
 		SAVE_VARIABLE (default_state, 4);
@@ -1290,6 +1292,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 		SAVE_VARIABLE (active_actor, 9);
 		SAVE_VARIABLE (death_animation, 10);
 		SAVE_VARIABLE (medtank_id, 11);
+		SAVE_VARIABLE (sequence_advanced, 12);
 	}
 
 	// On Created, place unit in Default State
@@ -1305,6 +1308,7 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 		my_sniper_target = 0;
 		my_register_id = 0;
 		can_damage = false;
+		sequence_advanced = false;
 		default_state = false;
 		death_animation = false;
 		MX0_A02_NOD_SNIPER_01 = 0;
@@ -1521,6 +1525,26 @@ DECLARE_SCRIPT (MX0_A02_ACTOR, "ActorID=0:int")
 				if (my_register_id >= MX0_A02_ACTOR_NOD_START)
 				{
 					Commands->Send_Custom_Event (obj, controller, MX0_A02_CUSTOM_TYPE_NOD_SOLDIER_KILLED, my_register_id, 0.1f);
+				}
+
+				/*
+				**	The rocket soldier advances the spawn sequence himself: he
+				**	shoots the APC, walks off, destroys himself and sends
+				**	NEXT_SEQUENCE, which is what brings the troop helicopters in.
+				**	Nothing else sends it, and his death cannot substitute --
+				**	MX0_A02_Fill_Empty_Slot registers him with current_target
+				**	false, so NOD_SOLDIER_KILLED above will not advance anything
+				**	for him.
+				**
+				**	So if the player kills him now that he can be killed, the
+				**	sequence has to be carried forward here or the helicopters
+				**	never arrive. Guarded because he is only ever worth one
+				**	advance, whichever way he goes.
+				*/
+				if (Get_Int_Parameter ("ActorID") == 3 && !sequence_advanced)
+				{
+					sequence_advanced = true;
+					Commands->Send_Custom_Event (obj, controller, MX0_A02_CUSTOM_TYPE_NEXT_SEQUENCE, MX0_A02_CUSTOM_PARAM_DEFAULT);
 				}
 			}
 		}
