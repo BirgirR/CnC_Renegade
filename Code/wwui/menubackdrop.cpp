@@ -42,6 +42,7 @@
 #include "render2d.h"
 #include "light.h"
 #include "hanim.h"
+#include <math.h>
 
 
 ////////////////////////////////////////////////////////////////
@@ -96,9 +97,42 @@ MenuBackDropClass::MenuBackDropClass (void)	:
 	//
 	//	Configure the view plane
 	//
+	//	The menu backdrop is a 3D scene, not a picture, so how much of it the
+	//	player sees is a question of field of view.
+	//
+	//	This used to hold the horizontal at 45 degrees and scale the vertical by
+	//	the screen's height over its width. Two things were wrong with that.
+	//	Field of view scales as tangents rather than linearly, so the arithmetic
+	//	was off -- by little enough at 4:3 to ship unnoticed. And pinning the
+	//	horizontal means the vertical shrinks as screens get wider: at 16:9 the
+	//	scene is cropped top and bottom relative to the framing it was composed
+	//	for, which is what makes it sit badly on a modern display.
+	//
+	//	So the vertical the original 4:3 framing gave is kept, and the extra
+	//	width is added at the sides. Same convention as the combat camera in
+	//	Code/Combat/ccamera.cpp.
+	//
 	const RectClass &screen_size = Render2DClass::Get_Screen_Resolution ();
-	float hfov = DEG_TO_RAD(45.0F);
-	float vfov = (screen_size.Height () / screen_size.Width ()) * hfov;
+
+	const float original_hfov = DEG_TO_RAD(45.0F);
+	const float original_aspect = 4.0F / 3.0F;
+
+	//	What the 4:3 framing actually was, with the tangents done properly.
+	const float vfov = 2.0F * ::atan( ::tan( original_hfov / 2.0F ) / original_aspect );
+
+	float aspect = original_aspect;
+	if ( screen_size.Width () > 0 && screen_size.Height () > 0 ) {
+		aspect = screen_size.Width () / screen_size.Height ();
+	}
+
+	//	Never narrower than the original: a 5:4 screen keeps the framing it had
+	//	rather than having the sides pulled in.
+	if ( aspect < original_aspect ) {
+		aspect = original_aspect;
+	}
+
+	const float hfov = 2.0F * ::atan( ::tan( vfov / 2.0F ) * aspect );
+
 	Camera->Set_View_Plane (hfov, vfov);
 
 	//
