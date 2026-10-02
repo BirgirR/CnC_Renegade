@@ -55,9 +55,16 @@
 
 /*
 **	Turn off some unneeded warnings.
+**
+**	Each was turned back on (and promoted to /W3) in a scratch build of the
+**	whole tree; the count and verdict are beside it. Most are off by default
+**	in a current MSVC or only fire at /W4, so these pragmas mainly keep a /W4
+**	build (RENEGADE_ENGINE_WARNINGS) readable. C4056, C4511, C4512, C4097 and
+**	C4786 were dropped: none fires any more, and the last two no longer exist.
 */
 
 // "unreferenced inline function has been removed" Yea, so what?
+// 4,031 sites, all optimizer bookkeeping.
 #pragma warning(disable : 4514)
 
 // "conversion from 'X' to 'Y', possible loss of data". Not only double to float:
@@ -67,45 +74,32 @@
 // to check new code rather than trusting this.
 #pragma warning(disable : 4244)
 
-// "overflow in floating-point constant arithmetic" This warning occurs even if the
-// loss of precision is insignificant.
-#pragma warning(disable : 4056)
-
 // "function not inlined" This warning is typically useless. The inline keyword
 // only serves as a suggestion to the compiler and it may or may not inline a
 // function on a case by case basis. No need to be told of this.
+// 4,485 sites.
 #pragma warning(disable : 4710)
 
 // "'this' used in base member initializer list" Using "this" in a base member
 // initializer is valid -- no need for this warning.
+// 23 sites, all audited: every receiver (the boss state machines, ActionClass,
+// ReferenceableClass, AABTreeIterator and the anim and shadow managers) only
+// stores the pointer, and none calls back into the half-built object. Re-check
+// any new one: that is the case this warning exists for.
 #pragma warning(disable : 4355)
 
-// "typedef-name used as a synonym for class-name". This is by design and should
-// not be a warning.
-#pragma warning(disable : 4097)
-
 // Unreferenced local function removed.
+// 2 sites: _euler_axis_j and _euler_axis_h in euler.cpp, unused members of a set
+// of four. Dead, but harmless.
 #pragma warning(disable : 4505)
 
-// 'function selected for automatic inlining'
+// 'function selected for automatic inline expansion'
+// 7,052 sites, all optimizer bookkeeping.
 #pragma warning(disable : 4711)
-
-// 'copy constructor could not be generated'
-#pragma warning(disable : 4511)
-
-// 'assignment operator could not be generated' 
-#pragma warning(disable : 4512)
 
 // 'unreferenced formal parameter'
+// 3,497 sites. Style, not correctness.
 #pragma warning(disable : 4100)
-
-// HIDE WARNING 4786 "identifier was truncated to '255' characters in the browser information"
-// Tempates create LLLOOONNNGGG identifiers!
-#pragma warning(disable : 4786)
-
-// 'function selected for automatic inline expansion'.  Cool, but since we're treating
-// warnings as errors, don't warn me about this!
-#pragma warning(disable : 4711)
 
 
 

@@ -192,22 +192,18 @@ The first goal was a tree that builds and plays unchanged on a current compiler,
 and some of what that took was scaffolding rather than repair. Most of it is gone.
 The tree builds clean at `/W3`, CI builds it with `/WX`, and every VC6
 compatibility switch has been removed: `/Zc:forScope-`, `/Zc:wchar_t-`,
-`_USE_32BIT_TIME_T`, `/permissive` and `/Zc:strictStrings-`. This is what
-remains, in the order it should go. A step is done when the tree builds clean
-with `/WX` without it.
+`_USE_32BIT_TIME_T`, `/permissive` and `/Zc:strictStrings-`. The warnings
+`Code/wwlib/visualc.h` still switches off have each been turned back on in a
+scratch build and the verdict recorded beside the pragma; C4244 and C4355
+were audited site by site. This is what remains, in the order it should go.
+A step is done when the tree builds clean with `/WX` without it.
 
-1. **Warnings the source switches off.** `Code/wwlib/visualc.h` disables a dozen
-   warnings in every file that includes it. C4244, narrowing conversions, has
-   been audited once and its real bugs fixed; it stays off because most of its
-   ~1,200 sites are harmless `int` to `float`. The others have not been looked
-   at. Turn each on in a scratch build, fix what is real, and record the verdict
-   beside the pragma.
-2. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
+1. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
    `ebp` as a scratch register at 59 sites. The blocks checked restore it before
    touching a local, but not all of them have been checked.
-3. **The inline assembly itself.** 27 files in the game and engine carry x86
+2. **The inline assembly itself.** 27 files in the game and engine carry x86
    `__asm`, mostly maths and colour conversion. Replacing it with C or SSE
-   intrinsics settles step 2 and is the precondition for a 64-bit build. That
+   intrinsics settles step 1 and is the precondition for a 64-bit build. That
    build is welcome but not a goal, for the reason under Requirements.
 
 
