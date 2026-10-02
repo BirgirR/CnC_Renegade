@@ -315,13 +315,6 @@ target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->
     # deprecated CRT names are used throughout
     $<$<COMPILE_LANGUAGE:C,CXX>:/wd4996>
-    # The x86 inline assembly borrows ebp (and, once inlined into a function
-    # that aligns its stack, ebx) as a scratch register: push, use, pop. In the
-    # blocks checked, locals are read before the clobber and written after the
-    # restore, which is safe but beyond what C4731 can see; it fires at 59
-    # sites. Not every block has been audited. The assembly goes away with the
-    # x64 port.
-    $<$<COMPILE_LANGUAGE:C,CXX>:/wd4731>
     # The Profile configuration these settings reproduce always built with
     # /Zi. Except.cpp's crash handler resolves symbols through IMAGEHLP, so
     # without a PDB every report is a bare address that moves with ASLR.

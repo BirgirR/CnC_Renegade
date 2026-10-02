@@ -865,11 +865,11 @@ WWINLINE unsigned int DX8Wrapper::Convert_Color(const Vector3& color,float alpha
 	// such that 32 bit ingeger has AAAAAAAARRRRRRRRGGGGGGGGBBBBBBBB.
 	__asm
 	{
-		push	ebp
-		//	EBX, ESI and EDI are callee-saved and all three are written below.
-		//	This function is __forceinline, so without these the damage lands in
-		//	whatever function it was inlined into.
-		push	ebx
+		//	ESI and EDI are callee-saved and both are written below. This
+		//	function is __forceinline, so without these the damage lands in
+		//	whatever function it was inlined into. It used EBP and EBX as two
+		//	more scratch registers, which a caller may be using as its frame
+		//	pointer (C4731); ECX was free, and ESI is once the color is loaded.
 		push	esi
 		push	edi
 		sub	esp,20					// space for a, r, g and b float plus fpu rounding mode
@@ -906,15 +906,15 @@ skip:
 		fistp	dword ptr[esp+4]		// b
 		fistp	dword ptr[esp+8]		// g
 		fistp	dword ptr[esp+12]		// r
-		mov	ebp,[esp]				// a
+		mov	ecx,[esp]				// a
 		mov	eax,[esp+4]				// b
 		mov	edx,[esp+8]				// g
-		mov	ebx,[esp+12]			// r
-		shl	ebp,24					// a << 24
-		shl	ebx,16					// r << 16
+		mov	esi,[esp+12]			// r
+		shl	ecx,24					// a << 24
+		shl	esi,16					// r << 16
 		shl	edx,8						//	g << 8
-		or		eax,ebp					// (a << 24) | b
-		or		eax,ebx					// (a << 24) | (r << 16) | b
+		or		eax,ecx					// (a << 24) | b
+		or		eax,esi					// (a << 24) | (r << 16) | b
 		or		eax,edx					// (a << 24) | (r << 16) | (g << 8) | b
 
 		fstp	st(0)
@@ -929,8 +929,6 @@ not_changed:
 		add	esp,20
 		pop	edi
 		pop	esi
-		pop	ebx
-		pop	ebp
 
 		mov	col,eax
 	}

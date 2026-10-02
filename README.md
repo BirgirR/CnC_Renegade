@@ -195,16 +195,15 @@ compatibility switch has been removed: `/Zc:forScope-`, `/Zc:wchar_t-`,
 `_USE_32BIT_TIME_T`, `/permissive` and `/Zc:strictStrings-`. The warnings
 `Code/wwlib/visualc.h` still switches off have each been turned back on in a
 scratch build and the verdict recorded beside the pragma; C4244 and C4355
-were audited site by site. This is what remains, in the order it should go.
-A step is done when the tree builds clean with `/WX` without it.
+were audited site by site. Outside the vendored libbinkdec, which builds at
+`/W0`, `CMakeLists.txt` suppresses only C4996, for the CRT names the code uses
+throughout.
 
-1. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
-   `ebp` as a scratch register at 59 sites. The blocks checked restore it before
-   touching a local, but not all of them have been checked.
-2. **The inline assembly itself.** 27 files in the game and engine carry x86
-   `__asm`, mostly maths and colour conversion. Replacing it with C or SSE
-   intrinsics settles step 1 and is the precondition for a 64-bit build. That
-   build is welcome but not a goal, for the reason under Requirements.
+What remains is the inline assembly. 27 files in the game and engine carry x86
+`__asm`, mostly maths and colour conversion. It works, and the one block that
+borrowed a frame register no longer does, so nothing forces it out. Replacing
+it with C or SSE intrinsics is the precondition for a 64-bit build, which is
+welcome but not a goal, for the reason under Requirements.
 
 
 ## Known issues
