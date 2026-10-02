@@ -174,9 +174,9 @@ committed, so an ordinary build never runs it, and it needs no interpreter beyon
 the CMake a build already requires.
 
 MSBuild cannot read `.dsp`/`.dsw` at all, so `CMakeLists.txt` replaces the
-workspace instead of converting it. The compiler settings it applies —
-`/Zc:wchar_t-` and `/permissive` — exist to reproduce VC6 semantics the code
-depends on; each is commented in place.
+workspace instead of converting it. The compiler setting it applies —
+`/permissive` — exists to reproduce VC6 semantics the code depends on, and is
+commented in place.
 
 The original VC6 route still works for what CMake does not cover:
 
@@ -214,8 +214,8 @@ surrounds your change and keep diffs to the lines you actually touched — there
 no `.clang-format` here on purpose, and a reformatting pass buries real changes.
 
 **Comment the whys, not the whats.** The compiler flags in `CMakeLists.txt`
-(`/Zc:wchar_t-`, `/permissive`) both reproduce VC6 semantics the code depends
-on, and each says so in place. Anything new that exists to work around
+(`/permissive`) reproduces VC6 semantics the code depends on, and says so in
+place. Anything new that exists to work around
 the age of this code deserves the same treatment.
 
 **Keep the build warning-free.** The tree builds clean at `/W3`, and CI builds

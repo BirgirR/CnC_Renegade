@@ -312,8 +312,6 @@ target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/EHsc>
     # this code predates two-phase lookup conformance
     $<$<COMPILE_LANGUAGE:C,CXX>:/permissive>
-    # VC6 treated wchar_t as unsigned short
-    $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:wchar_t->
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->
     # deprecated CRT names are used throughout
     $<$<COMPILE_LANGUAGE:C,CXX>:/wd4996>

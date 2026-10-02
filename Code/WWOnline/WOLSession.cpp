@@ -1771,7 +1771,7 @@ bool Session::PageUser(const wchar_t* username, const wchar_t* message)
 			}
 		else
 			{
-			HRESULT hr = mChat->RequestUnicodePage(&wolUser, message);
+			HRESULT hr = mChat->RequestUnicodePage(&wolUser, (const unsigned short*)message);
 
 			if (FAILED(hr))
 				{
@@ -2687,7 +2687,7 @@ bool Session::SendPublicMessage(const wchar_t* message)
 			}
 		else
 			{
-			return SUCCEEDED(mChat->RequestPublicUnicodeMessage(message));
+			return SUCCEEDED(mChat->RequestPublicUnicodeMessage((const unsigned short*)message));
 			}
 		}
 
@@ -2734,7 +2734,7 @@ bool Session::SendPublicAction(const wchar_t* action)
 			}
 		else
 			{
-			return SUCCEEDED(mChat->RequestPublicUnicodeAction(action));
+			return SUCCEEDED(mChat->RequestPublicUnicodeAction((const unsigned short*)action));
 			}
 		}
 
@@ -2775,7 +2775,7 @@ bool Session::SendPrivateMessage(const wchar_t* username, const wchar_t* message
 			return SUCCEEDED(mChat->RequestPrivateMessage(&user, ansiMessage));
 			}
 
-		return SUCCEEDED(mChat->RequestPrivateUnicodeMessage(&user, message));
+		return SUCCEEDED(mChat->RequestPrivateUnicodeMessage(&user, (const unsigned short*)message));
 		}
 
 	return false;
@@ -2824,7 +2824,7 @@ bool Session::SendPrivateMessage(const UserList& users, const wchar_t* message)
 			return SUCCEEDED(mChat->RequestPrivateMessage(wolUsers, ansiMessage));
 			}
 
-		return SUCCEEDED(mChat->RequestPrivateUnicodeMessage(wolUsers, message));
+		return SUCCEEDED(mChat->RequestPrivateUnicodeMessage(wolUsers, (const unsigned short*)message));
 		}
 
 	return false;
@@ -2873,7 +2873,7 @@ bool Session::SendPrivateAction(const UserList& users, const wchar_t* action)
 			return SUCCEEDED(mChat->RequestPrivateAction(wolUsers, ansiAction));
 			}
 
-		return SUCCEEDED(mChat->RequestPrivateUnicodeAction(wolUsers, action));
+		return SUCCEEDED(mChat->RequestPrivateUnicodeAction(wolUsers, (const unsigned short*)action));
 		}
 
 	return false;

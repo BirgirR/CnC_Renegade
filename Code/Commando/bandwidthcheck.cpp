@@ -70,10 +70,10 @@ BandwidthCheckerClass::BandwidthCheckerThreadClass BandwidthCheckerClass::Thread
 HANDLE BandwidthCheckerClass::EventNotify = NULL;
 unsigned long BandwidthCheckerClass::UpstreamBandwidth = 0;
 unsigned long BandwidthCheckerClass::ReportedUpstreamBandwidth = 0;
-unsigned short *BandwidthCheckerClass::UpstreamBandwidthString = NULL;
+WCHAR *BandwidthCheckerClass::UpstreamBandwidthString = NULL;
 unsigned long BandwidthCheckerClass::DownstreamBandwidth = 0;
 unsigned long BandwidthCheckerClass::ReportedDownstreamBandwidth = 0;
-unsigned short *BandwidthCheckerClass::DownstreamBandwidthString = NULL;
+WCHAR *BandwidthCheckerClass::DownstreamBandwidthString = NULL;
 int BandwidthCheckerClass::FailureCode = BANDTEST_OK;
 bool BandwidthCheckerClass::GotBandwidth = false;
 const char *BandwidthCheckerClass::DefaultServerName = "www.westwood.com";
@@ -125,7 +125,7 @@ unsigned long BandwidthCheckerClass::Bandwidths[NUM_BANDS * 2] = {
 /*
 ** Human readable names for each bandwidth level.
 */
-unsigned short *BandwidthCheckerClass::BandwidthNames [NUM_BANDS+1] = {
+WCHAR *BandwidthCheckerClass::BandwidthNames [NUM_BANDS+1] = {
 	L"14400",
 	L"28800",
 	L"33600",
@@ -615,7 +615,7 @@ unsigned long BandwidthCheckerClass::Get_Reported_Upstream_Bandwidth(void)
  * HISTORY:                                                                                    *
  *   11/21/2001 2:56PM ST : Created                                                            *
  *=============================================================================================*/
-unsigned short *BandwidthCheckerClass::Get_Upstream_Bandwidth_As_String(void)
+WCHAR *BandwidthCheckerClass::Get_Upstream_Bandwidth_As_String(void)
 {
 	return(UpstreamBandwidthString);
 }
@@ -675,7 +675,7 @@ unsigned long BandwidthCheckerClass::Get_Reported_Downstream_Bandwidth(void)
  * HISTORY:                                                                                    *
  *   11/21/2001 2:57PM ST : Created                                                            *
  *=============================================================================================*/
-unsigned short *BandwidthCheckerClass::Get_Downstream_Bandwidth_As_String(void)
+WCHAR *BandwidthCheckerClass::Get_Downstream_Bandwidth_As_String(void)
 {
 	return(DownstreamBandwidthString);
 }
@@ -695,15 +695,15 @@ unsigned short *BandwidthCheckerClass::Get_Downstream_Bandwidth_As_String(void)
  * HISTORY:                                                                                    *
  *   11/21/2001 2:58PM ST : Created                                                            *
  *=============================================================================================*/
-unsigned short *BandwidthCheckerClass::Get_Bandwidth_As_String(void)
+WCHAR *BandwidthCheckerClass::Get_Bandwidth_As_String(void)
 {
 
 	if (cUserOptions::Get_Bandwidth_Type() == BANDWIDTH_AUTO) {
-		static unsigned short _build_string[256];
+		static WCHAR _build_string[256];
 		swprintf(_build_string, L"%s,%s", DownstreamBandwidthString, UpstreamBandwidthString);
 		return(_build_string);
 	} else {
-		return((unsigned short*)cBandwidth::Get_Bandwidth_String_From_Type(
+		return((WCHAR*)cBandwidth::Get_Bandwidth_String_From_Type(
 			(BANDWIDTH_TYPE_ENUM)cUserOptions::Get_Bandwidth_Type()));
 	}
 }
@@ -723,9 +723,9 @@ unsigned short *BandwidthCheckerClass::Get_Bandwidth_As_String(void)
  * HISTORY:                                                                                    *
  *   11/21/2001 2:58PM ST : Created                                                            *
  *=============================================================================================*/
-unsigned short *BandwidthCheckerClass::Get_Bandwidth_As_String(PackedBandwidthType bandwidth)
+WCHAR *BandwidthCheckerClass::Get_Bandwidth_As_String(PackedBandwidthType bandwidth)
 {
-	static unsigned short _build_string[256];
+	static WCHAR _build_string[256];
 
 	assert(bandwidth.Bandwidth.Up < NUM_BANDS + 1);
 	assert(bandwidth.Bandwidth.Down < NUM_BANDS + 1);

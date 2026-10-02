@@ -124,6 +124,10 @@ class BitStreamClass : public cBitPacker
 		void		Add(char val,int type = NO_ENCODER)							{ Internal_Add(val,type); }
 		void		Add(int val,int type = NO_ENCODER)							{ Internal_Add(val,type); }
 		void		Add(float val,int type = NO_ENCODER)						{ Internal_Add(val,type); }
+		//	Under VC6 WCHAR was unsigned short and took the USHORT overload. As a
+		//	native wchar_t it would promote to int and go out as 32 bits, so pin
+		//	it to the 16-bit wire format explicitly.
+		void		Add(WCHAR val,int type = NO_ENCODER)						{ Internal_Add((USHORT)val,type); }
 
 		BYTE		Get(BYTE & set_val,int type = NO_ENCODER)					{ return Internal_Get(set_val,type); }
 		USHORT	Get(USHORT & set_val,int type = NO_ENCODER)				{ return Internal_Get(set_val,type); }
@@ -132,6 +136,7 @@ class BitStreamClass : public cBitPacker
 		char		Get(char & set_val,int type = NO_ENCODER)					{ return Internal_Get(set_val,type); }
 		int		Get(int & set_val,int type = NO_ENCODER)					{ return Internal_Get(set_val,type); }
 		float		Get(float & set_val,int type = NO_ENCODER)				{ return Internal_Get(set_val,type); }
+		WCHAR		Get(WCHAR & set_val,int type = NO_ENCODER)				{ USHORT val; Internal_Get(val,type); return set_val = (WCHAR)val; }
 
 	private:
 		
