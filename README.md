@@ -24,7 +24,7 @@ and [Steam](https://store.steampowered.com/bundle/39394/Command__Conquer_The_Ult
 - Visual Studio 2019 or newer, with the **x86** C++ toolset and the Windows SDK
 - CMake 3.20 or newer
 
-32-bit only, deliberately. Around twenty files carry x86 inline assembly, but the
+32-bit only, deliberately. About thirty files carry x86 inline assembly, but the
 binding constraint is that the retail `mss32.dll` and `binkw32.dll` are 32-bit
 and are loaded at runtime: a 64-bit build could load neither, and would trade the
 original audio mix and original movie playback for nothing a 2002 game needs.
@@ -188,12 +188,60 @@ The original VC6 route still works for what CMake does not cover:
   preprocessor defines to build the public release configuration.
 
 
+## What is left of VC6
+
+The first goal was a tree that builds and plays unchanged on a current compiler,
+and some of what that took was scaffolding rather than repair. Most of it is gone:
+the tree builds clean at `/W3`, CI builds it with `/WX`, and `/Zc:forScope-`,
+`/Zc:wchar_t-`, `_USE_32BIT_TIME_T` and `/permissive` have been removed. This is
+what remains, in the order it should go. A step is done when the tree builds
+clean with `/WX` without it.
+
+1. **String literals as `char *`.** `/Zc:strictStrings-` is the last VC6
+   allowance in `CMakeLists.txt`. Removing it is about 1,200 errors in some 150
+   files, nearly all a `char *` that should be `const char *` and the signatures
+   it reaches. Mechanical, but big enough to be a change of its own.
+2. **Warnings the source switches off.** `Code/wwlib/visualc.h` disables a dozen
+   warnings in every file that includes it. C4244, narrowing conversions, has
+   been audited once and its real bugs fixed; it stays off because most of its
+   ~1,200 sites are harmless `int` to `float`. The others have not been looked
+   at. Turn each on in a scratch build, fix what is real, and record the verdict
+   beside the pragma.
+3. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
+   `ebp` as a scratch register at 59 sites. The blocks checked restore it before
+   touching a local, but not all of them have been checked.
+4. **The inline assembly itself.** 27 files in the game and engine carry x86
+   `__asm`, mostly maths and colour conversion. Replacing it with C or SSE
+   intrinsics settles step 3 and is the precondition for a 64-bit build. That
+   build is welcome but not a goal, for the reason under Requirements.
+
+
 ## Known issues
 
 The Debug configuration of the game executable will sometimes fail to link,
 because Windows Defender incorrectly flags the output as containing a virus
 (likely the embedded browser code). Excluding `Run/` in Windows Defender resolves
 it.
+
+The C4244 audit turned up these and left them alone, because the fix was not
+clearly safe or the problem not clearly reachable:
+
+- `C4GameObj::Init_C4` plays the mode-1 timing sound for all three detonation
+  modes. Using `C4TimingSound2ID`/`3ID` would be right only if the game data
+  sets them, which this tree cannot check.
+- `M05_Building_Debris` keeps its health in an `int`, so it loses fractions
+  between hits. Making it a `float` changes the save-game layout.
+- `RaveshawBossGameObjClass` divides by the player's distance to a fixed point,
+  truncated to `int`; standing within a metre of it would divide by zero, if
+  that spot can be reached.
+- `DX8Wrapper::Set_Alpha` does not clamp, and weather can pass it a negative
+  alpha, which wraps to nearly opaque.
+- `StyleMgrClass` truncates scaled font sizes where rounding looks intended.
+- Movie capture runs game time about 1% slow (`1000 / 30` truncated).
+- `HeightDBClass::Get_Height` interpolates at the wrong patch spacing, and
+  `DynamicAABTreeCullClass` never considers the Z axis when shrinking cells.
+- Two console commands print integers with `%f`, and `PingProfile` copies
+  uninitialised bytes when a remote ping string is short.
 
 
 ## Contributing
