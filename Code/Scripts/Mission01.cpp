@@ -2764,12 +2764,12 @@ DECLARE_SCRIPT(M01_Ambient_Sound_Controller_JDG, "")
 
 		else if ((param == play_commcenter_klaxon)  && (players_location == INSIDE_COMM_CENTER) && (comm_center_state != DESTROYED))
 		{
-			char *klaxonNames[2] = {
+			const char *klaxonNames[2] = {
 				"Klaxon Warning",
 				"Klaxon Info"
 			};
 
-			char *klaxonName = klaxonNames[klaxon];
+			const char *klaxonName = klaxonNames[klaxon];
 
 			GameObject * star = Commands->Get_A_Star (Vector3(0.0f,0.0f,0.0f));
 			if ( star != NULL ) 
@@ -2791,7 +2791,7 @@ DECLARE_SCRIPT(M01_Ambient_Sound_Controller_JDG, "")
 
 		else if ((param == play_commcenter_sound) && (players_location == INSIDE_COMM_CENTER) && (comm_center_state != DESTROYED))
 		{
-			char *sounds[15] = {
+			const char *sounds[15] = {
 				"01-I022E",
 				"01-I028E",
 				"01-I030E",
@@ -2809,7 +2809,7 @@ DECLARE_SCRIPT(M01_Ambient_Sound_Controller_JDG, "")
 				"01-I066E"
 			};
 
-			char *soundName = sounds[sound];
+			const char *soundName = sounds[sound];
 
 			GameObject * star = Commands->Get_A_Star (Vector3(0.0f,0.0f,0.0f));
 			if ( star != NULL ) 
@@ -4190,7 +4190,7 @@ DECLARE_SCRIPT(M01_Church_Exterior_MiniGunner_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
@@ -4209,7 +4209,7 @@ DECLARE_SCRIPT(M01_Church_Exterior_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
@@ -4228,7 +4228,7 @@ DECLARE_SCRIPT(M01_Church_Exterior_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation (animationName, false);
@@ -4247,7 +4247,7 @@ DECLARE_SCRIPT(M01_Church_Exterior_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation (animationName, false);
@@ -4298,7 +4298,7 @@ DECLARE_SCRIPT(M01_Church_Balcony_MiniGunner_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
@@ -4317,7 +4317,7 @@ DECLARE_SCRIPT(M01_Church_Balcony_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
@@ -4336,7 +4336,7 @@ DECLARE_SCRIPT(M01_Church_Balcony_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation (animationName, false);
@@ -4355,7 +4355,7 @@ DECLARE_SCRIPT(M01_Church_Balcony_MiniGunner_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//minigunner is at animation point--choose and do animation
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation (animationName, false);
@@ -6267,7 +6267,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 					{
 						case M01_WALKING_WAYPATH_01_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_01_JDG );
 								params.Set_Animation (animationName, false);
@@ -6288,7 +6288,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 
 						case M01_WALKING_WAYPATH_02_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_02_JDG );
 								params.Set_Animation (animationName, false);
@@ -6309,7 +6309,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 
 						case M01_WALKING_WAYPATH_03_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_03_JDG );
 								params.Set_Animation (animationName, false);
@@ -6330,7 +6330,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 
 						case M01_WALKING_WAYPATH_04_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_04_JDG );
 								params.Set_Animation (animationName, false);
@@ -6351,7 +6351,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 
 						case M01_WALKING_WAYPATH_05_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_05_JDG );
 								params.Set_Animation (animationName, false);
@@ -6372,7 +6372,7 @@ DECLARE_SCRIPT(M01_GDI_Toolshed_PatrolGuy_JDG, "")
 
 						case M01_WALKING_WAYPATH_06_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 30, M01_DOING_ANIMATION_06_JDG );
 								params.Set_Animation (animationName, false);
@@ -7022,7 +7022,7 @@ DECLARE_SCRIPT(M01_TailgunRun_NOD_Commander_JDG, "")//this guys ID is M01_TAILGU
 				{
 					firstTimeDamaged = false;
 
-					char *animationName = M01_Choose_Duck_Animation();
+					const char *animationName = M01_Choose_Duck_Animation();
 
 					ActionParamsStruct params;
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
@@ -7058,7 +7058,7 @@ DECLARE_SCRIPT(M01_TailgunRun_NOD_Commander_JDG, "")//this guys ID is M01_TAILGU
 						if (playerDistance >= 15)
 						{
 							//firstTimeDamaged = false;
-							char *animationName = M01_Choose_Duck_Animation();
+							const char *animationName = M01_Choose_Duck_Animation();
 							ActionParamsStruct params;
 							params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
 							params.Set_Animation( animationName, false );
@@ -7183,7 +7183,7 @@ DECLARE_SCRIPT(M01_ChurchArea_NOD_Commander_JDG, "")//M01_CHURCHAREA_NOD_COMMAND
 				if (playerDistance >= 15)
 				{
 					firstTimeDamaged = false;
-					char *animationName = M01_Choose_Duck_Animation();
+					const char *animationName = M01_Choose_Duck_Animation();
 					ActionParamsStruct params;
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
 					params.Set_Animation( animationName, false );
@@ -7218,7 +7218,7 @@ DECLARE_SCRIPT(M01_ChurchArea_NOD_Commander_JDG, "")//M01_CHURCHAREA_NOD_COMMAND
 						if (playerDistance >= 15)
 						{
 							//firstTimeDamaged = false;
-							char *animationName = M01_Choose_Duck_Animation();
+							const char *animationName = M01_Choose_Duck_Animation();
 							ActionParamsStruct params;
 							params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
 							params.Set_Animation( animationName, false );
@@ -7528,7 +7528,7 @@ DECLARE_SCRIPT(M01_GuardTower_Sniper_Target_JDG, "wave_location:vector3,  delete
 		Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 		powerupSpawnLocation.Z += 0.75f;
 
-		char *powerups[2] = 
+		const char *powerups[2] = 
 		{//this is a list of potential powerups to be dropped by sniper target guys
 			"POW_Health_100",
 			"POW_Armor_100",
@@ -7551,7 +7551,7 @@ DECLARE_SCRIPT(M01_GuardTower_Sniper_Target_JDG, "wave_location:vector3,  delete
 
 		if (param == M01_FACING_SPECIFIED_DIRECTION_01_JDG)
 		{
-			char *animationName = M01_Choose_Search_Animation ( );
+			const char *animationName = M01_Choose_Search_Animation ( );
 
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation( animationName, false );
@@ -10293,7 +10293,7 @@ DECLARE_SCRIPT(M01_Propaganda_Sounds_Controller_JDG, "")//this guys ID is 103099
 		
 			else if (param == M01_START_ACTING_JDG && destroyed == false)
 			{
-				char *propaganda_screen[10] = 
+				const char *propaganda_screen[10] = 
 				{
 					"M01_Propaganda_Screen_01",
 					"M01_Propaganda_Screen_02",
@@ -10307,7 +10307,7 @@ DECLARE_SCRIPT(M01_Propaganda_Sounds_Controller_JDG, "")//this guys ID is 103099
 					"M01_Propaganda_Screen_11",
 				};
 
-				char *propaganda_sound[10] = 
+				const char *propaganda_sound[10] = 
 				{
 					"M01NCXS_DSGN0270I1NCXS_SND",
 					"M01NCXS_DSGN0271I1NCXS_SND",
@@ -11391,7 +11391,7 @@ DECLARE_SCRIPT(M01_HON_Dojo_Civ_01_JDG, "")
 
 						case M01_DOING_ANIMATION_02_JDG: 
 							{
-								char *animationName = M01_Choose_Idle_Animation ( );
+								const char *animationName = M01_Choose_Idle_Animation ( );
 
 								params.Set_Basic( this, 100, M01_DOING_ANIMATION_03_JDG );//this is guy standing up 
 								params.Set_Animation( animationName, false );
@@ -12249,7 +12249,7 @@ params.Set_Basic(this, 100, M01_GOING_TO_EVAC_SPOT_JDG);
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -12439,7 +12439,7 @@ ActionParamsStruct params_inner;
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys	
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -12556,7 +12556,7 @@ ActionParamsStruct params_inner;
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -12937,7 +12937,7 @@ ActionParamsStruct params_inner;
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -13094,7 +13094,7 @@ ActionParamsStruct params_inner;
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -13274,7 +13274,7 @@ ActionParamsStruct params_inner;
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -14149,7 +14149,7 @@ DECLARE_SCRIPT(M01_PrisonPen_POW_JDG, "")
 
 			case M01_DOING_ANIMATION_01_JDG: 
 				{
-					char *animationName = M01_Choose_Cheer_Animation ( );
+					const char *animationName = M01_Choose_Cheer_Animation ( );
 
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 					params.Set_Animation( animationName, false );
@@ -14202,7 +14202,7 @@ DECLARE_SCRIPT(M01_PrisonPen_POW_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG)
 		{
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation( animationName, false );
 
@@ -14211,7 +14211,7 @@ DECLARE_SCRIPT(M01_PrisonPen_POW_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG)
 		{
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation( animationName, false );
 
@@ -14547,7 +14547,7 @@ DECLARE_SCRIPT(M01_PrisonPen_Civilian_JDG, "")
 
 			case M01_DOING_ANIMATION_01_JDG: 
 				{
-					char *animationName = M01_Choose_Cheer_Animation ( );
+					const char *animationName = M01_Choose_Cheer_Animation ( );
 
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 					params.Set_Animation( animationName, false );
@@ -14653,7 +14653,7 @@ DECLARE_SCRIPT(M01_PrisonPen_Civilian_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG)
 		{
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation( animationName, false );
@@ -14663,7 +14663,7 @@ DECLARE_SCRIPT(M01_PrisonPen_Civilian_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG)//civ is running to gate
 		{
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation( animationName, false );
 
@@ -14677,7 +14677,7 @@ DECLARE_SCRIPT(M01_PrisonPen_Civilian_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG)
 		{
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation( animationName, false );
 
@@ -14784,7 +14784,7 @@ DECLARE_SCRIPT(M01_GDI_GuardTower_NOD_Commander_JDG, "")//M01_BARNAREA_NOD_COMMA
 
 				if (playerDistance >= 15)
 				{
-					char *animationName = M01_Choose_Duck_Animation();
+					const char *animationName = M01_Choose_Duck_Animation();
 					firstTimeDamaged = false;
 					ActionParamsStruct params;
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
@@ -14819,7 +14819,7 @@ DECLARE_SCRIPT(M01_GDI_GuardTower_NOD_Commander_JDG, "")//M01_BARNAREA_NOD_COMMA
 
 						if (playerDistance >= 15)
 						{
-							char *animationName = M01_Choose_Duck_Animation();
+							const char *animationName = M01_Choose_Duck_Animation();
 							//firstTimeDamaged = false;
 							ActionParamsStruct params;
 							params.Set_Basic( this, 100, M01_DOING_ANIMATION_02_JDG );
@@ -14878,7 +14878,7 @@ DECLARE_SCRIPT(M01_GDI_GuardTower_NOD_Commander_JDG, "")//M01_BARNAREA_NOD_COMMA
 		Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 		powerupSpawnLocation.Z += 0.75f;
 
-		char *powerups[2] = 
+		const char *powerups[2] = 
 		{//this is a list of potential powerups to be dropped by sniper target guys
 			"POW_Health_100",
 			"POW_Armor_100",
@@ -16097,7 +16097,7 @@ DECLARE_SCRIPT(M01_TurretBeach_Engineer_JDG, "")//this guys ID is M01_TURRETBEAC
 
 		else if (action_id == M01_DOING_ANIMATION_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//engineer has been damaged look around
 		{
-			char *animationName = M01_Choose_Duck_Animation();
+			const char *animationName = M01_Choose_Duck_Animation();
 			Commands->Action_Reset ( obj, 100 );
 			params.Set_Basic(this, 60, M01_DOING_ANIMATION_04_JDG);
 			params.Set_Animation( animationName, false );
@@ -16353,7 +16353,7 @@ DECLARE_SCRIPT(M01_TurretBeach_Chinook_Spawned_Soldier_NOD, "")
 
 		else if (action_id == M01_DOING_ANIMATION_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)//engineer has been damaged look around
 		{
-			char *animationName = M01_Choose_Duck_Animation();
+			const char *animationName = M01_Choose_Duck_Animation();
 			Commands->Action_Reset ( obj, 100 );
 			params.Set_Basic(this, 60, M01_DOING_ANIMATION_04_JDG);
 			params.Set_Animation( animationName, false );
@@ -16401,7 +16401,7 @@ DECLARE_SCRIPT(M01_FP_NodBase_Dogfight_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[28] = 
+		const char *flyovers[28] = 
 		{
 			//these are the level 01 dogfights
 			"X1A_Apache_Orca_Chase_01.txt",
@@ -16471,7 +16471,7 @@ DECLARE_SCRIPT(M01_FP_BaseToBase_NorthSouth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[28] = 
+		const char *flyovers[28] = 
 		{
 			//this is a low level traffic lane from nod comm to gdi ocean-- N->S
 			"X1A_Solo_Orca_03.txt",
@@ -16540,7 +16540,7 @@ DECLARE_SCRIPT(M01_FP_BaseToBase_SouthNorth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[56] = 
+		const char *flyovers[56] = 
 		{
 			//this is a low level traffic lane from gdi ocean to nod comm center-- S->N
 			"X1A_Solo_Orca_05.txt",
@@ -16637,7 +16637,7 @@ DECLARE_SCRIPT(M01_FP_NodBase_EastWest_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[72] = 
+		const char *flyovers[72] = 
 		{
 			//this is a flyover at nod base it goes from the comm to the refinery-- E->W
 			"X1A_Solo_Orca_09.txt",
@@ -16747,7 +16747,7 @@ DECLARE_SCRIPT(M01_FP_NodBase_WestEast_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[48] = 
+		const char *flyovers[48] = 
 		{
 			//this is a flyover at nod base it goes from the refinery to the comm W->E
 			"X1A_Solo_Orca_12.txt",
@@ -16832,7 +16832,7 @@ DECLARE_SCRIPT(M01_FP_NodBase_NorthSouth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[48] = 
+		const char *flyovers[48] = 
 		{
 			//this is a flyover at nod base it goes from the comm to the waterfall N->S
 			"X1A_Solo_Orca_14.txt",
@@ -16916,7 +16916,7 @@ DECLARE_SCRIPT(M01_FP_NodBase_SouthNorth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[48] = 
+		const char *flyovers[48] = 
 		{
 			//this is a flyover at nod base it goes from guard tower 01 to the comm center S-N
 			"X1A_Solo_Orca_16.txt",
@@ -17000,7 +17000,7 @@ DECLARE_SCRIPT(M01_FP_GDIOcean_NorthSouth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[28] = 
+		const char *flyovers[28] = 
 		{
 			//this is a GDI ocean traffic lane  N->S
 			"X1A_Solo_Orca_18.txt",
@@ -17065,7 +17065,7 @@ DECLARE_SCRIPT(M01_FP_GDIOcean_SouthNorth_Contoller_JDG, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[26] = 
+		const char *flyovers[26] = 
 		{
 			//this is a GDI ocean traffic lane  S->N
 			"X1A_Solo_Orca_20.txt",
@@ -18883,7 +18883,7 @@ DECLARE_SCRIPT(M01_GDIBase_BaseCommander_JDG, "")//106050 Capt Duncan
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -19196,7 +19196,7 @@ DECLARE_SCRIPT(M01_Base_GDI_Grenadier_JDG, "")//116383
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",
@@ -19604,7 +19604,7 @@ params.Set_Basic( this, 100, M01_WALKING_WAYPATH_02_JDG );
 
 			else if (action_id == M01_DOING_ANIMATION_03_JDG )//pow guy is standingup  -- do cheer anim
 			{
-				char *animationName = M01_Choose_Cheer_Animation ( );
+				const char *animationName = M01_Choose_Cheer_Animation ( );
 
 				params.Set_Basic( this, 100, M01_DOING_ANIMATION_04_JDG );
 				params.Set_Animation( animationName, false );
@@ -22014,7 +22014,7 @@ DECLARE_SCRIPT(M01_Base_GDI_Minigunner_JDG, "")//116382
 				Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 				powerupSpawnLocation.Z += 0.75f;
 
-				char *powerups[2] = 
+				const char *powerups[2] = 
 				{//this is a list of potential powerups to be dropped by sniper target guys
 					"POW_Health_100",
 					"POW_Armor_100",

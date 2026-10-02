@@ -3009,7 +3009,7 @@ DECLARE_SCRIPT (M05_Park_Controller, "")
 			//	Leaves artillery_loc3 alone when the object is gone, rather than overwriting it with the origin.
 			Find_Object_Position (artillery_id3, artillery_loc3);
 			
-			char *bomb[3] = 
+			const char *bomb[3] = 
 			{
 				"Falling_Bomb_01",
 				"Falling_Bomb_02",
@@ -6746,7 +6746,7 @@ DECLARE_SCRIPT(M05_Flyover_Controller, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[3] = 
+		const char *flyovers[3] = 
 		{
 			"X5H_Apache_1.txt",
 			"X5H_Apache_2.txt",
@@ -7131,7 +7131,7 @@ DECLARE_SCRIPT(M05_Activate_Artillery, "Artillery_ID1=0:int, Artillery_ID2=0:int
 			//	Leaves artillery_loc3 alone when the object is gone, rather than overwriting it with the origin.
 			Find_Object_Position (artillery_id3, artillery_loc3);
 			
-			char *bomb[3] = 
+			const char *bomb[3] = 
 			{
 				"Falling_Bomb_01",
 				"Falling_Bomb_02",

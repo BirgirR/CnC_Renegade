@@ -115,7 +115,7 @@ const char *DEFAULT_INPUT_FILENAME = "DEFAULT_INPUT.CFG";
 
 typedef struct {
 	short	ID;
-	char	*Name;
+	const char	*Name;
 } StringID;
 
 StringID	ButtonNames[] = {

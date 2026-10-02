@@ -175,9 +175,7 @@ the CMake a build already requires.
 
 MSBuild cannot read `.dsp`/`.dsw` at all, so `CMakeLists.txt` replaces the
 workspace instead of converting it. It builds in standards-conformance mode
-(`/permissive-`) with one VC6 allowance left, `/Zc:strictStrings-`, because
-the code still binds string literals to `char *` in about 1,200 places. It is
-commented in place.
+(`/permissive-`), with none of VC6's compatibility switches left.
 
 The original VC6 route still works for what CMake does not cover:
 
@@ -191,28 +189,25 @@ The original VC6 route still works for what CMake does not cover:
 ## What is left of VC6
 
 The first goal was a tree that builds and plays unchanged on a current compiler,
-and some of what that took was scaffolding rather than repair. Most of it is gone:
-the tree builds clean at `/W3`, CI builds it with `/WX`, and `/Zc:forScope-`,
-`/Zc:wchar_t-`, `_USE_32BIT_TIME_T` and `/permissive` have been removed. This is
-what remains, in the order it should go. A step is done when the tree builds
-clean with `/WX` without it.
+and some of what that took was scaffolding rather than repair. Most of it is gone.
+The tree builds clean at `/W3`, CI builds it with `/WX`, and every VC6
+compatibility switch has been removed: `/Zc:forScope-`, `/Zc:wchar_t-`,
+`_USE_32BIT_TIME_T`, `/permissive` and `/Zc:strictStrings-`. This is what
+remains, in the order it should go. A step is done when the tree builds clean
+with `/WX` without it.
 
-1. **String literals as `char *`.** `/Zc:strictStrings-` is the last VC6
-   allowance in `CMakeLists.txt`. Removing it is about 1,200 errors in some 150
-   files, nearly all a `char *` that should be `const char *` and the signatures
-   it reaches. Mechanical, but big enough to be a change of its own.
-2. **Warnings the source switches off.** `Code/wwlib/visualc.h` disables a dozen
+1. **Warnings the source switches off.** `Code/wwlib/visualc.h` disables a dozen
    warnings in every file that includes it. C4244, narrowing conversions, has
    been audited once and its real bugs fixed; it stays off because most of its
    ~1,200 sites are harmless `int` to `float`. The others have not been looked
    at. Turn each on in a scratch build, fix what is real, and record the verdict
    beside the pragma.
-3. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
+2. **C4731.** `CMakeLists.txt` disables it because the inline assembly borrows
    `ebp` as a scratch register at 59 sites. The blocks checked restore it before
    touching a local, but not all of them have been checked.
-4. **The inline assembly itself.** 27 files in the game and engine carry x86
+3. **The inline assembly itself.** 27 files in the game and engine carry x86
    `__asm`, mostly maths and colour conversion. Replacing it with C or SSE
-   intrinsics settles step 3 and is the precondition for a 64-bit build. That
+   intrinsics settles step 2 and is the precondition for a 64-bit build. That
    build is welcome but not a goal, for the reason under Requirements.
 
 
@@ -262,9 +257,9 @@ tabs, `Upper_Snake_Case` functions, `/* ** */` comment banners. Match whatever
 surrounds your change and keep diffs to the lines you actually touched — there is
 no `.clang-format` here on purpose, and a reformatting pass buries real changes.
 
-**Comment the whys, not the whats.** The one VC6 allowance left in
-`CMakeLists.txt` (`/Zc:strictStrings-`) says in place why it is there. Anything
-new that exists to work around the age of this code deserves the same treatment.
+**Comment the whys, not the whats.** Each workaround in `CMakeLists.txt`, such
+as a disabled warning, says in place why it is there. Anything new that exists to
+work around the age of this code deserves the same treatment.
 
 **Keep the build warning-free.** The tree builds clean at `/W3`, and CI builds
 with `/WX`, so a new warning fails the pull request. Fix the warning rather than

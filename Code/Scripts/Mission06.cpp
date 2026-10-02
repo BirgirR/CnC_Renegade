@@ -4971,7 +4971,7 @@ DECLARE_SCRIPT(M06_Flyover_Controller, "")  // 100018
 		{
 			last = param;
 
-			char *flyovers_inner[11] = 
+			const char *flyovers_inner[11] = 
 			{
 				"M06_XG_VehicleDrop0.txt",
 				"M06_XG_VehicleDrop1.txt",

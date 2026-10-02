@@ -128,7 +128,7 @@ typedef struct ScriptCommandsStruct {
 	unsigned int Version;
 
 	// Debug messages
-	void (*	Debug_Message )( char *format, ... );
+	void (*	Debug_Message )( const char *format, ... );
 
 	// Action Commands
 	void ( * Action_Reset )( GameObject * obj, float priority );
@@ -324,7 +324,7 @@ typedef struct ScriptCommandsStruct {
 	unsigned int (* Get_Sync_Time)( void );
 
 	// Objectives
-	void	( * Add_Objective_Fn )( int id, int type, int status, int short_description_id, char * description_sound_filename, int long_description_id );
+	void	( * Add_Objective_Fn )( int id, int type, int status, int short_description_id, const char * description_sound_filename, int long_description_id );
 	void	(* Remove_Objective)( int id );
 	void	(* Set_Objective_Status)( int id, int status );
 	void	(* Change_Objective_Type)( int id, int type );
@@ -488,7 +488,7 @@ typedef struct ScriptCommandsStruct {
 	void Set_Innate_Soldier_Home_Location( GameObject * obj, const Vector3& home_pos, float home_radius = 999999 ) const { Set_Innate_Soldier_Home_Location_Fn( obj, home_pos, home_radius ); }
 	void Static_Anim_Phys_Goto_Frame( int obj_id, float frame, const char * anim_name = NULL ) const { Static_Anim_Phys_Goto_Frame_Fn( obj_id, frame, anim_name ); }
 	void Static_Anim_Phys_Goto_Last_Frame( int obj_id, const char * anim_name = NULL ) const { Static_Anim_Phys_Goto_Last_Frame_Fn( obj_id, anim_name ); }
-	void Add_Objective( int id, int type, int status, int short_description_id, char * description_sound_filename = NULL, int long_description_id = 0 ) const { Add_Objective_Fn( id, type, status, short_description_id, description_sound_filename, long_description_id ); }
+	void Add_Objective( int id, int type, int status, int short_description_id, const char * description_sound_filename = NULL, int long_description_id = 0 ) const { Add_Objective_Fn( id, type, status, short_description_id, description_sound_filename, long_description_id ); }
 	void Shake_Camera( const Vector3 & pos, float radius = 25, float intensity = 0.25f, float duration = 1.5f ) const { Shake_Camera_Fn( pos, radius, intensity, duration ); }
 	void Grant_Key( GameObject* object, int key, bool grant = true ) const { Grant_Key_Fn( object, key, grant ); }
 	int Create_Conversation( const char *conversation_name, int priority = 0, float max_dist = 0, bool is_interruptable = true ) const { return Create_Conversation_Fn( conversation_name, priority, max_dist, is_interruptable ); }

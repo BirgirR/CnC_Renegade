@@ -1090,7 +1090,7 @@ DECLARE_SCRIPT(M04_A01_Sniper_JDG, "")
 		{
 			if (action_id == M01_WALKING_WAYPATH_01_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 
 				params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 				params.Set_Animation (animationName, false);
@@ -1109,7 +1109,7 @@ DECLARE_SCRIPT(M04_A01_Sniper_JDG, "")
 
 			else if (action_id == M01_WALKING_WAYPATH_02_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 
 				params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 				params.Set_Animation (animationName, false);
@@ -1128,7 +1128,7 @@ DECLARE_SCRIPT(M04_A01_Sniper_JDG, "")
 
 			else if (action_id == M01_WALKING_WAYPATH_03_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 
 				params.Set_Basic( this, 45, M01_DOING_ANIMATION_03_JDG );
 				params.Set_Animation (animationName, false);
@@ -1147,7 +1147,7 @@ DECLARE_SCRIPT(M04_A01_Sniper_JDG, "")
 
 			else if (action_id == M01_WALKING_WAYPATH_04_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 
 				params.Set_Basic( this, 45, M01_DOING_ANIMATION_04_JDG );
 				params.Set_Animation (animationName, false);
@@ -1166,7 +1166,7 @@ DECLARE_SCRIPT(M04_A01_Sniper_JDG, "")
 
 			else if (action_id == M01_WALKING_WAYPATH_05_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 
 				params.Set_Basic( this, 45, M01_DOING_ANIMATION_05_JDG );
 				params.Set_Animation (animationName, false);
@@ -1789,7 +1789,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_01_JDG, "")
 	
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1809,7 +1809,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_01_JDG, "")
 		
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1829,7 +1829,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_01_JDG, "")
 
 		else if (action_id == 104 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1849,7 +1849,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_01_JDG, "")
 
 		else if (action_id == 106 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1901,7 +1901,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_02_JDG, "")
 	
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1921,7 +1921,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_02_JDG, "")
 		
 		if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 50, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1941,7 +1941,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_02_JDG, "")
 
 		if (action_id == 104 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -1961,7 +1961,7 @@ DECLARE_SCRIPT(M04_MissileRoom_Guard_02_JDG, "")
 
 		if (action_id == 106 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -2123,7 +2123,7 @@ DECLARE_SCRIPT(M04_CargoHold_Blackhand_02_JDG, "")
 	
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -2143,7 +2143,7 @@ DECLARE_SCRIPT(M04_CargoHold_Blackhand_02_JDG, "")
 		
 		if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -2163,7 +2163,7 @@ DECLARE_SCRIPT(M04_CargoHold_Blackhand_02_JDG, "")
 
 		if (action_id == 104 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -2924,7 +2924,7 @@ DECLARE_SCRIPT(M04_EngineRoom_Prison_Guard_01_JDG, "")//M04_ENGINEROOM_PRISONGUA
 				GameObject* guard02 = Commands->Find_Object ( M04_ENGINEROOM_PRISONGUARD_02_JDG );
 				if (obj && guard02 != NULL )
 				{
-					char *conversations[3] = 
+					const char *conversations[3] = 
 					{
 						"M04_PrisonHazing_Conversation_01",
 						"M04_PrisonHazing_Conversation_02",
@@ -3232,7 +3232,7 @@ DECLARE_SCRIPT(M04_EngineRoom_Prisoner_01_JDG, "")//this guys ID number is M04_P
 		else if (param == M01_MODIFY_YOUR_ACTION_JDG)//you've been freed--cheer you ungrateful bastard
 		{
 			freedYet = true;
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			Commands->Action_Reset (  obj, 100 );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation( animationName, false );
@@ -3467,7 +3467,7 @@ DECLARE_SCRIPT(M04_EngineRoom_Prisoner_03_JDG, "")//this guys ID number is M04_P
 		else if (param == M01_MODIFY_YOUR_ACTION_JDG)//you've been freed--cheer you ungrateful bastard
 		{
 			freedYet = true;
-			char *animationName = M01_Choose_Cheer_Animation ( );
+			const char *animationName = M01_Choose_Cheer_Animation ( );
 			Commands->Action_Reset (  obj, 100 );
 			params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation( animationName, false );
@@ -4088,7 +4088,7 @@ DECLARE_SCRIPT(M04_Aft_RightBarracks_PatrolGuy_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4108,7 +4108,7 @@ DECLARE_SCRIPT(M04_Aft_RightBarracks_PatrolGuy_JDG, "")
 		
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4144,7 +4144,7 @@ DECLARE_SCRIPT(M04_Aft_LeftBarracks_TalkGuy_JDG, "")
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
 			ActionParamsStruct params;
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, 100 );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -4179,7 +4179,7 @@ DECLARE_SCRIPT(M04_Aft_LockerRoom_PatrolGuy01_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4199,7 +4199,7 @@ DECLARE_SCRIPT(M04_Aft_LockerRoom_PatrolGuy01_JDG, "")
 		
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4246,7 +4246,7 @@ DECLARE_SCRIPT(M04_Aft_LockerRoom_PatrolGuy02_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4266,7 +4266,7 @@ DECLARE_SCRIPT(M04_Aft_LockerRoom_PatrolGuy02_JDG, "")
 		
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4703,7 +4703,7 @@ DECLARE_SCRIPT(M04_ApacheRoom_Sniper01_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4723,7 +4723,7 @@ DECLARE_SCRIPT(M04_ApacheRoom_Sniper01_JDG, "")
 
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4770,7 +4770,7 @@ DECLARE_SCRIPT(M04_ApacheRoom_Sniper02_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4790,7 +4790,7 @@ DECLARE_SCRIPT(M04_ApacheRoom_Sniper02_JDG, "")
 
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4948,7 +4948,7 @@ DECLARE_SCRIPT(M04_ForeDeck_MapRoom_Guard02_JDG, "")
 
 		if (action_id == 100 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -4968,7 +4968,7 @@ DECLARE_SCRIPT(M04_ForeDeck_MapRoom_Guard02_JDG, "")
 
 		else if (action_id == 102 && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			curr_action_id++;
 			params.Set_Basic( this, 45, curr_action_id );
 			params.Set_Animation (animationName, false);
@@ -5577,7 +5577,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_SamRoom_PatrolGuy_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5595,7 +5595,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_SamRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5613,7 +5613,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_SamRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5631,7 +5631,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_SamRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5668,7 +5668,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_MissileRoom_PatrolGuy_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5686,7 +5686,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_MissileRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5704,7 +5704,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_MissileRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_03_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_03_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5722,7 +5722,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_MissileRoom_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_04_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_04_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5759,7 +5759,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_OfficerQuarters_PatrolGuy_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5777,7 +5777,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_OfficerQuarters_PatrolGuy_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5814,7 +5814,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_FrontDeck_PatrolGuy01_JDG, "")
 
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5832,7 +5832,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_FrontDeck_PatrolGuy01_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5870,7 +5870,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_FrontDeck_PatrolGuy02_JDG, "")
 		if (action_id == M01_WALKING_WAYPATH_01_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
 			
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -5888,7 +5888,7 @@ DECLARE_SCRIPT(M04_PostFirstMate_FrontDeck_PatrolGuy02_JDG, "")
 
 		else if (action_id == M01_WALKING_WAYPATH_02_JDG && complete_reason == ACTION_COMPLETE_NORMAL)
 		{ 
-			char *animationName = M01_Choose_Idle_Animation ( );
+			const char *animationName = M01_Choose_Idle_Animation ( );
 			params.Set_Basic( this, 45, M01_DOING_ANIMATION_02_JDG );
 			params.Set_Animation (animationName, false);
 			Commands->Action_Play_Animation (obj, params);
@@ -6205,7 +6205,7 @@ DECLARE_SCRIPT(M04_EngineRoom_Stationary_Tech_JDG, "Console_ID :int")
 		{
 			if (action_id == M01_DOING_ANIMATION_01_JDG)
 			{
-				char *animationName = M01_Choose_Idle_Animation ( );
+				const char *animationName = M01_Choose_Idle_Animation ( );
 				params.Set_Basic( this, 50, M01_DOING_ANIMATION_02_JDG );
 				params.Set_Animation (animationName, false);
 				Commands->Action_Play_Animation (obj, params);
@@ -6325,7 +6325,7 @@ DECLARE_SCRIPT(M04_Doorway_Enterer_JDG, "first_location:vector3")
 		Vector3 powerupSpawnLocation = Commands->Get_Position (obj );
 		powerupSpawnLocation.Z += 0.75f;
 
-		char *powerups[2] = 
+		const char *powerups[2] = 
 		{//this is a list of potential powerups to be dropped by sniper target guys
 			"POW_Health_100",
 			"POW_Armor_100",
@@ -6354,7 +6354,7 @@ DECLARE_SCRIPT(M04_Doorway_Enterer_JDG, "first_location:vector3")
 					{
 						case M01_WALKING_WAYPATH_01_JDG:
 							{
-								char *animationName = M01_Choose_Search_Animation ( );
+								const char *animationName = M01_Choose_Search_Animation ( );
 
 								params.Set_Basic( this, 45, M01_DOING_ANIMATION_01_JDG );
 								params.Set_Animation( animationName, false );
@@ -7064,7 +7064,7 @@ DECLARE_SCRIPT(M04_TibHold_RealMutant_JDG, "")
 	void Created( GameObject * obj ) 
 	{
 		Commands->Enable_Hibernation(obj, false );
-		char *mutantAnimations[4] = 
+		const char *mutantAnimations[4] = 
 		{
 			"S_A_HUMAN.H_A_A0A0_L02",
 			"S_A_HUMAN.H_A_A0A0_L04",
@@ -7118,11 +7118,11 @@ DECLARE_SCRIPT(M04_TibHold_RealMutant_JDG, "")
 			{
 				if (obj && STAR)
 				{
-					char *soundName = M11_Choose_Mutant_Attack_Sound ( );
+					const char *soundName = M11_Choose_Mutant_Attack_Sound ( );
 					Vector3 myPosition = Commands->Get_Position ( obj );
 					Commands->Create_Sound ( soundName, myPosition, obj );
 
-					char *animationName = M11_Choose_Mutant_Attack_Animation ( );
+					const char *animationName = M11_Choose_Mutant_Attack_Animation ( );
 
 					params.Set_Basic( this, 100, M01_DOING_ANIMATION_01_JDG );
 					params.Set_Animation (animationName, false);

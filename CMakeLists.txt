@@ -310,10 +310,8 @@ target_compile_definitions(renegade_common INTERFACE
 # rc.exe fails on /EHsc long before it gets to anything interesting.
 target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/EHsc>
-    # Standard conformance, except that string literals may still bind to char *:
-    # the code relies on that at about 1,200 sites, which is its own cleanup.
+    # Standard C++ conformance.
     $<$<COMPILE_LANGUAGE:C,CXX>:/permissive->
-    $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:strictStrings->
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->
     # deprecated CRT names are used throughout
     $<$<COMPILE_LANGUAGE:C,CXX>:/wd4996>

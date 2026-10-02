@@ -254,7 +254,8 @@ public:
 			NextParameter = string;
 		}
 
-		if ( NextParameter == NULL || *NextParameter == 0 ) return "";
+		if ( NextParameter == NULL ) { static char _empty[1]; return _empty; }
+		if ( *NextParameter == 0 ) return NextParameter;
 
 		// Start at this parameter;
 		char * parameter = NextParameter;
@@ -897,7 +898,7 @@ public:
 	/*
 	**
 	*/
-	bool	Title_Match( char * * command, char * title ) 
+	bool	Title_Match( char * * command, const char * title ) 
 	{
 		if ( ::strnicmp( *command, title, strlen( title ) ) == 0 ) {
 			*command += strlen( title );
@@ -929,7 +930,7 @@ public:
 	*/
 	bool	Is_Presentation_Only( char *command )
 	{
-		static char * const TRANSIENT[] = { "Play_Audio", "Shake_Camera", "Create_Explosion" };
+		static const char * const TRANSIENT[] = { "Play_Audio", "Shake_Camera", "Create_Explosion" };
 
 		for ( int i = 0; i < (int)( sizeof( TRANSIENT ) / sizeof( TRANSIENT[0] ) ); i++ ) {
 			char *peek = command;

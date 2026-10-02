@@ -6101,7 +6101,7 @@ DECLARE_SCRIPT(M08_Flyover_Controller, "")
 
 	void Timer_Expired(GameObject * obj, int timer_id)
 	{
-		char *flyovers[8] = 
+		const char *flyovers[8] = 
 		{
 			"X8B_Apache_00.txt",
 			"X8B_Apache_01.txt",
@@ -6931,7 +6931,7 @@ DECLARE_SCRIPT (M08_Elevator_Movement_Zone, "Direction:int, Anim_num:int, Elev_o
 {
 	void Entered (GameObject * obj, GameObject * enterer)
 	{
-		char *elevators[1] = 
+		const char *elevators[1] = 
 		{
 			"res_elev06.res_elev06",
 			
