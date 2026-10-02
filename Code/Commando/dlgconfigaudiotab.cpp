@@ -159,7 +159,7 @@ DlgConfigAudioTabClass::On_Init_Dialog (void)
 	Check_Dlg_Button (IDC_SOUND_EFFECTS_CHECK, sound_on);
 	if (snd_vol_slider != NULL) {
 		snd_vol_slider->Set_Range (0, 100);
-		snd_vol_slider->Set_Pos (static_cast<int>(sound_vol * 100), false);
+		snd_vol_slider->Set_Pos (static_cast<int>(sound_vol * 100 + 0.5F), false);
 	}
 
 	//
@@ -168,7 +168,7 @@ DlgConfigAudioTabClass::On_Init_Dialog (void)
 	Check_Dlg_Button (IDC_MUSIC_CHECK, music_on);
 	if (mus_vol_slider != NULL) {
 		mus_vol_slider->Set_Range (0, 100);
-		mus_vol_slider->Set_Pos (static_cast<int>(music_vol * 100), false);
+		mus_vol_slider->Set_Pos (static_cast<int>(music_vol * 100 + 0.5F), false);
 	}
 
 	//
@@ -177,7 +177,7 @@ DlgConfigAudioTabClass::On_Init_Dialog (void)
 	Check_Dlg_Button (IDC_DIALOG_CHECK, dialog_on);
 	if (dia_vol_slider != NULL) {
 		dia_vol_slider->Set_Range (0, 100);
-		dia_vol_slider->Set_Pos (static_cast<int>(dialog_vol * 100), false);
+		dia_vol_slider->Set_Pos (static_cast<int>(dialog_vol * 100 + 0.5F), false);
 	}
 
 	//
@@ -186,7 +186,7 @@ DlgConfigAudioTabClass::On_Init_Dialog (void)
 	Check_Dlg_Button (IDC_CINEMATIC_CHECK, cinematic_on);
 	if (cin_vol_slider != NULL) {
 		cin_vol_slider->Set_Range (0, 100);
-		cin_vol_slider->Set_Pos (static_cast<int>(cinematic_vol * 100), false);
+		cin_vol_slider->Set_Pos (static_cast<int>(cinematic_vol * 100 + 0.5F), false);
 	}	
 
 	//

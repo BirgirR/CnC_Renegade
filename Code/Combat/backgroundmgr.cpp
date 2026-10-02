@@ -1940,7 +1940,7 @@ bool LightningClass::Update (Matrix3D &t, Vector3 &additivecolor, SoundEnvironme
   		Vector3	color;
 
   		phase = (((float) Time) / lightningtime) * (phasecount + 1);
-  		phase = MIN (phase, phasecount);
+  		phase = MIN (phase, phasecount - 1);
 
   		additivecolor = blue * _intensities [phase] * MAX (1.0f - Distance, minglowintensity);
 		LightningGlow->Configure (Direction, additivecolor, coldintensity);
@@ -2109,7 +2109,7 @@ bool WarBlitzClass::Update (Matrix3D &t, Vector3 &additivecolor)
   		unsigned phase;
 
   		phase = (((float) Time) / warblitztime) * (phasecount + 1);
-  		phase = MIN (phase, phasecount);
+  		phase = MIN (phase, phasecount - 1);
   		additivecolor = red * _intensities [phase] * MAX (1.0f - Distance, minglowintensity);
 		WarBlitzGlow->Configure (Direction, additivecolor, coldintensity);
 

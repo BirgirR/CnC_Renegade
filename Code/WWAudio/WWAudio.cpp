@@ -3213,10 +3213,10 @@ WWAudioClass::Save_To_Registry
 		registry.Set_Int (VALUE_NAME_SOUND_ENABLED,		sound_enabled);
 		registry.Set_Int (VALUE_NAME_DIALOG_ENABLED,		dialog_enabled);
 		registry.Set_Int (VALUE_NAME_CINEMATIC_ENABLED,	cinematic_enabled);
-		registry.Set_Int (VALUE_NAME_MUSIC_VOL,			music_volume * 100);
-		registry.Set_Int (VALUE_NAME_SOUND_VOL,			sound_volume * 100);
-		registry.Set_Int (VALUE_NAME_DIALOG_VOL,			dialog_volume * 100);
-		registry.Set_Int (VALUE_NAME_CINEMATIC_VOL,		cinematic_volume * 100);
+		registry.Set_Int (VALUE_NAME_MUSIC_VOL,			int(music_volume * 100 + 0.5F));
+		registry.Set_Int (VALUE_NAME_SOUND_VOL,			int(sound_volume * 100 + 0.5F));
+		registry.Set_Int (VALUE_NAME_DIALOG_VOL,			int(dialog_volume * 100 + 0.5F));
+		registry.Set_Int (VALUE_NAME_CINEMATIC_VOL,		int(cinematic_volume * 100 + 0.5F));
 		registry.Set_Int (VALUE_NAME_SPEAKER_TYPE,		speaker_type);
 
 		retval = true;

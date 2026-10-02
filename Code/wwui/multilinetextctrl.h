@@ -104,7 +104,7 @@ protected:
 	bool							IsScrollBarDisplayed;
 	int							RowCount;
 	int							RowsPerPage;
-	float							MouseWheelIncrement;
+	UINT							WheelScrollLines;
 };
 
 

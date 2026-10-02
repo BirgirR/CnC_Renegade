@@ -220,7 +220,13 @@ void	TimeManager::Update_Frame_Time()
 		FrameTicks = 0;
 	}
 
-	FrameTicks *= TimeScale;
+	// Carry the fraction each scaled frame loses. Truncating it instead slows
+	// game time below TimeScale, and stops it outright once a short frame
+	// scales to under one tick (3 ms at a TimeScale of 0.25).
+	static float scaled_tick_carry = 0;
+	float scaled_ticks = FrameTicks * TimeScale + scaled_tick_carry;
+	FrameTicks = (int)scaled_ticks;
+	scaled_tick_carry = scaled_ticks - FrameTicks;
 	FrameSeconds=(float)FrameTicks / TICKS_PER_SECOND;
 	RealFrameSeconds=(float)RealFrameTicks / TICKS_PER_SECOND;
 

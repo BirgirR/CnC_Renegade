@@ -53,8 +53,6 @@ MultiLineTextCtrlClass::MultiLineTextCtrlClass (void)	:
 	RowCount (0),
 	RowsPerPage (0)
 {
-	UINT scrolllines;
-
 	//
 	//	Configure the renderers
 	//
@@ -70,8 +68,8 @@ MultiLineTextCtrlClass::MultiLineTextCtrlClass (void)	:
 	ScrollBarCtrl.Set_Is_Embedded (true);
 
 	// Calculate the no. of lines to scroll for each mouse wheel increment.
-	SystemParametersInfo (SPI_GETWHEELSCROLLLINES, 0, &scrolllines, 0);
-	MouseWheelIncrement = ((float) scrolllines) / ((float) WHEEL_DELTA);
+	WheelScrollLines = 3;
+	SystemParametersInfo (SPI_GETWHEELSCROLLLINES, 0, &WheelScrollLines, 0);
 
 	return ;
 }
@@ -442,7 +440,10 @@ MultiLineTextCtrlClass::On_VScroll (ScrollBarCtrlClass *, int , int new_position
 void
 MultiLineTextCtrlClass::On_Mouse_Wheel (int direction)
 {
-	int lineoffset = direction * MouseWheelIncrement;
+	//	"One screen at a time" in the Windows mouse settings reports
+	//	WHEEL_PAGESCROLL, which scaled as a line count overflows an int.
+	int lines_per_notch = (WheelScrollLines == WHEEL_PAGESCROLL) ? RowsPerPage : (int)WheelScrollLines;
+	int lineoffset = direction * lines_per_notch / WHEEL_DELTA;
 
 	Set_Scroll_Pos (ScrollPos + lineoffset);
 	return ;

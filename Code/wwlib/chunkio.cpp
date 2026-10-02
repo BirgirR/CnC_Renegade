@@ -278,7 +278,7 @@ uint32 ChunkSaveClass::Write(const void * buf, uint32 nbytes)
 	
 	// track them if you are using a micro-chunk too.
 	if (InMicroChunk) {
-		assert(MCHeader.Get_Size() < 255 - nbytes);	// micro chunks can only be 255 bytes
+		assert(MCHeader.Get_Size() + nbytes <= 255);	// micro chunks can only be 255 bytes
 		MCHeader.Add_Size(nbytes);
 	}
 

@@ -591,9 +591,10 @@ public:
 		LoadPercentage = WWMath::Clamp( LoadPercentage, 0, LoadPercentageClamp );
 		LoadPercentageDrawn += ( LoadPercentage - LoadPercentageDrawn ) * 0.1f;
 		backdrop.Set_Animation_Percentage( LoadPercentageDrawn );
-		if (ConsoleBox.Is_Exclusive() && _last_percent_drawn != LoadPercentageDrawn) {
-			_last_percent_drawn = LoadPercentageDrawn;
-			ConsoleBox.Print("Load %d%% complete\r", (int)(LoadPercentageDrawn * 100.0f));
+		int percent_drawn = (int)(LoadPercentageDrawn * 100.0f);
+		if (ConsoleBox.Is_Exclusive() && _last_percent_drawn != percent_drawn) {
+			_last_percent_drawn = percent_drawn;
+			ConsoleBox.Print("Load %d%% complete\r", percent_drawn);
 		}
 
 #if 0

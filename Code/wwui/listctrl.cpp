@@ -2225,7 +2225,7 @@ ListCtrlClass::Entry_From_Pos (const Vector2 &mouse_pos)
 	//
 	//	Test each row
 	//
-	int y_pos		= TextRect.Top;
+	float y_pos		= TextRect.Top;
 	int row_count	= Get_Entry_Count ();
 	for (int row_index = ScrollPos; row_index < row_count; row_index ++) {
 

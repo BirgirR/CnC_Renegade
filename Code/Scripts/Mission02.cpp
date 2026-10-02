@@ -3679,7 +3679,7 @@ DECLARE_SCRIPT (M02_Nod_Soldier, "Area_Number:int,Area_Officer:int,Pre_Placed:in
 				// Time to move the chem-warrior. Pick a new location.
 				
 				Vector3 newloc;
-				int rndnum = (Get_Int_Random(0.0f,1.0f) * 5);
+				int rndnum = Get_Int_Random(0, 4);
 				switch (rndnum)
 				{
 				case (0):

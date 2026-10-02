@@ -345,7 +345,6 @@ DECLARE_SCRIPT(M00_Global_Objective_Controller_RMV, "Set_Type:int, Set_Status:in
 {
 	int set_type, set_status, remove;
 	int i_obj, i_new;
-	float f_obj;
 
 	void Created(GameObject * obj)
 	{
@@ -358,27 +357,25 @@ DECLARE_SCRIPT(M00_Global_Objective_Controller_RMV, "Set_Type:int, Set_Status:in
 	{
 		if (type == set_type)
 		{
-			f_obj = (float)param;
-			f_obj /= 10.0;
-			i_obj = int(f_obj);
-			i_new = (f_obj - i_obj) * 10;
+			// param is objective_id * 10 + the new type.
+			i_obj = param / 10;
+			i_new = param % 10;
 			switch (i_new) {
-			case 1: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_PRIMARY);
-			case 2: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_SECONDARY);
-			case 3: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_TERTIARY);
+			case 1: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_PRIMARY);		break;
+			case 2: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_SECONDARY);	break;
+			case 3: Commands->Change_Objective_Type(i_obj, OBJECTIVE_TYPE_TERTIARY);		break;
 			}
 		}
 		else if (type == set_status)
 		{
-			f_obj = (float)param;
-			f_obj /= 10.0;
-			i_obj = int(f_obj);
-			i_new = (f_obj - i_obj) * 10;
+			// param is objective_id * 10 + the new status.
+			i_obj = param / 10;
+			i_new = param % 10;
 			switch (i_new) {
-			case 1: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_PENDING);
-			case 2: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_ACCOMPLISHED);
-			case 3: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_FAILED);
-			case 4: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_HIDDEN);
+			case 1: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_PENDING);		break;
+			case 2: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_ACCOMPLISHED);	break;
+			case 3: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_FAILED);			break;
+			case 4: Commands->Set_Objective_Status(i_obj, OBJECTIVE_STATUS_HIDDEN);			break;
 			}
 		}
 		else if (type == remove)
