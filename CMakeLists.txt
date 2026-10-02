@@ -72,7 +72,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 option(RENEGADE_EXCLUDE_UNPORTED
     "Skip the translation units that do not yet compile under modern MSVC" ON)
 option(RENEGADE_ENGINE_WARNINGS
-    "Compile the engine libraries with diagnostics on (they build at /W0)" OFF)
+    "Compile the engine libraries at /W4 instead of the default /W3" OFF)
+# CI turns this on so a new /W3 warning fails the build. It stays off by
+# default because each new MSVC release adds warnings, and a toolchain update
+# should not stop anyone from building the game.
+option(RENEGADE_WARNINGS_AS_ERRORS
+    "Treat compiler warnings as errors (/WX)" OFF)
 # WWMath::Inv_Sqrt is a __declspec(naked) x87 routine that writes to [esp-8]
 # and [esp-12] -- below the stack pointer, which Win32 has no red zone for.
 # Turning this on substitutes plain C, to isolate it when debugging.
@@ -315,11 +320,19 @@ target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->
     # deprecated CRT names are used throughout
     $<$<COMPILE_LANGUAGE:C,CXX>:/wd4996>
+    # The x86 inline assembly borrows ebp (and, once inlined into a function
+    # that aligns its stack, ebx) as a scratch register: push, use, pop. In the
+    # blocks checked, locals are read before the clobber and written after the
+    # restore, which is safe but beyond what C4731 can see; it fires at 59
+    # sites. Not every block has been audited. The assembly goes away with the
+    # x64 port.
+    $<$<COMPILE_LANGUAGE:C,CXX>:/wd4731>
     # The Profile configuration these settings reproduce always built with
     # /Zi. Except.cpp's crash handler resolves symbols through IMAGEHLP, so
     # without a PDB every report is a bare address that moves with ASLR.
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zi>
-    $<$<COMPILE_LANGUAGE:C,CXX>:/W0>)
+    $<$<COMPILE_LANGUAGE:C,CXX>:/W3>
+    $<$<AND:$<BOOL:${RENEGADE_WARNINGS_AS_ERRORS}>,$<COMPILE_LANGUAGE:C,CXX>>:/WX>)
 
 # /Zi is only half of it: the linker has to emit the PDB too. Debug info goes
 # into a separate file, so the shipped binaries are unchanged in behaviour.
@@ -357,7 +370,7 @@ function(renegade_library NAME)
 
     add_library(${NAME} STATIC ${sources})
     if(RENEGADE_ENGINE_WARNINGS)
-        # renegade_common contributes /W0 via its INTERFACE, which lands after
+        # renegade_common contributes /W3 via its INTERFACE, which lands after
         # target options; source-level options come last and so take effect.
         set_source_files_properties(${sources} PROPERTIES COMPILE_OPTIONS "/W4")
     endif()
@@ -479,11 +492,11 @@ if(RENEGADE_BUILD_SCRIPTS)
     target_link_libraries(renegade_scripts PRIVATE renegade_common)
     target_include_directories(renegade_scripts PRIVATE "${CODE}/Scripts")
 
-    # The tree builds at /W0. Turn real diagnostics on for the mission scripts,
-    # which have never been compiled by anything but VC6.
-    option(RENEGADE_SCRIPT_WARNINGS "Compile the mission scripts with diagnostics on" OFF)
+    # The tree builds at /W3. Raise the mission scripts to /W4, since they
+    # were never compiled by anything but VC6.
+    option(RENEGADE_SCRIPT_WARNINGS "Compile the mission scripts at /W4 instead of the default /W3" OFF)
     if(RENEGADE_SCRIPT_WARNINGS)
-        # renegade_common contributes /W0 through its INTERFACE, which lands
+        # renegade_common contributes /W3 through its INTERFACE, which lands
         # after target options and wins. Source-level options come last, so set
         # them there.
         set_source_files_properties(${SCRIPTS_SOURCES}

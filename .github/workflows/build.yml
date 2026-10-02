@@ -20,8 +20,11 @@ jobs:
       #
       # -A Win32 is not a preference: 35 files contain x86 inline assembly and
       # the build refuses to configure for 64-bit pointers.
+      #
+      # Warnings are errors here, and only here: the tree builds clean at /W3,
+      # and this keeps it that way.
       - name: Configure
-        run: cmake -B build -A Win32 .
+        run: cmake -B build -A Win32 -DRENEGADE_WARNINGS_AS_ERRORS=ON .
 
       # commando and the mission scripts are EXCLUDE_FROM_ALL, so a bare build
       # would compile the engine libraries and stop short of the game itself.

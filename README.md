@@ -95,8 +95,9 @@ opened.
 | `RENEGADE_BUILD_SCRIPTS` | `ON` | Build the mission-script DLL. |
 | `RENEGADE_BUILD_TESTS` | `ON` | Build the `wwmath`/`wwlib` unit tests. |
 | `RENEGADE_EXCLUDE_UNPORTED` | `ON` | Skip the translation units listed in `cmake/Unported.cmake`, which is now empty. |
-| `RENEGADE_ENGINE_WARNINGS` | `OFF` | Compile the engine at `/W4`. The tree builds at `/W0`. |
+| `RENEGADE_ENGINE_WARNINGS` | `OFF` | Compile the engine at `/W4`. The tree builds at `/W3`. |
 | `RENEGADE_SCRIPT_WARNINGS` | `OFF` | Compile the mission scripts at `/W4`. |
+| `RENEGADE_WARNINGS_AS_ERRORS` | `OFF` | Build with `/WX`. CI turns it on. |
 | `RENEGADE_PORTABLE_INV_SQRT` | `OFF` | Substitute plain C for `WWMath::Inv_Sqrt`, a `__declspec(naked)` x87 routine, when debugging. |
 
 ### Tests
@@ -217,10 +218,10 @@ no `.clang-format` here on purpose, and a reformatting pass buries real changes.
 reproduce VC6 semantics the code depends on, and each says so in place. Anything
 new that exists to work around the age of this code deserves the same treatment.
 
-**Check your changes with warnings on.** The tree builds at `/W0`, which hides a
-great deal. Configure with `-DRENEGADE_ENGINE_WARNINGS=ON` (or
-`-DRENEGADE_SCRIPT_WARNINGS=ON`) while you work, even though the default stays
-off.
+**Keep the build warning-free.** The tree builds clean at `/W3`, and CI builds
+with `/WX`, so a new warning fails the pull request. Fix the warning rather than
+suppressing it. For a closer look while you work, configure with
+`-DRENEGADE_ENGINE_WARNINGS=ON` (or `-DRENEGADE_SCRIPT_WARNINGS=ON`) to get `/W4`.
 
 **Test what can be tested.** Changes to `wwmath` or `wwlib` should come with
 cases in `Code/Tests/unit` — `WWTEST(Suite, Name)` plus `CHECK`, `CHECK_EQ`,
