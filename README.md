@@ -175,8 +175,8 @@ the CMake a build already requires.
 
 MSBuild cannot read `.dsp`/`.dsw` at all, so `CMakeLists.txt` replaces the
 workspace instead of converting it. The compiler settings it applies —
-`/Zc:forScope-`, `/Zc:wchar_t-`, `_USE_32BIT_TIME_T`, `/permissive` — exist to
-reproduce VC6 semantics the code depends on; each is commented in place.
+`/Zc:wchar_t-` and `/permissive` — exist to reproduce VC6 semantics the code
+depends on; each is commented in place.
 
 The original VC6 route still works for what CMake does not cover:
 
@@ -214,9 +214,9 @@ surrounds your change and keep diffs to the lines you actually touched — there
 no `.clang-format` here on purpose, and a reformatting pass buries real changes.
 
 **Comment the whys, not the whats.** The compiler flags in `CMakeLists.txt`
-(`/Zc:forScope-`, `/Zc:wchar_t-`, `_USE_32BIT_TIME_T`, `/permissive`) all
-reproduce VC6 semantics the code depends on, and each says so in place. Anything
-new that exists to work around the age of this code deserves the same treatment.
+(`/Zc:wchar_t-`, `/permissive`) both reproduce VC6 semantics the code depends
+on, and each says so in place. Anything new that exists to work around
+the age of this code deserves the same treatment.
 
 **Keep the build warning-free.** The tree builds clean at `/W3`, and CI builds
 with `/WX`, so a new warning fails the pull request. Fix the warning rather than

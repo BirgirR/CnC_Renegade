@@ -303,9 +303,6 @@ target_compile_definitions(renegade_common INTERFACE
     # happened to agree on 0x0800, which is the version the code actually
     # uses (DirectInput8Create, IID_IDirectInput8). Stated once here instead.
     DIRECTINPUT_VERSION=0x0800
-    # VC6's time_t was a 32-bit long and the code stores it in longs. Modern
-    # MSVC defaults to a 64-bit time_t, which breaks every ctime/time call site.
-    _USE_32BIT_TIME_T
     $<$<CONFIG:Release>:NDEBUG>)
 
 # NB: every one of these is fenced to C/C++. renegade_common is an INTERFACE

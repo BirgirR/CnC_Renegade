@@ -48,7 +48,7 @@ protected:
 	static const int prodid;
 	static const int cdkey_id;
 	static const char *default_heartbeat_list;
-	int StartTime;
+	time_t StartTime;
 
 public:
 	void Init(void);
