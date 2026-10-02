@@ -174,8 +174,9 @@ committed, so an ordinary build never runs it, and it needs no interpreter beyon
 the CMake a build already requires.
 
 MSBuild cannot read `.dsp`/`.dsw` at all, so `CMakeLists.txt` replaces the
-workspace instead of converting it. The compiler setting it applies —
-`/permissive` — exists to reproduce VC6 semantics the code depends on, and is
+workspace instead of converting it. It builds in standards-conformance mode
+(`/permissive-`) with one VC6 allowance left, `/Zc:strictStrings-`, because
+the code still binds string literals to `char *` in about 1,200 places. It is
 commented in place.
 
 The original VC6 route still works for what CMake does not cover:
@@ -213,10 +214,9 @@ tabs, `Upper_Snake_Case` functions, `/* ** */` comment banners. Match whatever
 surrounds your change and keep diffs to the lines you actually touched — there is
 no `.clang-format` here on purpose, and a reformatting pass buries real changes.
 
-**Comment the whys, not the whats.** The compiler flags in `CMakeLists.txt`
-(`/permissive`) reproduces VC6 semantics the code depends on, and says so in
-place. Anything new that exists to work around
-the age of this code deserves the same treatment.
+**Comment the whys, not the whats.** The one VC6 allowance left in
+`CMakeLists.txt` (`/Zc:strictStrings-`) says in place why it is there. Anything
+new that exists to work around the age of this code deserves the same treatment.
 
 **Keep the build warning-free.** The tree builds clean at `/W3`, and CI builds
 with `/WX`, so a new warning fails the pull request. Fix the warning rather than

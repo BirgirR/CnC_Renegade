@@ -166,6 +166,12 @@ public:
 	//	Public methods
 	/////////////////////////////////////////////////////////
 	virtual T Evaluate (float time);
+
+protected:
+
+	typedef typename PrimitiveAnimationChannelClass<T>::KeyClass KeyClass;
+	using PrimitiveAnimationChannelClass<T>::m_Data;
+	using PrimitiveAnimationChannelClass<T>::m_LastIndex;
 };
 
 

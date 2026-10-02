@@ -197,7 +197,7 @@ if(RENEGADE_BINK_DECODER)
     add_library(binkdec STATIC ${BINKDEC_SOURCES})
     target_include_directories(binkdec PUBLIC "${CODE}/ThirdParty/libbinkdec/include")
     # Third-party code, built at its own warning level rather than ours, and
-    # never with /permissive or the VC6 compatibility switches.
+    # never with the VC6 compatibility switch.
     target_compile_options(binkdec PRIVATE /W0 /EHsc)
     set_target_properties(binkdec PROPERTIES FOLDER "ThirdParty")
 endif()
@@ -310,8 +310,10 @@ target_compile_definitions(renegade_common INTERFACE
 # rc.exe fails on /EHsc long before it gets to anything interesting.
 target_compile_options(renegade_common INTERFACE
     $<$<COMPILE_LANGUAGE:C,CXX>:/EHsc>
-    # this code predates two-phase lookup conformance
-    $<$<COMPILE_LANGUAGE:C,CXX>:/permissive>
+    # Standard conformance, except that string literals may still bind to char *:
+    # the code relies on that at about 1,200 sites, which is its own cleanup.
+    $<$<COMPILE_LANGUAGE:C,CXX>:/permissive->
+    $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:strictStrings->
     $<$<COMPILE_LANGUAGE:C,CXX>:/Zc:__cplusplus->
     # deprecated CRT names are used throughout
     $<$<COMPILE_LANGUAGE:C,CXX>:/wd4996>

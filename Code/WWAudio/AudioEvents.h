@@ -181,6 +181,14 @@ public:
 	void			Add_Callback (T pointer, uint32 user_data);
 	T				Get_Callback (int index, uint32 *user_data);
 	void			Remove_Callback (T pointer);
+
+	using SimpleDynVecClass< AUDIO_CALLBACK_STRUCT<T> >::Add;
+	using SimpleDynVecClass< AUDIO_CALLBACK_STRUCT<T> >::Delete;
+
+protected:
+
+	using SimpleDynVecClass< AUDIO_CALLBACK_STRUCT<T> >::Vector;
+	using SimpleDynVecClass< AUDIO_CALLBACK_STRUCT<T> >::ActiveCount;
 };
 
 

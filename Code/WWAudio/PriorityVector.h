@@ -57,6 +57,10 @@ class PriorityVectorClass : public DynamicVectorClass<T>
 			DynamicVectorClass<T>::operator= (rvalue);
 			return(*t8his);
 		}*/
+
+	protected:
+		using DynamicVectorClass<T>::Vector;
+		using DynamicVectorClass<T>::ActiveCount;
 };
 
 
