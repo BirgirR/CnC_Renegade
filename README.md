@@ -204,22 +204,20 @@ precondition for a 64-bit build, which is welcome but not a goal, for the
 reason under Requirements. Every live block with an exact replacement has
 been replaced: the breakpoints, `rdtsc`, `cpuid`, the packet CRC byte swap,
 the texture loader's spin lock, `WWMath::Float_To_Long` and `Sqrt`, and
-`DX8Wrapper`'s colour conversion and clamp.
+`DX8Wrapper`'s colour conversion and clamp. The LCW compressor is C now, and
+the blitters use their C++ templates; the hand-written ones were never called
+by the game, and two of them drew one pixel short.
 `Code/Tests/unit/test_asm_replacements.cpp` runs each original beside its
 replacement and requires the same bits. What is left, in order:
 
-1. **Compiled but never called.** The LCW compressor (`wwlib/lcw.cpp`) and the
-   `unsigned short` specialisations in `blitblit.h` and `rlerle.h`. Two of
-   the blitter specialisations draw one pixel short of the generic templates
-   they would fall back to.
-2. **Never compiled.** `#if 0` blocks, Intel-compiler-only paths in
+1. **Never compiled.** `#if 0` blocks, Intel-compiler-only paths in
    `WWMath/vp.cpp`, a disabled spin lock mode in `wwdebug/wwmemlog.cpp`, the
    all-`#if 0` `wwphys/bpt.cpp`, and three tool programs outside the build.
-3. **The crash handler.** `Except.cpp` converts the x87 registers from 80-bit
+2. **The crash handler.** `Except.cpp` converts the x87 registers from 80-bit
    for its dump, which has no intrinsic, and seeds `Stack_Walk` from EIP, ESP
    and EBP, which `RtlCaptureContext` can do if the function keeps its frame
    pointer.
-4. **`WWMath::Sin`, `Cos` and `Inv_Sqrt`.** Not reproducible bit for bit:
+3. **`WWMath::Sin`, `Cos` and `Inv_Sqrt`.** Not reproducible bit for bit:
    `fsin`/`fcos` reduce their argument with a 66-bit pi, and the naked
    `Inv_Sqrt` rounds each Newton step at whatever precision the x87 is set to,
    which Direct3D changes. Replacing them means choosing to change the last
