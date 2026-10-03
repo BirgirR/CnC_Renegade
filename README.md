@@ -199,11 +199,33 @@ were audited site by site. Outside the vendored libbinkdec, which builds at
 `/W0`, `CMakeLists.txt` suppresses only C4996, for the CRT names the code uses
 throughout.
 
-What remains is the inline assembly. 27 files in the game and engine carry x86
-`__asm`, mostly maths and colour conversion. It works, and the one block that
-borrowed a frame register no longer does, so nothing forces it out. Replacing
-it with C or SSE intrinsics is the precondition for a 64-bit build, which is
-welcome but not a goal, for the reason under Requirements.
+What remains is the inline assembly. Replacing it with C or intrinsics is the
+precondition for a 64-bit build, which is welcome but not a goal, for the
+reason under Requirements. Every live block with an exact replacement has
+been replaced: the breakpoints, `rdtsc`, `cpuid`, the packet CRC byte swap,
+the texture loader's spin lock, `WWMath::Float_To_Long` and `Sqrt`, and
+`DX8Wrapper`'s colour conversion and clamp.
+`Code/Tests/unit/test_asm_replacements.cpp` runs each original beside its
+replacement and requires the same bits. What is left, in order:
+
+1. **Compiled but never called.** The LCW compressor (`wwlib/lcw.cpp`) and the
+   `unsigned short` specialisations in `blitblit.h` and `rlerle.h`. Two of
+   the blitter specialisations draw one pixel short of the generic templates
+   they would fall back to.
+2. **Never compiled.** `#if 0` blocks, Intel-compiler-only paths in
+   `WWMath/vp.cpp`, a disabled spin lock mode in `wwdebug/wwmemlog.cpp`, the
+   all-`#if 0` `wwphys/bpt.cpp`, and three tool programs outside the build.
+3. **The crash handler.** `Except.cpp` converts the x87 registers from 80-bit
+   for its dump, which has no intrinsic, and seeds `Stack_Walk` from EIP, ESP
+   and EBP, which `RtlCaptureContext` can do if the function keeps its frame
+   pointer.
+4. **`WWMath::Sin`, `Cos` and `Inv_Sqrt`.** Not reproducible bit for bit:
+   `fsin`/`fcos` reduce their argument with a 66-bit pi, and the naked
+   `Inv_Sqrt` rounds each Newton step at whatever precision the x87 is set to,
+   which Direct3D changes. Replacing them means choosing to change the last
+   bits of every normalised vector and rotation. `Scripts/wwmath.h`, a copy of
+   `WWMath/wwmath.h` for the mission DLL, also lacks the
+   `RENEGADE_PORTABLE_INV_SQRT` switch.
 
 
 ## Known issues

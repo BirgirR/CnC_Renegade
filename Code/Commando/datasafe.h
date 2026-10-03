@@ -1381,14 +1381,13 @@ unsigned long DataSafeClass<T>::Get_Type_Code(void)
 	** Since we aren't using RTTI I need some other way of distinguishing types in the safe. Because it's templatised, this
 	** code will get expanded once for each type it's used with. I will use the location in memory of the function to
 	** uniquely identify each type. What a cunning plan.
+	**
+	** That was a code address taken with inline assembly. The address of this static serves the same way: there is
+	** one per instantiation, and being writable it cannot be folded with another. The value only ever identifies a
+	** type within this process; what is saved or sent is the registration order.
 	*/
 	static unsigned long instruction_pointer;
-	instruction_pointer = 0;
-	__asm {
-here:
-		lea	eax,here
-		mov	[instruction_pointer],eax
-	};
+	instruction_pointer = (unsigned long)&instruction_pointer;
 
 	ds_assert(instruction_pointer != 0);
 

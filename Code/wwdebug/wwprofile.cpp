@@ -54,6 +54,7 @@
 #include "fastallocator.h"
 #include "wwdebug.h"
 #include <windows.h>
+#include <intrin.h>
 //#include "systimer.h"
 #include "systimer.h"
 #include "rawfile.h"
@@ -87,20 +88,9 @@ inline void WWProfile_Get_Ticks(_int64 * ticks)
 #ifdef _UNIX
        *ticks = TIMEGETTIME();
 #else
-	__asm
-	{
-		push edx;
-		push ecx;
-		push eax;
-		mov ecx,ticks;
-		_emit 0Fh
-		_emit 31h
-		mov [ecx],eax;
-		mov [ecx+4],edx;
-		pop eax;
-		pop ecx;
-		pop edx;
-	}
+	// Not QueryPerformanceCounter: every profile time is scaled by
+	// CPUDetectClass::Get_Inv_Processor_Ticks_Per_Second, calibrated in rdtsc ticks.
+	*ticks = (_int64)__rdtsc();
 #endif
 }
 

@@ -23,6 +23,7 @@
 #include "mpu.h"
 #pragma warning (disable : 4201)	// Nonstandard extension - nameless struct
 #include <windows.h>
+#include <intrin.h>
 #include "systimer.h"
 
 struct OSInfoStruct {
@@ -142,34 +143,18 @@ const char* CPUDetectClass::Get_Processor_Manufacturer_Name()
 	return ManufacturerNames[ProcessorManufacturer];
 }
 
-#define ASM_RDTSC _asm _emit 0x0f _asm _emit 0x31
-
 static unsigned Calculate_Processor_Speed(__int64& ticks_per_second)
 {
-	struct {
-		unsigned timer0_h;
-		unsigned timer0_l;
-		unsigned timer1_h;
-		unsigned timer1_l;
-	} Time;
-
-	__asm {
-		ASM_RDTSC;
-		mov Time.timer0_h,eax
-		mov Time.timer0_l,edx
-	}
+	__int64 timer0=(__int64)__rdtsc();
+	__int64 timer1=timer0;
 
 	unsigned start=TIMEGETTIME();
 	unsigned elapsed;
 	while ((elapsed=TIMEGETTIME()-start)<200) {
-		__asm {
-			ASM_RDTSC;
-			mov Time.timer1_h,eax
-			mov Time.timer1_l,edx
-		}
+		timer1=(__int64)__rdtsc();
 	}
 
-	__int64 t=*(__int64*)&Time.timer1_h-*(__int64*)&Time.timer0_h;
+	__int64 t=timer1-timer0;
 	ticks_per_second=(1000/200)*t;	// Ticks per second
 	return unsigned(t/(elapsed*1000));
 }
@@ -827,33 +812,13 @@ void CPUDetectClass::Init_Processor_String()
 
 void CPUDetectClass::Init_CPUID_Instruction()
 {
-	unsigned long cpuid_available=0;
-
-   // The pushfd/popfd commands are done using emits
-   // because CodeWarrior seems to have problems with
-   // the command (huh?)
-
-   __asm
-   {
-		mov cpuid_available,0	// clear flag
-		push ebx
-		pushfd
-		pop eax
-		mov ebx,eax
-		xor eax,0x00200000
-		push eax
-		popfd
-		pushfd
-		pop eax
-		xor eax,ebx
-		je done
-		mov cpuid_available,1
-done:
-		push ebx
-		popfd
-		pop ebx
-	}
-	HasCPUIDInstruction=!!cpuid_available;
+	// CPUID exists if the ID bit of EFLAGS can be toggled. Only that bit is
+	// compared: the compiler may touch the arithmetic flags between the reads.
+	unsigned int original=(unsigned int)__readeflags();
+	__writeeflags(original^0x00200000);
+	unsigned int toggled=(unsigned int)__readeflags();
+	__writeeflags(original);
+	HasCPUIDInstruction=((original^toggled)&0x00200000)!=0;
 }
 
 void CPUDetectClass::Init_Processor_Features()
@@ -917,30 +882,14 @@ bool CPUDetectClass::CPUID(
 {
 	if (!Has_CPUID_Instruction()) return false;	// Most processors since 486 have CPUID...
 
-	unsigned u_eax;
-	unsigned u_ebx;
-	unsigned u_ecx;
-	unsigned u_edx;
+	// The assembly this replaces cleared ECX before CPUID, so ask for subleaf 0.
+	int regs[4];
+	__cpuidex(regs,(int)cpuid_type,0);
 
-	__asm
-	{
-		pushad
-		mov		eax,[cpuid_type]
-		xor		ebx,ebx
-		xor		ecx,ecx
-		xor		edx,edx
-		cpuid
-		mov		[u_eax],eax
-		mov		[u_ebx],ebx
-		mov		[u_ecx],ecx
-		mov		[u_edx],edx
-		popad
-	}
-
-	u_eax_=u_eax;
-	u_ebx_=u_ebx;
-	u_ecx_=u_ecx;
-	u_edx_=u_edx;
+	u_eax_=(unsigned)regs[0];
+	u_ebx_=(unsigned)regs[1];
+	u_ecx_=(unsigned)regs[2];
+	u_edx_=(unsigned)regs[3];
 
 	return true;
 }

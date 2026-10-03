@@ -45,6 +45,7 @@
 #include "always.h"
 #include <math.h>
 #include <float.h>
+#include <emmintrin.h>
 #include <assert.h>
 #include <float.h>
 
@@ -298,17 +299,13 @@ WWINLINE bool WWMath::Is_Valid_Double(double x)
 // Float to long
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(_MSC_VER)
+// cvtss2si rounds by MXCSR, round-to-nearest-even, as fistp did by the x87
+// control word; both give 0x80000000 for out-of-range and NaN. Not the (long)
+// cast below, which truncates.
 WWINLINE long WWMath::Float_To_Long(float f)
 {
-	long i;
-
-	__asm {
-		fld [f]
-		fistp [i]
-	}
-
-	return i;
+	return _mm_cvtss_si32(_mm_set_ss(f));
 }
 #else 
 WWINLINE long WWMath::Float_To_Long(float f)
@@ -319,11 +316,8 @@ WWINLINE long WWMath::Float_To_Long(float f)
 
 WWINLINE long WWMath::Float_To_Long(double f)	
 {
-#if defined(_MSC_VER) && defined(_M_IX86)
-	long retval;
-	__asm fld	qword ptr [f]
-	__asm fistp dword ptr [retval]
-	return retval;
+#if defined(_MSC_VER)
+	return _mm_cvtsd_si32(_mm_set_sd(f));
 #else 
 	return (long) f;
 #endif
@@ -545,16 +539,13 @@ WWINLINE float WWMath::Asin(float val)
 // Sqrt
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(_MSC_VER)
+// sqrtss is correctly rounded, as fsqrt is at the 24-bit precision Direct3D
+// leaves the x87 in; at 53-bit fsqrt rounds twice, which for a square root
+// never changes the float result.
 WWINLINE float WWMath::Sqrt(float val)
 {
-	float retval;
-	__asm {
-		fld [val]
-		fsqrt
-		fstp [retval]
-	}
-	return retval;
+	return _mm_cvtss_f32(_mm_sqrt_ss(_mm_set_ss(val)));
 }
 #else
 WWINLINE float WWMath::Sqrt(float val)

@@ -25,6 +25,7 @@
 
 #include "always.h"
 #include "thread.h"
+#include <intrin.h>
 
 
 // Always use mutex or critical section when accessing the same data from multiple threads!
@@ -121,23 +122,13 @@ class FastCriticalSectionClass
 
 	void Thread_Safe_Set_Flag()
 	{
-		volatile unsigned& nFlag=Flag;
+		assert(((unsigned)&Flag % 4) == 0);
 
-		#define ts_lock _emit 0xF0
-		assert(((unsigned)&nFlag % 4) == 0);
-
-		__asm mov ebx, [nFlag]
-		__asm ts_lock
-		__asm bts dword ptr [ebx], 0
-		__asm jc The_Bit_Was_Previously_Set_So_Try_Again
-		return;
-
-		The_Bit_Was_Previously_Set_So_Try_Again:
-		ThreadClass::Switch_Thread();
-		__asm mov ebx, [nFlag]
-		__asm ts_lock
-		__asm bts dword ptr [ebx], 0
-		__asm jc  The_Bit_Was_Previously_Set_So_Try_Again
+		//	lock bts, as the assembly this replaces was, and a compiler barrier
+		//	too; spin with a yield while the bit was already set.
+		while (_interlockedbittestandset((volatile long *)&Flag, 0)) {
+			ThreadClass::Switch_Thread();
+		}
 	}
 
 	WWINLINE void Thread_Safe_Clear_Flag()

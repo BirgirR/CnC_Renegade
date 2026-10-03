@@ -521,12 +521,15 @@ if(RENEGADE_BUILD_TESTS)
     add_executable(wwtest
         "${CODE}/Tests/unit/wwtest.cpp"
         "${CODE}/Tests/unit/test_wwmath.cpp"
-        "${CODE}/Tests/unit/test_wwlib.cpp")
+        "${CODE}/Tests/unit/test_wwlib.cpp"
+        "${CODE}/Tests/unit/test_asm_replacements.cpp")
 
     # wwmath's spline/curve classes derive from PersistClass, so the save/load
     # system comes along; winmm supplies timeGetTime for wwlib's timers.
+    # directx8 is for the headers alone: test_asm_replacements checks
+    # DX8Wrapper's inline colour conversion, which needs no device.
     target_link_libraries(wwtest PRIVATE
-        renegade_common wwmath wwlib wwdebug wwsaveload winmm)
+        renegade_common wwmath wwlib wwdebug wwsaveload winmm directx8)
     target_include_directories(wwtest PRIVATE "${CODE}/Tests/unit")
     set_target_properties(wwtest PROPERTIES FOLDER "Tests")
 
